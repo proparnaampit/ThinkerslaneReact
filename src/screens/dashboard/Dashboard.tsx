@@ -5,7 +5,7 @@ import {logout} from '../../redux/authSlice';
 import Toast from 'react-native-toast-message';
 import dashboardstyles from './dashboardstyles';
 
-const DashboardScreen = () => {
+const DashboardScreen = ({navigation}: any) => {
   const dispatch = useDispatch();
 
   const handleLogout = () => {
