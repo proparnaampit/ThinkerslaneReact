@@ -5,6 +5,7 @@ import store, {persistor} from './src/redux/store';
 import Toast from 'react-native-toast-message';
 import {ActivityIndicator, View} from 'react-native';
 import {PersistGate} from 'redux-persist/integration/react';
+import {loadAuthState} from './src/redux/authSlice';
 
 export default function App() {
   return (

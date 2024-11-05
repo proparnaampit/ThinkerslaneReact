@@ -13,6 +13,10 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.user = null;
     },
+    setAuthState: (state, action) => {
+      state.isLoggedIn = action.payload.isLoggedIn;
+      state.user = action.payload.user;
+    },
   },
 });
 
@@ -20,12 +24,18 @@ export const loadAuthState = () => async dispatch => {
   const userData = await AsyncStorage.getItem('user');
   if (userData) {
     const user = JSON.parse(userData);
-    dispatch(login(user));
+    dispatch(authSlice.actions.setAuthState({isLoggedIn: true, user}));
+  } else {
+    dispatch(authSlice.actions.setAuthState({isLoggedIn: false, user: null}));
   }
 };
 
 export const saveAuthState = async user => {
-  await AsyncStorage.setItem('user', JSON.stringify(user));
+  if (user) {
+    await AsyncStorage.setItem('user', JSON.stringify(user));
+  } else {
+    await AsyncStorage.removeItem('user');
+  }
 };
 
 export const {login, logout} = authSlice.actions;

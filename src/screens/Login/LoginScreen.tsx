@@ -15,9 +15,11 @@ import commonstyles from '../../components/commonstyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const LoginScreen = () => {
+  const dispatch = useDispatch();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const dispatch = useDispatch();
+  const [isUsernameFocused, setIsUsernameFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   const handleLogin = async () => {
     if (username === 'test' && password === 'test') {
@@ -53,7 +55,14 @@ const LoginScreen = () => {
       <View style={loginStyles.overlay} />
       <View style={loginStyles.logoContainer}>
         <Text style={loginStyles.signInText}>Sign In</Text>
-        <View style={loginStyles.inputContainer}>
+
+        <View
+          style={[
+            loginStyles.inputContainer,
+            {
+              borderBottomColor: isUsernameFocused ? '#4CAF50' : 'red',
+            },
+          ]}>
           <Ionicons
             name="person"
             size={20}
@@ -65,9 +74,18 @@ const LoginScreen = () => {
             value={username}
             onChangeText={setUsername}
             style={loginStyles.input}
+            onFocus={() => setIsUsernameFocused(true)}
+            onBlur={() => setIsUsernameFocused(false)}
           />
         </View>
-        <View style={loginStyles.inputContainer}>
+
+        <View
+          style={[
+            loginStyles.inputContainer,
+            {
+              borderBottomColor: isPasswordFocused ? '#4CAF50' : 'red',
+            },
+          ]}>
           <Ionicons
             name="lock-closed"
             size={20}
@@ -80,8 +98,11 @@ const LoginScreen = () => {
             onChangeText={setPassword}
             secureTextEntry
             style={loginStyles.input}
+            onFocus={() => setIsPasswordFocused(true)}
+            onBlur={() => setIsPasswordFocused(false)}
           />
         </View>
+
         <TouchableOpacity
           style={[
             commonstyles.button,
