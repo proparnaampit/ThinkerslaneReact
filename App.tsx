@@ -1,56 +1,46 @@
-import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {Button, View, Text, StyleSheet} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Provider, useDispatch, useSelector} from 'react-redux';
+import AppNavigator from './src/navigation/AppNavigator';
+import store, {persistor} from './src/redux/store';
+import Toast from 'react-native-toast-message';
+import {ActivityIndicator, View} from 'react-native';
+import {PersistGate} from 'redux-persist/integration/react';
 
-const Stack = createNativeStackNavigator();
-
-const ScreenOne = ({navigation}:any) => {
+export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>This is Screen One</Text>
-      <Button
-        title="Go to Screen Two"
-        onPress={() => navigation.navigate('ScreenTwo')}
-      />
-    </View>
+    <Provider store={store}>
+      <PersistGate
+        loading={<ActivityIndicator size="large" color="#0000ff" />}
+        persistor={persistor}>
+        <AppWithRedux />
+      </PersistGate>
+      <Toast />
+    </Provider>
   );
-};
+}
 
-const ScreenTwo = ({navigation}:any) => {
-  return (
-    <View style={styles.container}>
-      <Text>This is Screen Two</Text>
-      <Button
-        title="Go to Screen One"
-        onPress={() => navigation.navigate('ScreenOne')}
-      />
-    </View>
-  );
-};
+function AppWithRedux() {
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+  const {isLoggedIn} = useSelector(state => state.auth);
 
-const App = () => {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="ScreenOne"
-        screenOptions={{
-          headerShown: true,
-          gestureEnabled: true,
-        }}>
-        <Stack.Screen name="ScreenOne" component={ScreenOne} />
-        <Stack.Screen name="ScreenTwo" component={ScreenTwo} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-};
+  useEffect(() => {
+    dispatch(loadAuthState());
+  }, [dispatch]);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  useEffect(() => {
+    if (isLoggedIn !== null) {
+      setLoading(false);
+    }
+  }, [isLoggedIn]);
 
-export default App;
+  if (loading) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  return <AppNavigator />;
+}
