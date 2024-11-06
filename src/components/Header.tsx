@@ -4,7 +4,7 @@ import {View, Text, Image, StyleSheet} from 'react-native';
 const CustomHeader = ({title, profileImage}: any) => {
   return (
     <View style={styles.headerContainer}>
-      <Text style={styles.title}>{title}</Text>
+      <Image source={require('../assets/loginLogo.png')} style={styles.logo} />
       <Image
         source={require('../assets/loginBack.jpg')}
         style={styles.profileImage}
@@ -31,6 +31,12 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     resizeMode: 'cover',
+  },
+  logo: {
+    height: 40,
+    left: 0,
+    width: '40%',
+    resizeMode: 'contain',
   },
 });
 
