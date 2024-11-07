@@ -8,17 +8,7 @@ const commonstyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 15,
-    // borderWidth: 1,
-    // borderColor: 'rgba(255, 255, 255, 0.6)',
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 4,
-    // },
-    // shadowOpacity: 0.3,
-    // shadowRadius: 6,
-    width: '50%',
-    // elevation: 5,
+    width: '40%',
     zIndex: 2,
   },
   buttonText: {

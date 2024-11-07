@@ -1,70 +1,69 @@
 import React from 'react';
-import {View, Text, Button, TouchableOpacity} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {logout} from '../../redux/authSlice';
+import {View, TouchableOpacity} from 'react-native';
 import Toast from 'react-native-toast-message';
-import {saveAuthState} from '../../redux/authSlice';
+import {useNavigation} from '@react-navigation/native';
 import dashboardstyles from './dashboardstyles';
-import CustomHeader from '../../components/Header';
 import commonstyles from '../../components/commonstyles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import CustomText from '../../components/CustomText';
 
-const DashboardScreen = ({navigation}: any) => {
-  const dispatch = useDispatch();
-  const user = useSelector(state => state.auth.user);
+const DashboardScreen = () => {
+  const navigation = useNavigation();
 
-  const handleLogout = async () => {
-    dispatch(logout());
-    await saveAuthState(null);
-    Toast.show({
-      text1: 'Logged Out',
-      text2: 'You have been logged out successfully.',
-      type: 'success',
-      position: 'top',
-      visibilityTime: 2000,
-    });
+  const handleAddExpense = () => {
+    navigation.navigate('AddExpenses');
+  };
+
+  const handleAddOrder = () => {
+    navigation.navigate('AddOrder');
   };
 
   return (
     <View style={dashboardstyles.container}>
-      <CustomHeader
-        title={user ? user.username : 'Dashboard'}
-        profileImage="https://example.com/profile.jpg"
-      />
       <View style={dashboardstyles.dashboard}></View>
+      <CustomText style={dashboardstyles.title}>
+        Welcome to the Dashboard!
+      </CustomText>
       <View style={dashboardstyles.buttonContainer}>
         <TouchableOpacity
           style={[commonstyles.button, commonstyles.expenseButton]}
-          onPress={() => console.log('Add Expenses button pressed')}>
-          <FontAwesome
-            name="money"
-            size={24}
-            style={{color: 'white', marginBottom: 10}}></FontAwesome>
-          <Text style={commonstyles.buttonText}>
+          onPress={handleAddExpense}>
+          <FontAwesome name="money" size={24} style={{color: 'white'}} />
+
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <FontAwesome
               name="plus-circle"
               size={16}
-              style={{color: 'white'}}></FontAwesome>{' '}
-            Add Expenses
-          </Text>
+              style={{color: 'white', marginRight: 7, marginTop: 10}}
+            />
+            <CustomText
+              style={[commonstyles.buttonText, {fontSize: 14, marginTop: 10}]}>
+              Add Expenses
+            </CustomText>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[commonstyles.button, commonstyles.orderButton]}>
+          style={[commonstyles.button, commonstyles.orderButton]}
+          onPress={handleAddOrder}>
           <FontAwesome
             name="shopping-cart"
             size={24}
-            style={{color: '#a92737', marginBottom: 10}}></FontAwesome>
-          <Text style={commonstyles.orderButtonText}>
+            style={{color: '#a92737'}}
+          />
+
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <FontAwesome
               name="plus-circle"
               size={16}
-              style={{color: '#a92737'}}></FontAwesome>{' '}
-            Add Order
-          </Text>
+              style={{color: '#a92737', marginRight: 7, marginTop: 10}}
+            />
+            <CustomText style={[commonstyles.orderButtonText, {marginTop: 10}]}>
+              Add Order
+            </CustomText>
+          </View>
         </TouchableOpacity>
       </View>
-      <Text style={dashboardstyles.title}>Welcome to the Dashboard!</Text>
     </View>
   );
 };
