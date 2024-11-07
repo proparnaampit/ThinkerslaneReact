@@ -13,6 +13,7 @@ import loginStyles from './loginstyles';
 import Toast from 'react-native-toast-message';
 import commonstyles from '../../components/commonstyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import CustomText from '../../components/CustomText';
 
 const LoginScreen = () => {
   const dispatch = useDispatch();
@@ -22,7 +23,7 @@ const LoginScreen = () => {
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   const handleLogin = async () => {
-    if (username === 'test' && password === 'test') {
+    if (username === 'Test' && password === 'Test') {
       const user = {username};
       dispatch(login(user));
       await saveAuthState(user);
@@ -54,7 +55,7 @@ const LoginScreen = () => {
       />
       <View style={loginStyles.overlay} />
       <View style={loginStyles.logoContainer}>
-        <Text style={loginStyles.signInText}>Sign In</Text>
+        <CustomText style={loginStyles.signInText}>Sign In</CustomText>
 
         <View
           style={[
@@ -110,7 +111,7 @@ const LoginScreen = () => {
             loginStyles.gap,
           ]}
           onPress={handleLogin}>
-          <Text style={commonstyles.buttonText}>Login</Text>
+          <CustomText style={commonstyles.buttonText}>Login</CustomText>
         </TouchableOpacity>
       </View>
     </ImageBackground>

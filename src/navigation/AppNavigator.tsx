@@ -1,7 +1,7 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import LoginScreen from '../screens/Login/LoginScreen';
+import LoginScreen from '../screens/login/LoginScreen';
 import {useSelector} from 'react-redux';
 import BottomTabNavigator from './BottomTabNavigator';
 import {enableScreens} from 'react-native-screens';
@@ -14,11 +14,29 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator screenOptions={{headerShown: false, animation: 'fade'}}>
         {isLoggedIn ? (
-          <Stack.Screen name="Main" component={BottomTabNavigator} />
+          <Stack.Screen
+            name="Main"
+            component={BottomTabNavigator}
+            options={{
+              headerShown: false,
+              presentation: 'modal',
+              animationTypeForReplace: 'push',
+              animation: 'slide_from_right',
+            }}
+          />
         ) : (
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{
+              headerShown: false,
+              presentation: 'modal',
+              animationTypeForReplace: 'push',
+              animation: 'slide_from_right',
+            }}
+          />
         )}
       </Stack.Navigator>
     </NavigationContainer>
