@@ -4,6 +4,7 @@ import storage from '@react-native-async-storage/async-storage';
 import authReducer from './authSlice';
 import {authApi} from '../services/authApi';
 import {commonService} from '../services/commonService';
+import {bookService} from '../services/bookService';
 
 const persistConfig = {
   key: 'root',
@@ -18,6 +19,7 @@ const store = configureStore({
     auth: persistedReducer,
     [authApi.reducerPath]: authApi.reducer,
     [commonService.reducerPath]: commonService.reducer,
+    [bookService.reducerPath]: bookService.reducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
@@ -25,7 +27,11 @@ const store = configureStore({
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
         ignoredPaths: ['register'],
       },
-    }).concat(authApi.middleware, commonService.middleware),
+    }).concat(
+      authApi.middleware,
+      commonService.middleware,
+      bookService.middleware,
+    ),
 });
 
 export const persistor = persistStore(store);

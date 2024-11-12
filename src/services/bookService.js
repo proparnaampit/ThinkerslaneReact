@@ -1,15 +1,15 @@
 import {createApi} from '@reduxjs/toolkit/query/react';
 import {baseQueryWithAuth} from '../api/baseQuery';
 
-export const commonService = createApi({
-  reducerPath: 'commonService',
+export const bookService = createApi({
+  reducerPath: 'bookService',
   baseQuery: baseQueryWithAuth,
   endpoints: builder => ({
-    fetchUserInfo: builder.query({
-      query: userId => `/getUserinfo?user_id=${userId}`,
+    fetchAllBooks: builder.query({
+      query: userId => `/getAllBooks`,
       keepUnusedDataFor: 86400,
     }),
   }),
 });
 
-export const {useFetchUserInfoQuery} = commonService;
+export const {useFetchAllBooksQuery} = bookService;

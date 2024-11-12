@@ -82,7 +82,8 @@ export default function BottomTabNavigator() {
             <FontAwesome6 name="money-check-dollar" color={color} size={size} />
           ),
           tabBarButton: () => null,
-          headerShown: true,
+          headerShown: false,
+          tabBarStyle: {display: 'none'},
         }}
       />
       <Tab.Screen

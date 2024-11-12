@@ -6,12 +6,12 @@ import bookStyles from './bookStyles';
 import commonstyles from '../../components/commonstyles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomText from '../../components/CustomText';
-import BookList from '../../components/BookList';
+import Book from '../../components/Book';
 
 const BookListScreen = () => {
   return (
     <View style={bookStyles.container}>
-      <BookList />
+      <Book data={null} />
     </View>
   );
 };
