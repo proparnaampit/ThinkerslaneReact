@@ -11,6 +11,10 @@ const commonstyles = StyleSheet.create({
     width: '40%',
     zIndex: 2,
   },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+  },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
