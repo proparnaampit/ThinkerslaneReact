@@ -1,40 +1,53 @@
 import {createSlice} from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Initial state setup
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {isLoggedIn: false, user: null},
+  initialState: {isLoggedIn: false, userId: null, token: null},
   reducers: {
     login: (state, action) => {
       state.isLoggedIn = true;
-      state.user = action.payload;
+      state.userId = action.payload.userId;
+      state.token = action.payload.token;
     },
     logout: state => {
       state.isLoggedIn = false;
-      state.user = null;
+      state.userId = null;
+      state.token = null;
     },
     setAuthState: (state, action) => {
       state.isLoggedIn = action.payload.isLoggedIn;
-      state.user = action.payload.user;
+      state.userId = action.payload.userId;
+      state.token = action.payload.token;
     },
   },
 });
 
 export const loadAuthState = () => async dispatch => {
-  const userData = await AsyncStorage.getItem('user');
-  if (userData) {
-    const user = JSON.parse(userData);
-    dispatch(authSlice.actions.setAuthState({isLoggedIn: true, user}));
+  const token = await AsyncStorage.getItem('authToken');
+  const userId = await AsyncStorage.getItem('userId');
+
+  if (token && userId) {
+    dispatch(authSlice.actions.setAuthState({isLoggedIn: true, userId, token}));
   } else {
-    dispatch(authSlice.actions.setAuthState({isLoggedIn: false, user: null}));
+    dispatch(
+      authSlice.actions.setAuthState({
+        isLoggedIn: false,
+        userId: null,
+        token: null,
+      }),
+    );
   }
 };
 
-export const saveAuthState = async user => {
-  if (user) {
-    await AsyncStorage.setItem('user', JSON.stringify(user));
+export const saveAuthState = async (userId, token) => {
+  if (userId && token) {
+    await AsyncStorage.setItem('userId', userId);
+    await AsyncStorage.setItem('authToken', token);
   } else {
-    await AsyncStorage.removeItem('user');
+    await AsyncStorage.removeItem('userId');
+    await AsyncStorage.removeItem('authToken');
   }
 };
 

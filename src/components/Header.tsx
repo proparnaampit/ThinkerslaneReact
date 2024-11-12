@@ -1,32 +1,49 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
-  Text,
   Image,
   StyleSheet,
   Modal,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {logout} from '../redux/authSlice';
+import {logout as reduxLogout} from '../redux/authSlice';
 import Toast from 'react-native-toast-message';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
 import {saveAuthState} from '../redux/authSlice';
 import CustomText from './CustomText';
+import DeviceInfo from 'react-native-device-info';
+import {useLogoutMutation} from '../services/authApi';
+import {useFetchUserInfoQuery} from '../services/commonService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CustomHeader = () => {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
-
+  const [logout] = useLogoutMutation();
+  const [userId, setUserId] = useState<any>(null);
+  const user = useSelector((state: any) => state?.auth?.userId);
+  const {data, error, isLoading} = useFetchUserInfoQuery(user);
   const toggleDropdown = () => {
     setDropdownVisible(!isDropdownVisible);
   };
+
+  const [deviceId, setDeviceId] = useState<any>(null);
   const dispatch = useDispatch();
-  const user = useSelector(state => state?.auth?.user);
-  const cartCount = 2;
+  const cartCount = 0;
+  useEffect(() => {
+    const getDeviceId = async () => {
+      const uniqueId = await DeviceInfo.getUniqueId();
+      setDeviceId(uniqueId);
+    };
+
+    getDeviceId();
+  }, []);
 
   const handleLogout = async () => {
-    dispatch(logout());
+    dispatch(reduxLogout());
+    await logout({device_id: deviceId});
     await saveAuthState(null);
     Toast.show({
       text1: 'Logged Out',
@@ -51,7 +68,7 @@ const CustomHeader = () => {
           )}
         </TouchableOpacity>
         <CustomText style={[styles.menuItemText, {marginRight: 10}]}>
-          {user.username}
+          {/* {user.username} */}
         </CustomText>
         <TouchableOpacity onPress={toggleDropdown}>
           <Image

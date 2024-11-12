@@ -23,7 +23,7 @@ export default function AppNavigator() {
               headerShown: false,
               presentation: 'modal',
               animationTypeForReplace: 'push',
-              animation: 'slide_from_right',
+              animation: 'fade',
             }}
           />
         ) : (
@@ -34,7 +34,7 @@ export default function AppNavigator() {
               headerShown: false,
               presentation: 'modal',
               animationTypeForReplace: 'push',
-              animation: 'slide_from_right',
+              animation: 'fade',
             }}
           />
         )}
