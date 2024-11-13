@@ -9,6 +9,8 @@ import AddExpenseScreen from '../screens/expenses/AddExpenseScreen';
 import OrderScreen from '../screens/order/OrderScreen';
 import AddOrderScreen from '../screens/order/AddOrderScreen';
 import BookListScreen from '../screens/booklist/Booklist';
+import Cart from '../screens/cart/Cart';
+import Checkout from '../screens/checkout/Checkout';
 
 const Tab = createBottomTabNavigator();
 
@@ -94,7 +96,31 @@ export default function BottomTabNavigator() {
           tabBarIcon: ({color, size}) => (
             <FontAwesome6 name="book" color={color} size={size} />
           ),
-          headerShown: true,
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="Cart"
+        component={Cart}
+        initialParams={{add: false}}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <FontAwesome6 name="cart-shopping" color={color} size={size} />
+          ),
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="Checkout"
+        component={Checkout}
+        initialParams={{add: false}}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <FontAwesome6 name="cart-shopping" color={color} size={size} />
+          ),
+          headerShown: false,
+          tabBarButton: () => null,
+          tabBarStyle: {display: 'none'},
         }}
       />
     </Tab.Navigator>

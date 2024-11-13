@@ -9,7 +9,16 @@ export const bookService = createApi({
       query: userId => `/getAllBooks`,
       keepUnusedDataFor: 86400,
     }),
+    fetchBooks: builder.query({
+      query: searchTerm => {
+        const url = `https://staging.thinkerslane.com/th1/getBooks?search=${searchTerm}`;
+        return url;
+      },
+      transformResponse: response => {
+        return response.data || [];
+      },
+    }),
   }),
 });
 
-export const {useFetchAllBooksQuery} = bookService;
+export const {useFetchAllBooksQuery, useFetchBooksQuery} = bookService;

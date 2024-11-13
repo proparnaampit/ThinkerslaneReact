@@ -1,25 +1,33 @@
-import React, {useState} from 'react';
+import React, {useState, useMemo, useEffect, useRef} from 'react';
 import {
   View,
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
   TextInput,
-  StyleSheet,
+  Animated,
 } from 'react-native';
-import Toast from 'react-native-toast-message';
 import {useNavigation} from '@react-navigation/native';
 import addOrderStyles from './addOrderStyles';
 import commonstyles from '../../components/commonstyles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import CustomText from '../../components/CustomText';
-import Book from '../../components/Book';
-import {useFetchAllBooksQuery} from '../../services/bookService';
+import Book from '../../components/book/Book';
+import {
+  useFetchAllBooksQuery,
+  useFetchBooksQuery,
+} from '../../services/bookService';
+import {useCart} from '../../context/CartContext';
 
 const AddOrderScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const {cart, addToCart, decreaseQuantity, increaseQuantity, removeFromCart} =
+    useCart();
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const {
     data: booksData,
@@ -27,55 +35,155 @@ const AddOrderScreen = () => {
     error: booksLoadingError,
   } = useFetchAllBooksQuery({});
 
-  const filteredBooks = booksData?.data?.products?.filter((book: any) =>
-    book.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  const {
+    data: apiBooks,
+    isLoading: apiBooksLoading,
+    error: apiBooksError,
+  } = useFetchBooksQuery(searchQuery, {
+    skip: searchQuery.length === 0,
+  });
+
+  const filteredBooks = useMemo(() => {
+    return apiBooks?.filter((book: any) =>
+      book.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }, [apiBooks, searchTerm]);
+
+  const handleSearchClicked = () => {
+    setSearchQuery(searchTerm);
+  };
+
+  const handleAddToCart = (book: any) => {
+    const {id, name, image, price, offered_price, short_description} = book;
+    addToCart({
+      id,
+      name,
+      image,
+      price,
+      offered_price,
+      short_description,
+      quantity: 1,
+    });
+  };
+
+  const handleDecreaseQuantity = (bookId: any) => {
+    decreaseQuantity(bookId);
+  };
+
+  const message =
+    filteredBooks?.length === 0
+      ? 'No Books Found..'
+      : filteredBooks === undefined
+      ? 'Type the name of the book in the search bar...'
+      : null;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  const totalCartCount = Object.values(cart).reduce(
+    (acc: any, item: any) => acc + item.quantity,
+    0,
   );
+
+  const handleCartAction = () => {
+    navigation.navigate('Cart');
+  };
 
   return (
-    <ScrollView style={addOrderStyles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <MaterialIcons
-          name="keyboard-backspace"
-          color={'black'}
-          size={24}
-          style={{marginBottom: 20}}
-        />
-      </TouchableOpacity>
+    <View style={{flex: 1}}>
+      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <FontAwesome6
+            name="arrow-left-long"
+            color={commonstyles.thinkerslane.color}
+            size={24}
+            style={{margin: 10}}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{flexDirection: 'row', alignItems: 'center', marginRight: 10}}
+          onPress={handleCartAction}>
+          <FontAwesome6
+            name="cart-shopping"
+            color={commonstyles.thinkerslane.color}
+            size={24}
+            style={{margin: 10}}
+          />
+          <CustomText style={addOrderStyles.totalCart}>
+            {totalCartCount}
+          </CustomText>
+        </TouchableOpacity>
+      </View>
+      <View style={addOrderStyles.header}>
+        <View style={addOrderStyles.searchBar}>
+          <TextInput
+            style={addOrderStyles.searchInput}
+            placeholder="Type book name and hit search button .."
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+          />
+          <FontAwesome
+            name="search"
+            size={16}
+            style={{
+              color: commonstyles.thinkerslane.color,
+              marginRight: 7,
+              padding: 8,
+              borderRadius: 10,
+            }}
+            onPress={handleSearchClicked}
+          />
+        </View>
+      </View>
 
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search books by name"
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-      />
+      <ScrollView
+        style={addOrderStyles.booksContainer}
+        showsVerticalScrollIndicator={false}>
+        {apiBooksLoading && <ActivityIndicator size="large" color="#0000ff" />}
+        {filteredBooks?.length > 0 &&
+          filteredBooks.map((book: any) => {
+            const cartItem = cart[book.id];
+            const quantity = cartItem ? cartItem.quantity : 0;
+            return (
+              <TouchableOpacity
+                key={book.id}
+                style={addOrderStyles.bookContainer}
+                onPress={() => handleAddToCart(book)}
+                activeOpacity={0.8}>
+                <View style={{flex: 1}}>
+                  <Book data={book} />
+                </View>
 
-      {booksDataLoading && <ActivityIndicator size="large" color="#0000ff" />}
+                {quantity > 0 && (
+                  <TouchableOpacity
+                    style={addOrderStyles.quantityBadgeContainer}
+                    onPress={e => {
+                      e.stopPropagation();
+                      handleDecreaseQuantity(book.id);
+                    }}>
+                    <View>
+                      <FontAwesome name="minus" size={16} color="red" />
+                    </View>
+                    <CustomText style={addOrderStyles.quantityText}>
+                      {quantity}
+                    </CustomText>
+                  </TouchableOpacity>
+                )}
+              </TouchableOpacity>
+            );
+          })}
 
-      {booksLoadingError && (
-        <CustomText
-          text="Failed to load books."
-          style={commonstyles.errorText}
-        />
-      )}
-
-      {filteredBooks?.length > 0 &&
-        filteredBooks.map((book: any) => {
-          return <Book key={book.id} data={book} />;
-        })}
-    </ScrollView>
+        <Animated.View style={{opacity: fadeAnim}}>
+          <CustomText style={commonstyles.errorText}>{message}</CustomText>
+        </Animated.View>
+      </ScrollView>
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  searchInput: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    backgroundColor: '#fff',
-  },
-});
 
 export default AddOrderScreen;

@@ -2,8 +2,9 @@ import React, {useState} from 'react';
 import {View, StyleSheet, Image} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
-import CustomText from './CustomText';
+import CustomText from '../CustomText';
 import singleBookStyles from './singleBookStyles';
+import FastImage from 'react-native-fast-image';
 
 const Book = ({data}: any) => {
   const imageUrl = `https://thinkerslane.com/public/uploads/admin/books/${
@@ -12,18 +13,19 @@ const Book = ({data}: any) => {
 
   const short_description = data.short_description;
   const plainTextDescription = short_description
-    .replace(/<[^>]*>/g, '') // Remove HTML tags
-    .replace(/\\r|\\n/g, ' ') // Replace any \r or \n with a space
-    .split(' ') // Split the text into words
-    .slice(0, 20) // Take only the first 100 words
-    .join(' '); // Join the words back into a string
+    .replace(/<[^>]*>/g, '')
+    .replace(/\\r|\\n/g, ' ')
+    .split(' ')
+    .slice(0, 20)
+    .join(' ');
 
-  if (data.id == 204) {
-    console.log(imageUrl);
-  }
   return (
     <View style={singleBookStyles.container}>
-      <Image source={{uri: imageUrl}} style={singleBookStyles.image} />
+      <FastImage
+        source={{uri: imageUrl}}
+        style={singleBookStyles.image}
+        resizeMode={FastImage.resizeMode.cover}
+      />
       <View style={singleBookStyles.textContainer}>
         <CustomText style={singleBookStyles.title}>{data.name}</CustomText>
         {data.quantity > 0 && (

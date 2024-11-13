@@ -11,14 +11,14 @@ const singleBookStyles = StyleSheet.create({
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    borderBottomColor: 'black',
     marginVertical: 5,
     alignItems: 'center',
   },
   image: {
-    width: 100,
-    height: '100%',
-    resizeMode: 'cover',
+    width: 150,
+    height: 220,
+    resizeMode: 'contain',
     borderRadius: 4,
   },
   textContainer: {
@@ -30,7 +30,7 @@ const singleBookStyles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     flexWrap: 'wrap',
-    width: '70%',
+    width: '90%',
     color: '#333',
   },
   description: {
@@ -51,12 +51,13 @@ const singleBookStyles = StyleSheet.create({
   },
   stock: {
     fontSize: 14,
-    color: '#666',
+    color: 'green',
     marginTop: 4,
+    fontWeight: 'bold',
   },
   stockLabel: {
     position: 'absolute',
-    top: 10,
+    bottom: 10,
     right: 10,
     fontSize: 14,
     fontWeight: 'bold',
