@@ -7,6 +7,7 @@ export const loginUser = (
   username,
   password,
   deviceId,
+  location,
   dispatch,
   setPassword,
 ) => {

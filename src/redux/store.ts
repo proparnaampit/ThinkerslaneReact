@@ -5,6 +5,7 @@ import authReducer from './authSlice';
 import {authApi} from '../services/authApi';
 import {commonService} from '../services/commonService';
 import {bookService} from '../services/bookService';
+import {expenseService} from '../services/expenseService';
 
 const persistConfig = {
   key: 'root',
@@ -20,6 +21,7 @@ const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [commonService.reducerPath]: commonService.reducer,
     [bookService.reducerPath]: bookService.reducer,
+    [expenseService.reducerPath]: expenseService.reducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
@@ -31,6 +33,7 @@ const store = configureStore({
       authApi.middleware,
       commonService.middleware,
       bookService.middleware,
+      expenseService.middleware,
     ),
 });
 

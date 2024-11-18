@@ -43,10 +43,14 @@ export const CartProvider = ({children}: any) => {
 
   const decreaseQuantity = (id: string) => {
     setCart((prevCart: any) => {
-      const newQuantity = prevCart[id].quantity - 1;
+      const newQuantity = prevCart[id]?.quantity - 1;
+
       if (newQuantity <= 0) {
-        return removeFromCart(id);
+        const updatedCart = {...prevCart};
+        delete updatedCart[id]; // Remove the item from the cart
+        return updatedCart; // Return the updated cart without the removed item
       }
+
       return {
         ...prevCart,
         [id]: {

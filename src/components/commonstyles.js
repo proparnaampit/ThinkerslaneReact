@@ -48,6 +48,17 @@ const commonstyles = StyleSheet.create({
   thinkerslane: {
     color: '#a92737',
   },
+  loaderContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000, // Ensure the loader appears on top
+  },
   // 'brick-red': {
   //   50: '#fdf4f3',
   //   100: '#fce8e7',
