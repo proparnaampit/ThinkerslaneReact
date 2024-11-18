@@ -6,7 +6,7 @@ export const commonService = createApi({
   baseQuery: baseQueryWithAuth,
   endpoints: builder => ({
     fetchUserInfo: builder.query({
-      query: userId => `/getUserinfo?user_id=${userId}`,
+      query: userId => `getUserinfo?user_id=${userId}`,
       keepUnusedDataFor: 86400,
     }),
   }),

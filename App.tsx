@@ -6,6 +6,7 @@ import Toast from 'react-native-toast-message';
 import {ActivityIndicator, View} from 'react-native';
 import {PersistGate} from 'redux-persist/integration/react';
 import {loadAuthState} from './src/redux/authSlice';
+import {CartProvider} from './src/context/CartContext';
 
 export default function App() {
   return (
@@ -13,7 +14,9 @@ export default function App() {
       <PersistGate
         loading={<ActivityIndicator size="large" color="#0000ff" />}
         persistor={persistor}>
-        <AppWithRedux />
+        <CartProvider>
+          <AppWithRedux />
+        </CartProvider>
       </PersistGate>
       <Toast />
     </Provider>

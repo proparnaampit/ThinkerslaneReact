@@ -12,8 +12,10 @@ const commonstyles = StyleSheet.create({
     zIndex: 2,
   },
   errorText: {
-    color: 'red',
+    color: 'grey', // changed from red to grey
     fontSize: 16,
+    textAlign: 'center', // center align the text
+    marginTop: 10, // optional for spacing
   },
   buttonText: {
     color: '#fff',
@@ -43,7 +45,20 @@ const commonstyles = StyleSheet.create({
     borderColor: '#8e2334',
     borderWidth: 1,
   },
-
+  thinkerslane: {
+    color: '#a92737',
+  },
+  loaderContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000, // Ensure the loader appears on top
+  },
   // 'brick-red': {
   //   50: '#fdf4f3',
   //   100: '#fce8e7',
@@ -52,7 +67,7 @@ const commonstyles = StyleSheet.create({
   //   400: '#ea8285',
   //   500: '#de555d',
   //   600: '#be3240',
-  //   700: '#a92737',
+  //   700: '#a92737', //main
   //   800: '#8e2334',
   //   900: '#7a2131',
   //   950: '#430e17',

@@ -11,18 +11,15 @@ import {useDispatch, useSelector} from 'react-redux';
 import {logout as reduxLogout} from '../redux/authSlice';
 import Toast from 'react-native-toast-message';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation} from '@react-navigation/native';
 import {saveAuthState} from '../redux/authSlice';
 import CustomText from './CustomText';
 import DeviceInfo from 'react-native-device-info';
 import {useLogoutMutation} from '../services/authApi';
 import {useFetchUserInfoQuery} from '../services/commonService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CustomHeader = () => {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const [logout] = useLogoutMutation();
-  const [userId, setUserId] = useState<any>(null);
   const user = useSelector((state: any) => state?.auth?.userId);
   const {data, error, isLoading} = useFetchUserInfoQuery(user);
   const toggleDropdown = () => {
@@ -31,7 +28,6 @@ const CustomHeader = () => {
 
   const [deviceId, setDeviceId] = useState<any>(null);
   const dispatch = useDispatch();
-  const cartCount = 0;
   useEffect(() => {
     const getDeviceId = async () => {
       const uniqueId = await DeviceInfo.getUniqueId();
@@ -57,18 +53,9 @@ const CustomHeader = () => {
   return (
     <View style={styles.headerContainer}>
       <Image source={require('../assets/loginLogo.png')} style={styles.logo} />
-
       <View style={styles.iconContainer}>
-        <TouchableOpacity style={styles.cartButton}>
-          <MaterialCommunityIcons name="cart" size={24} color="#a92737" />
-          {cartCount > 0 && (
-            <View style={styles.cartBadge}>
-              <CustomText style={styles.cartBadgeText}>{cartCount}</CustomText>
-            </View>
-          )}
-        </TouchableOpacity>
-        <CustomText style={[styles.menuItemText, {marginRight: 10}]}>
-          {/* {user.username} */}
+        <CustomText style={{marginRight: 10}}>
+          {data?.userDeatils?.name}
         </CustomText>
         <TouchableOpacity onPress={toggleDropdown}>
           <Image

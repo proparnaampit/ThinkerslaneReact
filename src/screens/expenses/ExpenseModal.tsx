@@ -25,6 +25,16 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
   onClose,
   expense,
 }) => {
+  const convertToAmPm = (time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const hourIn12HourFormat = hours % 12 || 12;
+    const formattedTime = `${hourIn12HourFormat}:${minutes
+      .toString()
+      .padStart(2, '0')} ${period}`;
+    return formattedTime;
+  };
+
   return (
     <Modal
       visible={visible}
@@ -39,17 +49,20 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
               <Text style={styles.boldText}>Date:</Text> {expense.date}
             </Text>
             <Text style={styles.modalText}>
-              <Text style={styles.boldText}>Time:</Text> {expense.time}
+              <Text style={styles.boldText}>Time:</Text>{' '}
+              {convertToAmPm(expense.time)}
             </Text>
             <Text style={styles.modalText}>
-              <Text style={styles.boldText}>Category:</Text> {expense.category}
+              <Text style={styles.boldText}>Category:</Text>
+              {expense.type_details?.name || 'N/A'}
             </Text>
             <Text style={styles.modalText}>
               <Text style={styles.boldText}>Amount:</Text> $
-              {expense.amount.toFixed(2)}
+              {parseFloat(expense.amount).toFixed(2)}
             </Text>
             <Text style={styles.modalText}>
-              <Text style={styles.boldText}>Purpose:</Text> {expense.purpose}
+              <Text style={styles.boldText}>Purpose:</Text>
+              {expense.description || 'Not provided'}
             </Text>
           </ScrollView>
 
@@ -70,8 +83,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
   },
   modalContainer: {
-    width: 320,
+    width: '80%',
     padding: 20,
+    height: '90%',
     backgroundColor: '#fff',
     borderRadius: 12,
     alignItems: 'flex-start',
@@ -89,7 +103,7 @@ const styles = StyleSheet.create({
   },
   modalText: {
     fontSize: 16,
-    marginBottom: 12,
+    padding: 20,
     color: '#666',
   },
   boldText: {
@@ -98,6 +112,8 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     maxHeight: 300,
+    padding: 10, // Adjust padding if necessary
+    flexGrow: 1, // Ensures content inside the ScrollView is allowed to expand
   },
   closeButton: {
     marginTop: 20,
