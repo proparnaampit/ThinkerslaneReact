@@ -16,7 +16,7 @@ const PaymentMethodModal = ({visible, onClose, onSelectMethod}: any) => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              onSelectMethod('Cash');
+              onSelectMethod('cash');
               onClose();
             }}>
             <FontAwesome6 name="money-bill-alt" size={24} color="#4CAF50" />
@@ -26,7 +26,7 @@ const PaymentMethodModal = ({visible, onClose, onSelectMethod}: any) => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              onSelectMethod('UPI');
+              onSelectMethod('upi');
               onClose();
             }}>
             <FontAwesome6 name="credit-card" size={24} color="#009688" />

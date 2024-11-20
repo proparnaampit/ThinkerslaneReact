@@ -4,28 +4,23 @@ import Geolocation from 'react-native-geolocation-service';
 import {
   View,
   TextInput,
-  Text,
   TouchableOpacity,
   ImageBackground,
   Image,
 } from 'react-native';
 import {useDispatch} from 'react-redux';
-import {login, saveAuthState} from '../../redux/authSlice';
 import {useLoginMutation} from '../../services/authApi';
 import loginStyles from './loginstyles';
 import Toast from 'react-native-toast-message';
 import commonstyles from '../../components/commonstyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomText from '../../components/CustomText';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
 import {loginUser} from '../../services/authService';
 
 const LoginScreen = () => {
   const dispatch = useDispatch();
   const [username, setUsername] = useState('');
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
   const [password, setPassword] = useState('');
   const [isUsernameFocused, setIsUsernameFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);

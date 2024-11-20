@@ -11,7 +11,7 @@ export const bookService = createApi({
     }),
     fetchBooks: builder.query({
       query: searchTerm => {
-        const url = `https://staging.thinkerslane.com/th1/getBooks?search=${searchTerm}`;
+        const url = `getBooks?search=${searchTerm}`;
         return url;
       },
       transformResponse: response => {
