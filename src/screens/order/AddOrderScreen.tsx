@@ -14,10 +14,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import CustomText from '../../components/CustomText';
 import Book from '../../components/book/Book';
-import {
-  useFetchAllBooksQuery,
-  useFetchBooksQuery,
-} from '../../services/bookService';
+import {useFetchBooksQuery} from '../../services/bookService';
 import {useCart} from '../../context/CartContext';
 
 const AddOrderScreen = () => {
@@ -28,12 +25,6 @@ const AddOrderScreen = () => {
     useCart();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  const {
-    data: booksData,
-    isLoading: booksDataLoading,
-    error: booksLoadingError,
-  } = useFetchAllBooksQuery({});
 
   const {
     data: apiBooks,
@@ -54,14 +45,15 @@ const AddOrderScreen = () => {
   };
 
   const handleAddToCart = (book: any) => {
-    const {id, name, image, price, offered_price, short_description} = book;
+    const {id, name, image, price, offered_price, actual_price} = book;
+    console.log(book);
     addToCart({
       id,
       name,
       image,
       price,
       offered_price,
-      short_description,
+      actual_price,
       quantity: 1,
     });
   };
@@ -95,7 +87,7 @@ const AddOrderScreen = () => {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1, padding: 10}}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <FontAwesome6
@@ -127,17 +119,17 @@ const AddOrderScreen = () => {
             value={searchTerm}
             onChangeText={setSearchTerm}
           />
-          <FontAwesome
-            name="search"
-            size={16}
+
+          <TouchableOpacity
             style={{
-              color: commonstyles.thinkerslane.color,
-              marginRight: 7,
-              padding: 8,
+              backgroundColor: commonstyles.thinkerslane.color,
+              margin: 10,
+              padding: 10,
               borderRadius: 10,
             }}
-            onPress={handleSearchClicked}
-          />
+            onPress={handleSearchClicked}>
+            <CustomText style={{color: 'white'}}>Search</CustomText>
+          </TouchableOpacity>
         </View>
       </View>
 

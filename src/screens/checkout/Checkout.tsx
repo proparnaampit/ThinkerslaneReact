@@ -7,6 +7,7 @@ import {
   Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import {useCart} from '../../context/CartContext';
 import {Picker} from '@react-native-picker/picker';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import CustomText from '../../components/CustomText';
@@ -66,13 +67,19 @@ const CheckoutScreen = () => {
   };
 
   const handleSelectMethod = (method: any) => {
+    if (!handleValidation()) return;
+
     Toast.show({
       text1: `Proceeding with ${method}`,
       type: 'info',
       position: 'top',
       visibilityTime: 2000,
     });
-    console.log(`Payment Method Selected: ${method}`);
+
+    navigation.navigate('Payment', {
+      formData: form,
+      paymentMethod: method,
+    });
   };
 
   return (
