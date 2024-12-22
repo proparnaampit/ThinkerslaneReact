@@ -9,7 +9,11 @@ export const commonService = createApi({
       query: userId => `getUserinfo?user_id=${userId}`,
       keepUnusedDataFor: 86400,
     }),
+    getAllUsers: builder.query({
+      query: () => `https://staging.thinkerslane.com/th1/getAllUsers`,
+      keepUnusedDataFor: 86400,
+    }),
   }),
 });
 
-export const {useFetchUserInfoQuery} = commonService;
+export const {useFetchUserInfoQuery, useGetAllUsersQuery} = commonService;

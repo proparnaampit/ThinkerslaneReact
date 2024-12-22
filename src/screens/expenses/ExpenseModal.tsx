@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 interface ExpenseModalProps {
   visible: boolean;
@@ -24,7 +25,7 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
   visible,
   onClose,
   expense,
-}) => {
+}: any) => {
   const convertToAmPm = (time: string) => {
     const [hours, minutes] = time.split(':').map(Number);
     const period = hours >= 12 ? 'PM' : 'AM';
@@ -44,31 +45,41 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitle}>Expense Details</Text>
-          <ScrollView contentContainerStyle={styles.scrollView}>
-            <Text style={styles.modalText}>
-              <Text style={styles.boldText}>Date:</Text> {expense.date}
-            </Text>
-            <Text style={styles.modalText}>
-              <Text style={styles.boldText}>Time:</Text>{' '}
-              {convertToAmPm(expense.time)}
-            </Text>
-            <Text style={styles.modalText}>
-              <Text style={styles.boldText}>Category:</Text>
-              {expense.type_details?.name || 'N/A'}
-            </Text>
-            <Text style={styles.modalText}>
-              <Text style={styles.boldText}>Amount:</Text> $
-              {parseFloat(expense.amount).toFixed(2)}
-            </Text>
-            <Text style={styles.modalText}>
-              <Text style={styles.boldText}>Purpose:</Text>
-              {expense.description || 'Not provided'}
-            </Text>
-          </ScrollView>
-
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>Close</Text>
+          <TouchableOpacity style={styles.closeIcon} onPress={onClose}>
+            <Entypo name="circle-with-cross" size={24} color="black" />
           </TouchableOpacity>
+          <View style={styles.scrollView}>
+            <View style={styles.viewPurpose}>
+              <Text style={styles.boldText}>Date:</Text>
+              <Text style={styles.normalText}>{expense.date}</Text>
+            </View>
+            <View style={styles.viewPurpose}>
+              <Text style={styles.boldText}>Time:</Text>
+              <Text style={styles.normalText}>
+                {convertToAmPm(expense.time)}
+              </Text>
+            </View>
+            <View style={styles.viewPurpose}>
+              <Text style={styles.boldText}>Category:</Text>
+              <Text style={styles.normalText}>
+                {expense.type_details?.name || 'N/A'}
+              </Text>
+            </View>
+            <View style={styles.viewPurpose}>
+              <Text style={styles.boldText}>Amount:</Text>
+              <Text style={styles.normalText}>
+                Rs.{parseFloat(expense.amount).toFixed(2)}
+              </Text>
+            </View>
+            <View style={styles.viewPurposeDesc}>
+              <Text style={styles.boldText}>Purpose:</Text>
+              <ScrollView style={styles.descriptionScroll}>
+                <Text style={styles.normalText}>
+                  {expense.description || 'Not provided'}
+                </Text>
+              </ScrollView>
+            </View>
+          </View>
         </View>
       </View>
     </Modal>
@@ -82,18 +93,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
   },
+  viewPurpose: {
+    marginBottom: 20,
+  },
+  viewPurposeDesc: {
+    flex: 1,
+    height: 500,
+  },
+  descriptionScroll: {
+    maxHeight: 'auto',
+    paddingBottom: 20,
+    borderRadius: 8,
+  },
+  scrollView: {
+    padding: 10,
+    flexGrow: 1,
+  },
   modalContainer: {
     width: '80%',
     padding: 20,
     height: '90%',
     backgroundColor: '#fff',
     borderRadius: 12,
-    alignItems: 'flex-start',
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 5,
+    position: 'relative',
+  },
+  closeIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 10, // Ensures it stays on top of other elements
   },
   modalTitle: {
     fontSize: 20,
@@ -110,10 +143,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
-  scrollView: {
-    maxHeight: 300,
-    padding: 10, // Adjust padding if necessary
-    flexGrow: 1, // Ensures content inside the ScrollView is allowed to expand
+  normalText: {
+    fontWeight: 'normal',
+    color: '#333',
   },
   closeButton: {
     marginTop: 20,

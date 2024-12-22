@@ -33,15 +33,7 @@ const Cart = () => {
 
   return (
     <View style={cartStyles.container}>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <TouchableOpacity onPress={() => navigation.navigate('AddOrder')}>
-          <FontAwesome6
-            name="arrow-left-long"
-            color={commonstyles.thinkerslane.color}
-            size={24}
-            style={{margin: 10}}
-          />
-        </TouchableOpacity>
+      <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
         {!isCartEmpty && (
           <TouchableOpacity
             style={cartStyles.proceedButton}

@@ -1,20 +1,24 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import Entypo from 'react-native-vector-icons/Entypo';
 import {Picker} from '@react-native-picker/picker';
 import ExpenseModal from './ExpenseModal';
-import XLSX from 'xlsx';
 import {useSelector} from 'react-redux';
-import Toast from 'react-native-toast-message';
-import RNFS from 'react-native-fs';
 import commonstyles from '../../components/commonstyles';
 import CustomText from '../../components/CustomText';
 import {
   useFetchAllExpenseCategoryQuery,
   useGetExpensesQuery,
 } from '../../services/expenseService';
+import allExpensestyles from './allExpensestyles';
 
 const ExpenseScreen = () => {
   const navigation = useNavigation<any>();
@@ -25,7 +29,6 @@ const ExpenseScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<any>(null);
   const months = [
-    'Choose Month',
     'Jan',
     'Feb',
     'Mar',
@@ -53,13 +56,24 @@ const ExpenseScreen = () => {
   } = useFetchAllExpenseCategoryQuery({});
 
   useEffect(() => {
+    if (
+      expenseCategory?.status === 'successs' &&
+      expenseCategory.data?.categories
+    ) {
+      const categoryNames = expenseCategory.data.categories.map((cat: any) =>
+        cat.name.trim(),
+      );
+      setCategories(categoryNames);
+    }
+  }, [expenseCategory]);
+
+  useEffect(() => {
     const fetchData = async () => {
       if (!expensesLoading && !expenseCatloading && user_id) {
-        if (expensesData?.data?.expenses) {
+        if (expensesData?.data?.expenses && expensesData.status) {
           const expensesDataArray = expensesData.data.expenses;
           setExpenses(expensesDataArray);
         } else {
-          console.error('No expenses data found or structure is incorrect');
         }
       }
     };
@@ -89,6 +103,11 @@ const ExpenseScreen = () => {
     return sum + (isNaN(amount) ? 0 : amount);
   }, 0);
 
+  const handleReset = () => {
+    setSelectedCategory('Choose Category');
+    setSelectedMonth('Choose Month');
+  };
+
   const openModal = (expense: any) => {
     setSelectedExpense(expense);
     setModalVisible(true);
@@ -114,51 +133,28 @@ const ExpenseScreen = () => {
 
   const renderItem = ({item}: any) => (
     <TouchableOpacity onPress={() => openModal(item)}>
-      <View style={styles.row}>
-        <CustomText style={styles.cell}>{item.date}</CustomText>
-        <CustomText style={styles.cell}>{convertToAmPm(item.time)}</CustomText>
-        <CustomText style={styles.cell}>{item.type_details?.name}</CustomText>
-        <CustomText style={styles.cell}>
+      <View style={allExpensestyles.row}>
+        <CustomText style={allExpensestyles.cell}>{item.date}</CustomText>
+        <CustomText style={allExpensestyles.cell}>
+          {convertToAmPm(item.time)}
+        </CustomText>
+        <CustomText style={allExpensestyles.cell}>
+          {item.type_details?.name}
+        </CustomText>
+        <CustomText style={allExpensestyles.cell}>
           Rs. {parseFloat(item.amount).toFixed(2)}
         </CustomText>
       </View>
     </TouchableOpacity>
   );
 
-  const exportToExcel = async () => {
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(filteredExpenses);
-    XLSX.utils.book_append_sheet(wb, ws, 'Expenses');
-
-    const path = `${RNFS.DownloadDirectoryPath}/Expenses.xlsx`;
-
-    try {
-      await RNFS.writeFile(
-        path,
-        XLSX.write(wb, {bookType: 'xlsx', type: 'binary'}),
-        'ascii',
-      );
-      Toast.show({
-        text1: 'Excel File Saved!',
-        type: 'success',
-        position: 'top',
-      });
-    } catch (error) {
-      console.error('Export error:', error);
-      Toast.show({
-        text1: 'There is some error exporting excel',
-        type: 'error',
-        position: 'top',
-      });
-    }
-  };
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.totalText}>
-        Total Expenses: Rs.{totalExpenses.toFixed(2)}
-      </Text>
-      <View style={[styles.buttonsContainer, {flexDirection: 'row', gap: 10}]}>
+    <View style={allExpensestyles.container}>
+      <View
+        style={[
+          allExpensestyles.buttonsContainer,
+          {flexDirection: 'row', gap: 10},
+        ]}>
         <TouchableOpacity
           style={[commonstyles.button, commonstyles.expenseButton]}
           onPress={handleAddExpense}>
@@ -173,40 +169,71 @@ const ExpenseScreen = () => {
           </View>
         </TouchableOpacity>
       </View>
-
-      <View style={styles.filters}>
-        <View style={styles.filterContainer}>
+      <Text style={allExpensestyles.totalText}>
+        Total Expenses: Rs.{totalExpenses.toFixed(2)}
+      </Text>
+      <View style={allExpensestyles.filterRow}>
+        <View style={allExpensestyles.pickerContainer}>
           <Picker
             selectedValue={selectedCategory}
-            style={styles.picker}
+            style={allExpensestyles.picker}
             onValueChange={itemValue => setSelectedCategory(itemValue)}>
+            <Picker.Item label="Category" value="Choose Category" />
             {categories.map(category => (
               <Picker.Item key={category} label={category} value={category} />
             ))}
           </Picker>
         </View>
-        <View style={styles.filterContainer}>
+
+        <View style={allExpensestyles.pickerContainer}>
           <Picker
             selectedValue={selectedMonth}
-            style={styles.picker}
+            style={allExpensestyles.picker}
             onValueChange={itemValue => setSelectedMonth(itemValue)}>
+            <Picker.Item label="Month" value="Choose Month" />
             {months.map(month => (
               <Picker.Item key={month} label={month} value={month} />
             ))}
           </Picker>
         </View>
+
+        <TouchableOpacity
+          style={allExpensestyles.resetButton}
+          onPress={handleReset}>
+          <Entypo
+            name="circle-with-cross"
+            size={24}
+            style={allExpensestyles.resetIcon}
+          />
+          <Text>Reset Filter</Text>
+        </TouchableOpacity>
       </View>
-      <View style={styles.tableHeader}>
-        <Text style={styles.headerCell}>Date</Text>
-        <Text style={styles.headerCell}>Time</Text>
-        <Text style={styles.headerCell}>Category</Text>
-        <Text style={styles.headerCell}>Amount</Text>
+      <View style={allExpensestyles.tableHeader}>
+        <Text style={allExpensestyles.headerCell}>Date</Text>
+        <Text style={allExpensestyles.headerCell}>Time</Text>
+        <Text style={allExpensestyles.headerCell}>Category</Text>
+        <Text style={allExpensestyles.headerCell}>Amount</Text>
       </View>
-      <FlatList
-        data={filteredExpenses}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-      />
+
+      {expensesLoading ? (
+        <View style={allExpensestyles.loaderContainer}>
+          <ActivityIndicator size="large" color="#007BFF" />
+          <Text style={allExpensestyles.loaderText}>Loading expenses...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredExpenses}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          ListEmptyComponent={
+            <View style={allExpensestyles.emptyContainer}>
+              <Text style={allExpensestyles.emptyText}>No expenses found.</Text>
+            </View>
+          }
+          ListFooterComponent={<View style={{marginBottom: 20}} />}
+        />
+      )}
+
       {selectedExpense && (
         <ExpenseModal
           visible={modalVisible}
@@ -217,65 +244,5 @@ const ExpenseScreen = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: 'white',
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  totalText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 10,
-  },
-  filters: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  filterContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  filterLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  picker: {
-    width: '100%',
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    borderBottomWidth: 2,
-    borderBottomColor: '#ddd',
-    paddingVertical: 8,
-    backgroundColor: '#f1f1f1',
-  },
-  headerCell: {
-    flex: 1,
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'left',
-    color: '#333',
-  },
-  row: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    paddingVertical: 10,
-  },
-  cell: {
-    flex: 1,
-    fontSize: 14,
-    textAlign: 'left',
-    color: '#555',
-  },
-});
 
 export default ExpenseScreen;

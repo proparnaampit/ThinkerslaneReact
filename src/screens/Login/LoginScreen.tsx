@@ -3,6 +3,8 @@ import {PermissionsAndroid, Platform, ActivityIndicator} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import {
   View,
+  Modal,
+  Button,
   TextInput,
   TouchableOpacity,
   ImageBackground,
@@ -27,6 +29,8 @@ const LoginScreen = () => {
   const [deviceId, setDeviceId] = useState<any>(null);
   const [loginMutation] = useLoginMutation();
   const [isLoading, setIsLoading] = useState(false);
+  const [countdown, setCountdown] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const getDeviceId = async () => {
@@ -72,7 +76,6 @@ const LoginScreen = () => {
 
       if (data.results.length > 0) {
         const address = data.results[0].formatted;
-        console.log('Address:', address);
         return address;
       } else {
         return null;
@@ -82,7 +85,24 @@ const LoginScreen = () => {
     }
   };
 
+  const handleForgetPass = () => {
+    setModalVisible(true);
+  };
+
   const handleLogin = async () => {
+    const currentHour = new Date().getHours();
+
+    // if (currentHour < 9 || currentHour >= 21) {
+    //   Toast.show({
+    //     text1: 'Login Time Restriction',
+    //     text2: 'Login is only allowed between 9 AM and 9 PM.',
+    //     type: 'error',
+    //     position: 'top',
+    //     visibilityTime: 2000,
+    //   });
+    //   return;
+    // }
+
     const hasLocationPermission = await requestLocationPermission();
     if (!hasLocationPermission) {
       Toast.show({
@@ -117,18 +137,17 @@ const LoginScreen = () => {
       return;
     }
     setIsLoading(true);
-    const location = await getCurrentLocation();
-
+    const location: any = await getCurrentLocation();
+    let address;
     if (location && location?.coords) {
       if (location.coords.latitude && location.coords.longitude) {
-        const address = await getAddressFromCoordinates(
+        address = await getAddressFromCoordinates(
           location.coords.latitude,
           location.coords.longitude,
         );
       }
-    } else {
-      console.log('Location is not available');
     }
+
     setIsLoading(false);
 
     loginUser(
@@ -136,7 +155,7 @@ const LoginScreen = () => {
       username,
       password,
       deviceId,
-      location,
+      address,
       dispatch,
       setPassword,
     );
@@ -144,17 +163,28 @@ const LoginScreen = () => {
   };
 
   return (
-    <ImageBackground
-      source={require('../../assets/loginBack.jpg')}
-      style={loginStyles.container}>
+    <ImageBackground style={loginStyles.container}>
       <Image
-        source={require('../../assets/loginLogo.png')}
+        source={require('../../assets/logo_png.png')}
+        style={loginStyles.logo}
+      />
+      <Image
+        source={require('../../assets/calligraphy_Suprokash.png')}
         style={loginStyles.logo}
       />
       <View style={loginStyles.overlay} />
       <View style={loginStyles.logoContainer}>
         <CustomText style={loginStyles.signInText}>Sign In</CustomText>
-
+        {countdown && (
+          <View style={loginStyles.countdownContainer}>
+            <CustomText style={loginStyles.countdownText}>
+              {countdown}
+            </CustomText>
+            <CustomText style={loginStyles.logintext}>
+              Login Allowed only between 9AM to 9PM
+            </CustomText>
+          </View>
+        )}
         <View
           style={[
             loginStyles.inputContainer,
@@ -180,7 +210,6 @@ const LoginScreen = () => {
             textContentType="emailAddress"
           />
         </View>
-
         <View
           style={[
             loginStyles.inputContainer,
@@ -207,7 +236,6 @@ const LoginScreen = () => {
             textContentType="password"
           />
         </View>
-
         <TouchableOpacity
           style={[
             commonstyles.button,
@@ -217,6 +245,9 @@ const LoginScreen = () => {
           onPress={handleLogin}>
           <CustomText style={commonstyles.buttonText}>Login</CustomText>
         </TouchableOpacity>
+        <TouchableOpacity style={[loginStyles.gap]} onPress={handleForgetPass}>
+          <CustomText style={{color: 'black'}}>Forget Pass?</CustomText>
+        </TouchableOpacity>
       </View>
 
       {isLoading && (
@@ -224,6 +255,20 @@ const LoginScreen = () => {
           <ActivityIndicator size="large" color="#FFFFFF" />
         </View>
       )}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={loginStyles.modalBackground}>
+          <View style={loginStyles.modalContainer}>
+            <CustomText style={loginStyles.modalText}>
+              Please contact the admin for the username and password.
+            </CustomText>
+            <Button title="Close" onPress={() => setModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 };

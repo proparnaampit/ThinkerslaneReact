@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import dashboardstyles from './dashboardstyles';
 import commonstyles from '../../components/commonstyles';
@@ -18,12 +19,43 @@ const DashboardScreen = () => {
     navigation.navigate('AddOrder');
   };
 
+  const [location, setLocation] = useState('');
+
+  useEffect(() => {
+    const retrieveLocation = async () => {
+      try {
+        const storedLocation = await AsyncStorage.getItem('location');
+        if (storedLocation !== null) {
+          setLocation(storedLocation);
+        } else {
+          setLocation('No location found');
+        }
+      } catch (error) {
+        console.error('Error retrieving location:', error);
+        setLocation('Error retrieving location');
+      }
+    };
+
+    retrieveLocation();
+  }, []);
+
   return (
     <View style={dashboardstyles.container}>
-      <View style={dashboardstyles.dashboard}></View>
       <CustomText style={dashboardstyles.title}>
         Welcome to the Dashboard!
       </CustomText>
+      <CustomText style={[{fontSize: 15, width: '100%', textAlign: 'center'}]}>
+        Logged In Location
+        <FontAwesome
+          name="map-marker"
+          size={20}
+          style={{color: commonstyles.thinkerslane.color, marginLeft: 10}}
+        />
+      </CustomText>
+      <CustomText style={[{fontSize: 12, width: '100%', textAlign: 'center'}]}>
+        {location}
+      </CustomText>
+
       <View style={dashboardstyles.buttonContainer}>
         <TouchableOpacity
           style={[commonstyles.button, commonstyles.expenseButton]}
@@ -64,6 +96,20 @@ const DashboardScreen = () => {
           </View>
         </TouchableOpacity>
       </View>
+      <CustomText
+        style={[
+          {
+            fontSize: 15,
+            width: '100%',
+            textAlign: 'center',
+            backgroundColor: '#ccc',
+            padding: 20,
+          },
+        ]}>
+        If Anything Wrong is Happening , Order not taking , Please close the app
+        , clear it from the recent apps and open it again. If still not working
+        please contact us.
+      </CustomText>
     </View>
   );
 };

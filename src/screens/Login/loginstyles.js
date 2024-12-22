@@ -72,12 +72,47 @@ const loginStyles = StyleSheet.create({
     zIndex: 1,
   },
   signInText: {
-    alignSelf: 'flex-start', // Align the text to the left
+    alignSelf: 'flex-start',
     fontSize: 22,
     fontFamily: 'monospace',
     fontWeight: 'bold',
-    color: '#000', // Adjust to match your theme
+    color: '#000',
     marginBottom: 10,
+  },
+  countdownContainer: {
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  countdownText: {
+    color: 'black',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  logintext: {
+    marginTop: 20,
+    color: 'red',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  },
+  modalContainer: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    marginBottom: 20,
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

@@ -7,6 +7,9 @@ const addOrderStyles = StyleSheet.create({
     backgroundColor: 'white',
     zIndex: 10,
   },
+  headers: {
+    backgroundColor: 'white',
+  },
   footerLoader: {
     paddingVertical: 20,
     justifyContent: 'center',
@@ -16,8 +19,7 @@ const addOrderStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#e6e6e6',
-    borderRadius: 20,
-    paddingHorizontal: 10,
+    borderRadius: 10,
     marginHorizontal: 10,
   },
   totalCart: {
@@ -30,8 +32,12 @@ const addOrderStyles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    padding: 8,
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 10,
     fontSize: 16,
+    borderColor: '#ccc',
+    backgroundColor: 'white',
     color: '#333',
   },
   booksContainer: {

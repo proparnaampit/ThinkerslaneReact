@@ -49,17 +49,23 @@ const CustomHeader = () => {
       visibilityTime: 2000,
     });
   };
-
+  const userImage = data?.userDeatils?.image;
   return (
     <View style={styles.headerContainer}>
-      <Image source={require('../assets/loginLogo.png')} style={styles.logo} />
+      <Image
+        source={require('../assets/calligraphy_Suprokash.png')}
+        style={styles.logo}
+      />
       <View style={styles.iconContainer}>
         <CustomText style={{marginRight: 10}}>
           {data?.userDeatils?.name}
         </CustomText>
+
         <TouchableOpacity onPress={toggleDropdown}>
           <Image
-            source={require('../assets/loginBack.jpg')}
+            source={
+              userImage ? {uri: userImage} : require('../assets/profile.png')
+            }
             style={styles.profileImage}
           />
         </TouchableOpacity>
@@ -95,7 +101,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   logo: {
-    height: 40,
+    height: 30,
     width: '20%',
     resizeMode: 'contain',
   },

@@ -23,7 +23,7 @@ const PaymentMethodModal = ({visible, onClose, onSelectMethod}: any) => {
             <Text style={styles.buttonText}>Proceed with Cash</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.button}
             onPress={() => {
               onSelectMethod('upi');
@@ -31,7 +31,7 @@ const PaymentMethodModal = ({visible, onClose, onSelectMethod}: any) => {
             }}>
             <FontAwesome6 name="credit-card" size={24} color="#009688" />
             <Text style={styles.buttonText}>Proceed with UPI</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Text style={styles.closeButtonText}>Cancel</Text>

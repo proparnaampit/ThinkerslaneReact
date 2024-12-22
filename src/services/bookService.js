@@ -10,15 +10,28 @@ export const bookService = createApi({
       keepUnusedDataFor: 86400,
     }),
     fetchBooks: builder.query({
-      query: searchTerm => {
-        const url = `getBooks?search=${searchTerm}`;
+      query: ({search, pid}) => {
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (pid) params.append('pid', pid);
+        const url = `/getBooks?${params.toString()}`;
+        console.log(url);
+
         return url;
       },
-      transformResponse: response => {
-        return response.data || [];
-      },
+
+      keepUnusedDataFor: 0,
+      transformResponse: response => response.data || [],
+    }),
+    getAllPublishers: builder.query({
+      query: () => 'https://staging.thinkerslane.com/th1/getPublishers',
+      keepUnusedDataFor: 86400,
     }),
   }),
 });
 
-export const {useFetchAllBooksQuery, useFetchBooksQuery} = bookService;
+export const {
+  useFetchAllBooksQuery,
+  useFetchBooksQuery,
+  useGetAllPublishersQuery,
+} = bookService;

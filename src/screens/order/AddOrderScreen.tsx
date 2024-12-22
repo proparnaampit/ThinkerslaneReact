@@ -6,6 +6,7 @@ import {
   ScrollView,
   TextInput,
   Animated,
+  Switch,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import addOrderStyles from './addOrderStyles';
@@ -14,39 +15,84 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import CustomText from '../../components/CustomText';
 import Book from '../../components/book/Book';
-import {useFetchBooksQuery} from '../../services/bookService';
 import {useCart} from '../../context/CartContext';
+import {Dropdown} from 'react-native-element-dropdown';
+import {
+  useFetchBooksQuery,
+  useGetAllPublishersQuery,
+} from '../../services/bookService';
 
 const AddOrderScreen = () => {
   const navigation = useNavigation<any>();
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const {cart, addToCart, decreaseQuantity, increaseQuantity, removeFromCart} =
-    useCart();
+  const [selectedPublisher, setSelectedPublisher] = useState<any>(null);
+  const [triggerSearch, setTriggerSearch] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [isSuprokashSelected, setIsSuprokashSelected] = useState(false);
 
+  const {data: publishersData, isLoading, error} = useGetAllPublishersQuery({});
+
+  const publishers = useMemo(() => {
+    if (publishersData?.data) {
+      return publishersData.data.map(
+        (publisher: {id: string; name: string}) => ({
+          label: publisher.name.trim(),
+          value: publisher.id,
+        }),
+      );
+    }
+    return [];
+  }, [publishersData]);
+
+  const {cart, addToCart, decreaseQuantity} = useCart();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const {
     data: apiBooks,
     isLoading: apiBooksLoading,
     error: apiBooksError,
-  } = useFetchBooksQuery(searchQuery, {
-    skip: searchQuery.length === 0,
-  });
+    refetch,
+  } = useFetchBooksQuery(
+    {search: searchTerm, pid: selectedPublisher},
+    {skip: !triggerSearch},
+  );
+
+  useEffect(() => {
+    if (triggerSearch) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [triggerSearch]);
+
+  useEffect(() => {
+    if (triggerSearch && !apiBooksLoading) {
+      setSearching(false);
+    }
+  }, [apiBooksLoading, triggerSearch]);
+
+  const handleSearchClicked = () => {
+    setTriggerSearch(false);
+    setSearching(true);
+    setTimeout(() => {
+      setTriggerSearch(true);
+    }, 0);
+  };
 
   const filteredBooks = useMemo(() => {
+    if (searching) {
+      return null;
+    }
+
     return apiBooks?.filter((book: any) =>
       book.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [apiBooks, searchTerm]);
 
-  const handleSearchClicked = () => {
-    setSearchQuery(searchTerm);
-  };
-
   const handleAddToCart = (book: any) => {
     const {id, name, image, price, offered_price, actual_price} = book;
-    console.log(book);
     addToCart({
       id,
       name,
@@ -111,26 +157,93 @@ const AddOrderScreen = () => {
           </CustomText>
         </TouchableOpacity>
       </View>
-      <View style={addOrderStyles.header}>
-        <View style={addOrderStyles.searchBar}>
-          <TextInput
-            style={addOrderStyles.searchInput}
-            placeholder="Type book name and hit search button .."
-            value={searchTerm}
-            onChangeText={setSearchTerm}
-          />
 
-          <TouchableOpacity
-            style={{
-              backgroundColor: commonstyles.thinkerslane.color,
-              margin: 10,
-              padding: 10,
-              borderRadius: 10,
-            }}
-            onPress={handleSearchClicked}>
-            <CustomText style={{color: 'white'}}>Search</CustomText>
-          </TouchableOpacity>
+      <View style={addOrderStyles.header}>
+        <CustomText style={{marginBottom: 5}}>Search by book name:</CustomText>
+        <View style={addOrderStyles.headers}>
+          <View style={addOrderStyles.searchBar}>
+            <TextInput
+              style={[
+                addOrderStyles.searchInput,
+                {
+                  backgroundColor: isSuprokashSelected ? '#e0e0e0' : '#fff',
+                  opacity: isSuprokashSelected ? 0.6 : 1,
+                },
+              ]}
+              placeholder="Start typing book name to search..."
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+              editable={!isSuprokashSelected}
+              placeholderTextColor={isSuprokashSelected ? '#aaa' : '#000'}
+            />
+          </View>
         </View>
+        <CustomText style={{marginBottom: 5, marginTop: 10}}>
+          Search by Publisher:
+        </CustomText>
+        <Dropdown
+          data={publishers}
+          labelField="label"
+          valueField="value"
+          placeholder="Select a Publisher"
+          value={selectedPublisher}
+          onChange={item => setSelectedPublisher(item.value)}
+          search={true}
+          searchPlaceholder="Search Publisher..."
+          disable={isSuprokashSelected}
+          style={{
+            marginBottom: 10,
+            borderColor: '#ccc',
+            borderWidth: 1,
+            borderRadius: 8,
+            padding: 8,
+            backgroundColor: isSuprokashSelected ? '#e0e0e0' : '#fff',
+            opacity: isSuprokashSelected ? 0.6 : 1,
+            pointerEvents: isSuprokashSelected ? 'none' : 'auto',
+          }}
+          renderItem={item => (
+            <View style={{padding: 10}}>
+              <CustomText>{item.label}</CustomText>
+            </View>
+          )}
+        />
+
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <Switch
+            value={isSuprokashSelected}
+            onValueChange={setIsSuprokashSelected}
+          />
+          <CustomText>Search only Suprokash Publisher</CustomText>
+        </View>
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: 'red',
+            padding: 10,
+            borderRadius: 8,
+            marginTop: 15,
+          }}
+          onPress={() => {
+            setSearchTerm('');
+            setSelectedPublisher(null);
+            setIsSuprokashSelected(false);
+          }}>
+          <CustomText style={{color: 'white', textAlign: 'center'}}>
+            Reset
+          </CustomText>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: commonstyles.thinkerslane.color,
+            marginVertical: 20,
+            padding: 15,
+            borderRadius: 10,
+            alignItems: 'center',
+          }}
+          onPress={handleSearchClicked}>
+          <CustomText style={{color: 'white'}}>Search</CustomText>
+        </TouchableOpacity>
       </View>
 
       <ScrollView

@@ -1,7 +1,5 @@
 import React, {useState} from 'react';
 import {View, StyleSheet, Image} from 'react-native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation} from '@react-navigation/native';
 import CustomText from '../CustomText';
 import singleBookStyles from './singleBookStyles';
 import FastImage from 'react-native-fast-image';
@@ -28,6 +26,7 @@ const Book = ({data}: any) => {
       />
       <View style={singleBookStyles.textContainer}>
         <CustomText style={singleBookStyles.title}>{data.name}</CustomText>
+        <CustomText style={singleBookStyles.subtitle}>{data.author}</CustomText>
         {data.quantity > 0 && (
           <View style={singleBookStyles.price}>
             <CustomText style={singleBookStyles.priceText}>

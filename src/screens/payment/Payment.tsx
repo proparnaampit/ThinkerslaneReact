@@ -28,7 +28,7 @@ const PaymentScreen = () => {
 
   const calculatePricing = () => {
     const total = Object.values(cart).reduce((acc: number, item: any) => {
-      return acc + item.offered_price * item.quantity;
+      return acc + item.price * item.quantity;
     }, 0);
 
     const appliedDiscount = discountAdded ? (total * discount) / 100 : 0;
@@ -45,8 +45,8 @@ const PaymentScreen = () => {
   const pricing = calculatePricing();
 
   const handlePayment = async () => {
-    const {fullName, email, address, phone, city, state, country, zip} =
-      formData;
+    console.log('s');
+    const {fullName, email, address, phone, city, state, zip} = formData;
 
     const payload = {
       user_id: user_id,
@@ -59,7 +59,7 @@ const PaymentScreen = () => {
         phone: parseInt(phone, 10),
         city,
         state,
-        country,
+        country: 'India',
         pin: parseInt(zip, 10),
         is_paid: paymentMethod === 'cash' ? 1 : 0,
       },
@@ -72,13 +72,14 @@ const PaymentScreen = () => {
 
     try {
       setLoading(true);
-      await addOrderCash(payload).unwrap();
+      const details = await addOrderCash(payload).unwrap();
+
       setTimeout(() => {
         setLoading(false);
         setPaymentSuccess(true);
         setTimeout(() => {
           setPaymentSuccess(false);
-          navigation.navigate('Dashboard');
+          navigation.navigate('Bill', {details});
           Toast.show({
             text1: 'Order added successfully',
             type: 'success',

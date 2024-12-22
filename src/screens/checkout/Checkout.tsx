@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {
   View,
   TouchableOpacity,
@@ -14,35 +14,51 @@ import CustomText from '../../components/CustomText';
 import commonstyles from '../../components/commonstyles';
 import checkoutStyles from './checkoutStyles';
 import cartStyles from '../cart/cartStyles';
+import {Dropdown} from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import PaymentMethodModal from '../../components/modal/PaymentMethodModal';
+import {useGetAllUsersQuery} from '../../services/commonService';
 
 const CheckoutScreen = () => {
   const [orderType, setOrderType] = useState('Online Order');
   const navigation = useNavigation<any>();
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const {data: usersData, isLoading, error} = useGetAllUsersQuery({});
+
+  console.log(usersData);
   const [form, setForm] = useState<any>({
     fullName: '',
     email: '',
     phone: '',
     address: '',
     landmark: '',
-    country: '',
     city: '',
-    state: '',
+    state: 'West Bengal',
     zip: '',
   });
 
   const handleChange = (name: any, value: any) => {
     setForm({...form, [name]: value});
   };
+  useEffect(() => {
+    if (usersData && usersData.data) {
+      console.log('First 10 users:', usersData.data.slice(0, 2));
+    }
+  }, [usersData]);
+
+  const filteredUsers: any = useMemo(() => {
+    return usersData?.data?.filter(
+      (user: any) => user.mobile && user.mobile.trim() !== '',
+    );
+  }, [usersData]);
 
   const handleValidation = () => {
-    const requiredFields = {
+    const requiredFields: any = {
       fullName: 'Full Name',
       phone: 'Phone number',
-      address: 'Address',
-      zip: 'Zip code',
+      zip: 'Pin Code',
     };
 
     for (let field in requiredFields) {
@@ -82,6 +98,20 @@ const CheckoutScreen = () => {
     });
   };
 
+  const handleUserSelection = (item: any) => {
+    setSelectedUser(item?.value);
+    setForm({
+      fullName: item?.name || '',
+      email: item?.email || '',
+      phone: item?.mobile || '',
+      address: item?.address || '',
+      landmark: item?.landmark || '',
+      city: item?.city || '',
+      state: item?.state || 'West Bengal',
+      zip: item?.pin || '',
+    });
+  };
+
   return (
     <View style={checkoutStyles.container}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -108,17 +138,79 @@ const CheckoutScreen = () => {
         </TouchableOpacity>
       </View>
 
+      <Dropdown
+        data={filteredUsers || []}
+        labelField="name"
+        valueField="id"
+        placeholder="Select a User"
+        value={selectedUser}
+        onChange={(item: any) => handleUserSelection(item)}
+        search={true}
+        searchQuery={(keyword, labelValue) => {
+          const lowerKeyword = keyword.toLowerCase();
+          return (
+            labelValue.toLowerCase().includes(lowerKeyword) ||
+            filteredUsers
+              .find((user: {name: string}) => user.name === labelValue)
+              ?.mobile?.toLowerCase()
+              .includes(lowerKeyword) ||
+            filteredUsers
+              .find((user: {name: string}) => user.name === labelValue)
+              ?.pin?.toLowerCase()
+              .includes(lowerKeyword)
+          );
+        }}
+        searchPlaceholder="Search by Name, Mobile, or PIN..."
+        renderItem={item => (
+          <View
+            style={{
+              padding: 15,
+              marginVertical: 5,
+              backgroundColor: '#fff',
+              borderRadius: 8,
+              shadowColor: '#000',
+              shadowOffset: {width: 0, height: 4},
+              shadowOpacity: 0.1,
+              shadowRadius: 6,
+              elevation: 5,
+              borderWidth: 1,
+              borderColor: '#ddd',
+            }}>
+            <View style={{marginBottom: 5}}>
+              <CustomText style={{fontWeight: 'bold'}}>
+                Name: {item.name}
+              </CustomText>
+            </View>
+
+            {item.mobile && (
+              <View style={{marginBottom: 5}}>
+                <CustomText style={{fontWeight: 'bold'}}>
+                  Mobile: {item.mobile}
+                </CustomText>
+              </View>
+            )}
+
+            {item.pin && (
+              <View>
+                <CustomText style={{fontWeight: 'bold'}}>
+                  Pin: {item.pin}
+                </CustomText>
+              </View>
+            )}
+          </View>
+        )}
+        style={{
+          marginTop: 20,
+          borderColor: '#ccc',
+          borderWidth: 1,
+          borderRadius: 8,
+          padding: 8,
+        }}
+      />
+
       <ScrollView
         style={checkoutStyles.form}
         showsVerticalScrollIndicator={false}>
-        <Picker
-          selectedValue={orderType}
-          style={checkoutStyles.input}
-          onValueChange={itemValue => setOrderType(itemValue)}>
-          <Picker.Item label="Online Order" value="Online Order" />
-          <Picker.Item label="Self Collection" value="Self Collection" />
-        </Picker>
-
         <TextInput
           style={checkoutStyles.input}
           placeholder="Full Name"
@@ -152,12 +244,7 @@ const CheckoutScreen = () => {
           value={form.landmark}
           onChangeText={text => handleChange('landmark', text)}
         />
-        <TextInput
-          style={checkoutStyles.input}
-          placeholder="Country"
-          value={form.country}
-          onChangeText={text => handleChange('country', text)}
-        />
+
         <TextInput
           style={checkoutStyles.input}
           placeholder="City"
@@ -172,7 +259,7 @@ const CheckoutScreen = () => {
         />
         <TextInput
           style={checkoutStyles.input}
-          placeholder="Zip"
+          placeholder="PIN Code"
           value={form.zip}
           keyboardType="numeric"
           onChangeText={text => handleChange('zip', text)}
