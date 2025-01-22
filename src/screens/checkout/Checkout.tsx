@@ -17,7 +17,7 @@ import cartStyles from '../cart/cartStyles';
 import {Dropdown} from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import PaymentMethodModal from '../../components/modal/PaymentMethodModal';
-import {useGetAllUsersQuery} from '../../services/commonService';
+import {useGetAllUsersQuery} from '../../services/orderService';
 
 const CheckoutScreen = () => {
   const [orderType, setOrderType] = useState('Online Order');

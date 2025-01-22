@@ -27,10 +27,7 @@ const store = configureStore({
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
-        ignoredPaths: ['register'],
-      },
+      serializableCheck: false,
     }).concat(
       authApi.middleware,
       commonService.middleware,

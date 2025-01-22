@@ -22,16 +22,16 @@ import {Dropdown} from 'react-native-element-dropdown';
 import {
   useFetchBooksQuery,
   useGetAllPublishersQuery,
+  useFetchAllBooksQuery,
 } from '../../services/bookService';
+import {debounce} from 'lodash';
 
 const AddOrderScreen = () => {
   const navigation = useNavigation<any>();
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedPublisher, setSelectedPublisher] = useState<any>(null);
-  const [triggerSearch, setTriggerSearch] = useState(false);
-  const [searching, setSearching] = useState(false);
   const [isSuprokashSelected, setIsSuprokashSelected] = useState(false);
-  const [isLoadingBooks, setIsLoadingBooks] = useState(true);
 
   const {data: publishersData, isLoading, error} = useGetAllPublishersQuery({});
 
@@ -47,60 +47,59 @@ const AddOrderScreen = () => {
     return [];
   }, [publishersData]);
 
+  const handleSearchTermChange = debounce(term => {
+    setDebouncedSearchTerm(term);
+  }, 300);
+
+  // Monitor search input changes
+  const onSearchChange = (text: any) => {
+    setSearchTerm(text);
+    handleSearchTermChange(text); // Update debounced term
+  };
+
   const {cart, addToCart, decreaseQuantity} = useCart();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const {
     data: apiBooks,
     isLoading: apiBooksLoading,
-    error: apiBooksError,
-    refetch,
-  } = useFetchBooksQuery(
-    {search: searchTerm, pid: selectedPublisher},
-    {skip: !triggerSearch},
-  );
-
-  useEffect(() => {
-    if (triggerSearch) {
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [triggerSearch]);
-
-  useEffect(() => {
-    if (triggerSearch && !apiBooksLoading) {
-      setSearching(false);
-    }
-  }, [apiBooksLoading, triggerSearch]);
-
-  const handleSearchClicked = () => {
-    setTriggerSearch(false);
-    setSearching(true);
-    setTimeout(() => {
-      setTriggerSearch(true);
-    }, 0);
-  };
+    error: booksLoadingError,
+  } = useFetchAllBooksQuery({});
 
   const filteredBooks = useMemo(() => {
-    if (searching) {
-      return null;
+    if (apiBooks?.data) {
+      let books = apiBooks.data;
+
+      if (debouncedSearchTerm) {
+        const normalizedSearchTerm = debouncedSearchTerm
+          .normalize('NFC')
+          .toLocaleLowerCase('bn');
+
+        books = books.filter((book: {name: string}) =>
+          book.name
+            .normalize('NFC')
+            .toLocaleLowerCase('bn')
+            .includes(normalizedSearchTerm),
+        );
+      }
+
+      if (selectedPublisher) {
+        books = books.filter(
+          (book: {publisher_id: any}) =>
+            book.publisher_id === selectedPublisher,
+        );
+      }
+
+      return books;
     }
-
-    if (apiBooksLoading) {
-      return [];
-    }
-
-    return apiBooks?.filter((book: any) =>
-      book.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [apiBooks, searchTerm, apiBooksLoading]);
-
-  useEffect(() => {
-    setIsLoadingBooks(apiBooksLoading);
-  }, [apiBooksLoading]);
+    return [];
+  }, [
+    apiBooks,
+    debouncedSearchTerm,
+    selectedPublisher,
+    isSuprokashSelected,
+    searchTerm,
+  ]);
 
   const handleAddToCart = (book: any) => {
     const {id, name, image, price, offered_price, actual_price} = book;
@@ -118,13 +117,6 @@ const AddOrderScreen = () => {
   const handleDecreaseQuantity = (bookId: any) => {
     decreaseQuantity(bookId);
   };
-
-  const message =
-    filteredBooks?.length === 0
-      ? 'No Books Found..'
-      : filteredBooks === undefined
-      ? 'Type the name of the book in the search bar...'
-      : null;
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -195,50 +187,38 @@ const AddOrderScreen = () => {
         <View style={addOrderStyles.headers}>
           <View style={addOrderStyles.searchBar}>
             <TextInput
-              style={[
-                addOrderStyles.searchInput,
-                {
-                  backgroundColor: isSuprokashSelected ? '#e0e0e0' : '#fff',
-                  opacity: isSuprokashSelected ? 0.6 : 1,
-                },
-              ]}
+              style={addOrderStyles.searchInput}
               placeholder="Start typing book name to search..."
               value={searchTerm}
-              onChangeText={setSearchTerm}
-              editable={!isSuprokashSelected}
-              placeholderTextColor={isSuprokashSelected ? '#aaa' : '#000'}
+              onChangeText={onSearchChange}
+              placeholderTextColor="#000"
             />
           </View>
         </View>
         <CustomText style={{marginBottom: 5, marginTop: 10}}>
           Search by Publisher:
         </CustomText>
-        <Dropdown
-          data={publishers}
-          labelField="label"
-          valueField="value"
-          placeholder="Select a Publisher"
-          value={selectedPublisher}
-          onChange={item => setSelectedPublisher(item.value)}
-          search={true}
-          searchPlaceholder="Search Publisher..."
-          disable={isSuprokashSelected}
-          style={{
-            marginBottom: 10,
-            borderColor: '#ccc',
-            borderWidth: 1,
-            borderRadius: 8,
-            padding: 8,
-            backgroundColor: isSuprokashSelected ? '#e0e0e0' : '#fff',
-            opacity: isSuprokashSelected ? 0.6 : 1,
-            pointerEvents: isSuprokashSelected ? 'none' : 'auto',
-          }}
-          renderItem={item => (
-            <View style={{padding: 10}}>
-              <CustomText>{item.label}</CustomText>
-            </View>
-          )}
-        />
+        <View style={addOrderStyles.headers}>
+          <View style={addOrderStyles.searchBar}>
+            <Dropdown
+              data={publishers}
+              labelField="label"
+              valueField="value"
+              placeholder="Select a Publisher"
+              value={selectedPublisher}
+              onChange={item => setSelectedPublisher(item.value)}
+              search={true}
+              searchPlaceholder="Search Publisher..."
+              disable={isSuprokashSelected}
+              style={addOrderStyles.searchInput}
+              renderItem={item => (
+                <View style={{padding: 10}}>
+                  <CustomText>{item.label}</CustomText>
+                </View>
+              )}
+            />
+          </View>
+        </View>
 
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <Switch
@@ -264,6 +244,7 @@ const AddOrderScreen = () => {
           }}
           onPress={() => {
             setSearchTerm('');
+            setDebouncedSearchTerm('');
             setSelectedPublisher(null);
             setIsSuprokashSelected(false);
           }}>
@@ -271,61 +252,7 @@ const AddOrderScreen = () => {
             Reset
           </CustomText>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{
-            backgroundColor: commonstyles.thinkerslane.color,
-            marginVertical: 20,
-            padding: 15,
-            borderRadius: 10,
-            alignItems: 'center',
-          }}
-          onPress={handleSearchClicked}>
-          <CustomText style={{color: 'white'}}>Search</CustomText>
-        </TouchableOpacity>
       </View>
-
-      {/* <ScrollView
-        style={addOrderStyles.booksContainer}
-        showsVerticalScrollIndicator={false}>
-        {apiBooksLoading && <ActivityIndicator size="large" color="#0000ff" />}
-        {filteredBooks?.length > 0 &&
-          filteredBooks.map((book: any) => {
-            const cartItem = cart[book.id];
-            const quantity = cartItem ? cartItem.quantity : 0;
-            return (
-              <TouchableOpacity
-                key={book.id}
-                style={addOrderStyles.bookContainer}
-                onPress={() => handleAddToCart(book)}
-                activeOpacity={0.8}>
-                <View style={{flex: 1}}>
-                  <Book data={book} />
-                </View>
-
-                {quantity > 0 && (
-                  <TouchableOpacity
-                    style={addOrderStyles.quantityBadgeContainer}
-                    onPress={e => {
-                      e.stopPropagation();
-                      handleDecreaseQuantity(book.id);
-                    }}>
-                    <View>
-                      <FontAwesome name="minus" size={16} color="red" />
-                    </View>
-                    <CustomText style={addOrderStyles.quantityText}>
-                      {quantity}
-                    </CustomText>
-                  </TouchableOpacity>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-
-        <Animated.View style={{opacity: fadeAnim}}>
-          <CustomText style={commonstyles.errorText}>{message}</CustomText>
-        </Animated.View>
-      </ScrollView> */}
 
       <View>
         <FlatList
@@ -364,22 +291,26 @@ const AddOrderScreen = () => {
           }}
           keyExtractor={item => item.id}
           ListEmptyComponent={
-            <Animated.View style={{opacity: fadeAnim}}>
-              <CustomText style={commonstyles.errorText}>{message}</CustomText>
-            </Animated.View>
+            apiBooksLoading ? (
+              <View>{renderSkeleton()}</View>
+            ) : (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 20,
+                }}>
+                <CustomText style={commonstyles.errorText}>
+                  {debouncedSearchTerm || selectedPublisher
+                    ? 'No books found for the search criteria.'
+                    : 'Start searching for books by typing in the search bar or selecting a publisher.'}
+                </CustomText>
+              </View>
+            )
           }
           windowSize={21}
           maxToRenderPerBatch={15}
-          extraData={isLoadingBooks}
-          ListEmptyComponent={
-            !isLoadingBooks ? (
-              <CustomText style={commonstyles.errorText}>
-                No books found or maybe loading..
-              </CustomText>
-            ) : (
-              <View>{renderSkeleton()}</View>
-            )
-          }
+          extraData={filteredBooks}
         />
       </View>
     </View>

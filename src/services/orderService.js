@@ -42,6 +42,11 @@ export const orderService = createApi({
       }),
       providesTags: ['Order'],
     }),
+    getAllUsers: builder.query({
+      query: () => `https://thinkerslane.com/th1/getAllUsers`,
+      keepUnusedDataFor: 0,
+      providesTags: ['Order'],
+    }),
   }),
 });
 
@@ -49,4 +54,5 @@ export const {
   useAddOrderCashMutation,
   useGetOrderDetailsQuery,
   useGetOrderHistoryQuery,
+  useGetAllUsersQuery,
 } = orderService;
