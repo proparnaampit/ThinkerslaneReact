@@ -47,8 +47,8 @@ export const CartProvider = ({children}: any) => {
 
       if (newQuantity <= 0) {
         const updatedCart = {...prevCart};
-        delete updatedCart[id]; // Remove the item from the cart
-        return updatedCart; // Return the updated cart without the removed item
+        delete updatedCart[id];
+        return updatedCart;
       }
 
       return {

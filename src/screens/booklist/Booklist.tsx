@@ -21,7 +21,6 @@ import addOrderStyles from '../order/addOrderStyles';
 const BookListScreen = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigation = useNavigation<any>();
-  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [booksToDisplay, setBooksToDisplay] = useState<any[]>([]);
   const {
@@ -31,28 +30,32 @@ const BookListScreen = () => {
   } = useFetchAllBooksQuery({});
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
-
+  const handleSearchClicked = () => {
+    if (booksData) {
+      const filtered = booksData.data.filter((book: any) =>
+        book.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+      setBooksToDisplay(filtered);
+      setPage(1);
+    }
+  };
   const loadMoreBooks = () => {
     if (booksData) {
       const startIndex = page * 10;
-      const nextBooks = booksData?.data?.slice(startIndex, startIndex + 10);
+      const nextBooks = booksData.data.slice(startIndex, startIndex + 10);
       setBooksToDisplay(prevBooks => [...prevBooks, ...nextBooks]);
       setPage(prevPage => prevPage + 1);
     }
   };
 
   const filteredBooks = useMemo(() => {
-    return booksToDisplay.filter((book: any) =>
-      book.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [booksToDisplay, searchTerm]);
-
-  const handleSearchClicked = () => {
-    setSearchQuery(searchTerm);
-    setPage(1);
-    setBooksToDisplay([]);
-    loadMoreBooks();
-  };
+    if (booksData) {
+      return booksData.data.filter((book: any) =>
+        book.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+    }
+    return [];
+  }, [booksData, searchTerm]);
 
   const message =
     filteredBooks?.length === 0
@@ -79,16 +82,6 @@ const BookListScreen = () => {
 
   return (
     <View style={{flex: 1}}>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <FontAwesome6
-            name="arrow-left-long"
-            color={commonstyles.thinkerslane.color}
-            size={24}
-            style={{margin: 10}}
-          />
-        </TouchableOpacity>
-      </View>
       <View style={addOrderStyles.header}>
         <View style={addOrderStyles.searchBar}>
           <TextInput

@@ -48,6 +48,7 @@ export const saveAuthState = async (userId, token) => {
   } else {
     await AsyncStorage.removeItem('userId');
     await AsyncStorage.removeItem('authToken');
+    await AsyncStorage.removeItem('location');
   }
 };
 

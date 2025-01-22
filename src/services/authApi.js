@@ -6,11 +6,13 @@ export const authApi = createApi({
   baseQuery: baseQueryWithAuth,
   endpoints: builder => ({
     login: builder.mutation({
-      query: ({email_id, password, device_id}) => ({
-        url: 'login',
-        method: 'POST',
-        body: {email_id, password, device_id},
-      }),
+      query: ({email_id, password, device_id, location}) => {
+        return {
+          url: 'login',
+          method: 'POST',
+          body: {email_id, password, device_id, location},
+        };
+      },
     }),
     logout: builder.mutation({
       query: ({device_id}) => ({

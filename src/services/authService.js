@@ -15,7 +15,9 @@ export const loginUser = (
     email_id: username,
     password,
     device_id: deviceId,
+    location,
   }).then(response => {
+    console.log('response', response);
     if (response.error && response.error.data?.messages?.error) {
       Toast.show({
         text1: 'Login Failed',
@@ -28,6 +30,7 @@ export const loginUser = (
     } else if (response && response.data.status === 'success') {
       const {token, user_id} = response.data;
       AsyncStorage.setItem('authToken', token);
+      AsyncStorage.setItem('location', location);
       AsyncStorage.setItem('userId', user_id);
       dispatch(login({user_id, token}));
       Toast.show({
