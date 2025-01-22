@@ -24,9 +24,9 @@ export default function App() {
 }
 
 function AppWithRedux() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<any>();
   const [loading, setLoading] = useState(true);
-  const {isLoggedIn} = useSelector(state => state.auth);
+  const {isLoggedIn} = useSelector((state: any) => state.auth);
 
   useEffect(() => {
     dispatch(loadAuthState());

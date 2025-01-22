@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Alert,
@@ -23,9 +23,11 @@ import {useGetOrderDetailsQuery} from '../../services/orderService';
 
 const Bill = ({route}: any) => {
   const {details} = route.params;
+
   const {data, error, isLoading} = useGetOrderDetailsQuery({
     order_id: details?.order_id,
   });
+
   const [share, setShare] = useState(false);
 
   if (isLoading) {
@@ -197,7 +199,6 @@ const Bill = ({route}: any) => {
           <p><strong>Grand Total: </strong>${booking_details.amount}</p>
         </div>
         <div class="footer">
-          <p>Amount In Word: One</p>
           <p>For Thinkerslane<br> Authorized Signatory</p>
         </div>
       </body>

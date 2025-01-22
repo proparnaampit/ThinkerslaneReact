@@ -1609,10 +1609,10 @@
     prompts "^2.4.2"
     semver "^7.5.2"
 
-"@react-native-community/masked-view@^0.1.11":
-  version "0.1.11"
-  resolved "https://registry.yarnpkg.com/@react-native-community/masked-view/-/masked-view-0.1.11.tgz#2f4c6e10bee0786abff4604e39a37ded6f3980ce"
-  integrity sha512-rQfMIGSR/1r/SyN87+VD8xHHzDYeHaJq6elOSCAD+0iLagXkSI2pfA0LmSXP21uw5i3em7GkkRjfJ8wpqWXZNw==
+"@react-native-masked-view/masked-view@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@react-native-masked-view/masked-view/-/masked-view-0.3.2.tgz#7064533a573e3539ec912f59c1f457371bf49dd9"
+  integrity sha512-XwuQoW7/GEgWRMovOQtX3A4PrXhyaZm0lVUiY8qJDvdngjLms9Cpdck6SmGAUNqQwcj2EadHC1HwL0bEyoa/SQ==
 
 "@react-native-picker/picker@^2.9.0":
   version "2.9.0"
@@ -5843,6 +5843,11 @@ react-native-html-to-pdf@^0.12.0:
   resolved "https://registry.yarnpkg.com/react-native-html-to-pdf/-/react-native-html-to-pdf-0.12.0.tgz#2b467296f85c9c9783a7288b19722a7028dcbcb8"
   integrity sha512-Yb5WO9SfF86s5Yv9PqXQ7fZDr9zZOJ+6jtweT9zFLraPNHWX7pSxe2dSkeg3cGiNrib65ZXGN6ksHymfYLFSSg==
 
+react-native-linear-gradient@^2.8.3:
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.8.3.tgz#9a116649f86d74747304ee13db325e20b21e564f"
+  integrity sha512-KflAXZcEg54PXkLyflaSZQ3PJp4uC4whM7nT/Uot9m0e/qxFV3p6uor1983D1YOBJbJN7rrWdqIjq0T42jOJyA==
+
 react-native-print@^0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/react-native-print/-/react-native-print-0.11.0.tgz#3dc69fb05552f0c5da5be0dd345a93e1604621d1"
@@ -5865,6 +5870,11 @@ react-native-share@^12.0.3:
   version "12.0.3"
   resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-12.0.3.tgz#1f2d6fc0c8f1e7ec9e75e0b4915bee78e06dce5b"
   integrity sha512-Bg96AjouSbcpdlI/AzWXMBwpjyWcm4NvGr49mSF1cz8aw8E1sMXwpsHa6I841SJML8Im6sRN3aXnK+/QManrtQ==
+
+react-native-skeleton-placeholder@^5.2.4:
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/react-native-skeleton-placeholder/-/react-native-skeleton-placeholder-5.2.4.tgz#a654fa083ff274a39c763e086f8a850c556d4c95"
+  integrity sha512-OZntVq1hU1UX33FltxK2ezT2v9vHIhV8YnEbnMWUCvxT0N9OsgD1qxiHm6qb9YRJVgq2o5z3S7dNPsPnDF/jNg==
 
 react-native-swipe-gestures@^1.0.5:
   version "1.0.5"
@@ -6015,7 +6025,7 @@ recast@^0.21.0:
     source-map "~0.6.1"
     tslib "^2.0.1"
 
-recyclerlistview@^4.0.0:
+recyclerlistview@^4.0.0, recyclerlistview@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/recyclerlistview/-/recyclerlistview-4.2.1.tgz#4537a0959400cdce1df1f38d26aab823786e9b13"
   integrity sha512-NtVYjofwgUCt1rEsTp6jHQg/47TWjnO92TU2kTVgJ9wsc/ely4HnizHHa+f/dI7qaw4+zcSogElrLjhMltN2/g==

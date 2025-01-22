@@ -24,7 +24,7 @@ export const bookService = createApi({
       transformResponse: response => response.data || [],
     }),
     getAllPublishers: builder.query({
-      query: () => 'https://staging.thinkerslane.com/th1/getPublishers',
+      query: () => 'https://thinkerslane.com/th1/getPublishers',
       keepUnusedDataFor: 86400,
     }),
   }),

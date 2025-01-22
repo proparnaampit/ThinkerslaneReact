@@ -10,7 +10,7 @@ export const commonService = createApi({
       keepUnusedDataFor: 86400,
     }),
     getAllUsers: builder.query({
-      query: () => `https://staging.thinkerslane.com/th1/getAllUsers`,
+      query: () => `https://thinkerslane.com/th1/getAllUsers`,
       keepUnusedDataFor: 86400,
     }),
   }),

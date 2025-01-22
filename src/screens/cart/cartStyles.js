@@ -18,6 +18,35 @@ const cartStyles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
+  modalContainer: {
+    flex: 1, // Ensures the modal takes up the full screen height
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Adds a semi-transparent background
+  },
+  modalContent: {
+    width: '90%', // Adjust width if needed
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  qrImage: {
+    width: '100%',
+    height: '90%',
+    marginBottom: 20,
+  },
+  doneButton: {
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    borderRadius: 5,
+  },
+  doneButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   clearCartButton: {
     marginTop: 20,
     paddingVertical: 12,

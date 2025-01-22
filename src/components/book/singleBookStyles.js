@@ -40,6 +40,13 @@ const singleBookStyles = StyleSheet.create({
     width: '90%',
     color: 'grey',
   },
+  publisher: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    flexWrap: 'wrap',
+    width: '90%',
+    color: 'red',
+  },
   description: {
     fontSize: 14,
     color: '#666',

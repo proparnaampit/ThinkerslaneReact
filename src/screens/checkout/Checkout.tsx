@@ -25,9 +25,8 @@ const CheckoutScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const {data: usersData, isLoading, error} = useGetAllUsersQuery({});
+  const {data: usersData, isLoading, error, refetch} = useGetAllUsersQuery({});
 
-  console.log(usersData);
   const [form, setForm] = useState<any>({
     fullName: '',
     email: '',
@@ -42,11 +41,6 @@ const CheckoutScreen = () => {
   const handleChange = (name: any, value: any) => {
     setForm({...form, [name]: value});
   };
-  useEffect(() => {
-    if (usersData && usersData.data) {
-      console.log('First 10 users:', usersData.data.slice(0, 2));
-    }
-  }, [usersData]);
 
   const filteredUsers: any = useMemo(() => {
     return usersData?.data?.filter(
@@ -64,8 +58,8 @@ const CheckoutScreen = () => {
     for (let field in requiredFields) {
       if (!form[field]) {
         Toast.show({
-          text1: 'Please fill in all mandatory fields.',
-          text2: `${requiredFields[field]} is required`,
+          text2: 'Please fill in all mandatory fields.',
+          text1: `${requiredFields[field]} is required`,
           type: 'error',
           position: 'top',
           visibilityTime: 2000,
@@ -84,6 +78,7 @@ const CheckoutScreen = () => {
 
   const handleSelectMethod = (method: any) => {
     if (!handleValidation()) return;
+    refetch();
 
     Toast.show({
       text1: `Proceeding with ${method}`,

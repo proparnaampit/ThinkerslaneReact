@@ -21,53 +21,69 @@ import {logout as reuxLogout} from '../redux/authSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import {useLogoutMutation} from '../services/authApi';
 import {saveAuthState} from '../redux/authSlice';
+import {useFetchUserInfoQuery} from '../services/commonService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabNavigator() {
-  // const dispatch = useDispatch();
-  // const {isLoggedIn} = useSelector((state: any) => state.auth);
-  // const [deviceId, setDeviceId] = useState(null);
-  // // const [logout] = useLogoutMutation();
+  const dispatch = useDispatch();
+  const {isLoggedIn} = useSelector((state: any) => state.auth);
+  const [deviceId, setDeviceId] = useState(null);
+  const [logout] = useLogoutMutation();
+  const [userId, setUserId] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   const getDeviceId = async () => {
-  //     const uniqueId: any = await DeviceInfo.getUniqueId();
-  //     setDeviceId(uniqueId);
-  //   };
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const id = await AsyncStorage.getItem('userId');
+        setUserId(id);
+      } catch (error) {
+        console.error('Error fetching userId:', error);
+      }
+    };
 
-  //   getDeviceId();
-  // }, []);
+    fetchUserId();
+  }, []);
 
-  // const checkTimeAndLogout = async () => {
-  //   const currentTime = new Date();
-  //   const currentHour = currentTime.getHours();
+  useEffect(() => {
+    const getDeviceId = async () => {
+      const uniqueId: any = await DeviceInfo.getUniqueId();
+      setDeviceId(uniqueId);
+    };
 
-  //   if (currentHour < 9 || currentHour >= 21) {
-  //     dispatch(reuxLogout());
-  //     await logout({device_id: deviceId});
-  //     await saveAuthState(null);
+    getDeviceId();
+  }, []);
 
-  //     ToastAndroid.show(
-  //       'You have been logged out as it is outside the allowed time (9 AM - 9 PM). You can log in tomorrow after 9 AM.',
-  //       ToastAndroid.LONG,
-  //     );
-  //   }
-  // };
+  const checkTimeAndLogout = async () => {
+    const currentTime = new Date();
+    const currentHour = currentTime.getHours();
 
-  // useEffect(() => {
-  //   if (isLoggedIn !== null && isLoggedIn) {
-  //     checkTimeAndLogout();
-  //   }
-  // }, [isLoggedIn]);
+    if (currentHour < 9 || currentHour >= 21) {
+      dispatch(reuxLogout());
+      await logout({device_id: deviceId});
+      await saveAuthState(null);
 
-  // if (isLoggedIn === null) {
-  //   return (
-  //     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-  //       <ActivityIndicator size="large" color="#0000ff" />
-  //     </View>
-  //   );
-  // }
+      ToastAndroid.show(
+        'You have been logged out as it is outside the allowed time (9 AM - 9 PM). You can log in tomorrow after 9 AM.',
+        ToastAndroid.LONG,
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (userId !== null && isLoggedIn && userId !== '13026') {
+      checkTimeAndLogout();
+    }
+  }, [isLoggedIn, userId]);
+
+  if (isLoggedIn === null) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <Tab.Navigator

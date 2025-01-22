@@ -27,6 +27,9 @@ const Book = ({data}: any) => {
       <View style={singleBookStyles.textContainer}>
         <CustomText style={singleBookStyles.title}>{data.name}</CustomText>
         <CustomText style={singleBookStyles.subtitle}>{data.author}</CustomText>
+        <CustomText style={singleBookStyles.publisher}>
+          Publisher: {data?.publisher_name}
+        </CustomText>
         {data.quantity > 0 && (
           <View style={singleBookStyles.price}>
             <CustomText style={singleBookStyles.priceText}>

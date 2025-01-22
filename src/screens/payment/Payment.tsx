@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {View, TouchableOpacity, TextInput, StyleSheet} from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+  Image,
+  Modal,
+} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import paymentstyles from './paymentstyles';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
@@ -17,6 +24,7 @@ import {useAddOrderCashMutation} from '../../services/orderService';
 const PaymentScreen = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
+  const [showUPIModal, setShowUPIModal] = useState(false);
   const {formData, paymentMethod} = route.params;
   const {cart, clearCart} = useCart();
   const [discount, setDiscount] = useState(0);
@@ -43,33 +51,42 @@ const PaymentScreen = () => {
   };
 
   const pricing = calculatePricing();
+  const {fullName, email, address, phone, city, state, zip} = formData;
+
+  const payload = {
+    user_id: user_id,
+    payment_method: paymentMethod,
+    booking_user_details: {
+      user_id: 1,
+      name: fullName,
+      email,
+      address,
+      phone: parseInt(phone, 10),
+      city,
+      state,
+      country: 'India',
+      pin: parseInt(zip, 10),
+      is_paid: 1,
+    },
+    pricing,
+    booking_products: Object.values(cart).map((item: any) => ({
+      product_id: item.id,
+      quantity: item.quantity || 1,
+    })),
+  };
+
+  console.log(payload);
 
   const handlePayment = async () => {
-    console.log('s');
-    const {fullName, email, address, phone, city, state, zip} = formData;
+    if (paymentMethod === 'upi') {
+      setShowUPIModal(true);
+      return;
+    }
 
-    const payload = {
-      user_id: user_id,
-      payment_method: paymentMethod,
-      booking_user_details: {
-        user_id: 1,
-        name: fullName,
-        email,
-        address,
-        phone: parseInt(phone, 10),
-        city,
-        state,
-        country: 'India',
-        pin: parseInt(zip, 10),
-        is_paid: paymentMethod === 'cash' ? 1 : 0,
-      },
-      pricing,
-      booking_products: Object.values(cart).map((item: any) => ({
-        product_id: item.id,
-        quantity: item.quantity || 1,
-      })),
-    };
+    await processPayment(payload);
+  };
 
+  const processPayment = async (payload: any) => {
     try {
       setLoading(true);
       const details = await addOrderCash(payload).unwrap();
@@ -160,7 +177,9 @@ const PaymentScreen = () => {
             size={20}
             style={cartStyles.proceedButtonIcon}
           />
-          <CustomText style={cartStyles.proceedButtonText}>Pay</CustomText>
+          <CustomText style={cartStyles.proceedButtonText}>
+            {paymentMethod === 'upi' ? 'Pay with UPI' : 'Pay'}
+          </CustomText>
         </TouchableOpacity>
       </View>
 
@@ -195,6 +214,30 @@ const PaymentScreen = () => {
           value={discount.toString()}
         />
       </View>
+
+      <Modal
+        visible={showUPIModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowUPIModal(false)}>
+        <View style={cartStyles.modalContainer}>
+          <View style={cartStyles.modalContent}>
+            <Image
+              source={require('../../assets/qr.jpg')}
+              style={cartStyles.qrImage}
+              resizeMode="contain"
+            />
+            <TouchableOpacity
+              style={cartStyles.doneButton}
+              onPress={async () => {
+                setShowUPIModal(false);
+                await processPayment(payload);
+              }}>
+              <CustomText style={cartStyles.doneButtonText}>Done</CustomText>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

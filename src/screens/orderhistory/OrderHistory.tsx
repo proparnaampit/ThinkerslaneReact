@@ -21,11 +21,11 @@ const OrderHistory = () => {
   const navigation = useNavigation<any>();
   const user_id = useSelector((state: any) => state?.auth?.userId);
   const {data, error, isLoading} = useGetOrderHistoryQuery({user_id: user_id});
+
   const currentDate = new Date().toISOString().split('T')[0];
   const [dateRange, setDateRange] = useState<any>({});
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
 
-  console.log(data);
   if (isLoading) {
     return (
       <View style={styles.loaderContainer}>

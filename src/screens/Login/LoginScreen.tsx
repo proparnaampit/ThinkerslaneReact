@@ -4,6 +4,7 @@ import Geolocation from 'react-native-geolocation-service';
 import {
   View,
   Modal,
+  ToastAndroid,
   Button,
   TextInput,
   TouchableOpacity,
@@ -92,16 +93,24 @@ const LoginScreen = () => {
   const handleLogin = async () => {
     const currentHour = new Date().getHours();
 
-    // if (currentHour < 9 || currentHour >= 21) {
-    //   Toast.show({
-    //     text1: 'Login Time Restriction',
-    //     text2: 'Login is only allowed between 9 AM and 9 PM.',
-    //     type: 'error',
-    //     position: 'top',
-    //     visibilityTime: 2000,
-    //   });
-    //   return;
-    // }
+    if (username == 'stafftest@gmail.com') {
+      //do nothing
+    } else if (currentHour < 9 || currentHour >= 21) {
+      Toast.show({
+        text1: 'Login Time Restriction',
+        text2: 'Login is only allowed between 9 AM and 9 PM.',
+        type: 'error',
+        position: 'top',
+        visibilityTime: 2000,
+      });
+
+      ToastAndroid.show(
+        'Login is only allowed between 9 AM and 9 PM.',
+        ToastAndroid.LONG,
+      );
+
+      return;
+    }
 
     const hasLocationPermission = await requestLocationPermission();
     if (!hasLocationPermission) {

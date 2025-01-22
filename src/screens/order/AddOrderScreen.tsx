@@ -4,10 +4,12 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
+  FlatList,
   TextInput,
   Animated,
   Switch,
 } from 'react-native';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import {useNavigation} from '@react-navigation/native';
 import addOrderStyles from './addOrderStyles';
 import commonstyles from '../../components/commonstyles';
@@ -29,6 +31,7 @@ const AddOrderScreen = () => {
   const [triggerSearch, setTriggerSearch] = useState(false);
   const [searching, setSearching] = useState(false);
   const [isSuprokashSelected, setIsSuprokashSelected] = useState(false);
+  const [isLoadingBooks, setIsLoadingBooks] = useState(true);
 
   const {data: publishersData, isLoading, error} = useGetAllPublishersQuery({});
 
@@ -86,10 +89,18 @@ const AddOrderScreen = () => {
       return null;
     }
 
+    if (apiBooksLoading) {
+      return [];
+    }
+
     return apiBooks?.filter((book: any) =>
       book.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-  }, [apiBooks, searchTerm]);
+  }, [apiBooks, searchTerm, apiBooksLoading]);
+
+  useEffect(() => {
+    setIsLoadingBooks(apiBooksLoading);
+  }, [apiBooksLoading]);
 
   const handleAddToCart = (book: any) => {
     const {id, name, image, price, offered_price, actual_price} = book;
@@ -131,6 +142,27 @@ const AddOrderScreen = () => {
   const handleCartAction = () => {
     navigation.navigate('Cart');
   };
+
+  const renderSkeleton = () => (
+    <SkeletonPlaceholder>
+      <SkeletonPlaceholder.Item
+        flexDirection="row"
+        padding={10}
+        alignItems="center"
+        marginBottom={10}>
+        <SkeletonPlaceholder.Item width={80} height={120} borderRadius={10} />
+        <SkeletonPlaceholder.Item marginLeft={10} flex={1}>
+          <SkeletonPlaceholder.Item width="80%" height={20} borderRadius={4} />
+          <SkeletonPlaceholder.Item
+            width="60%"
+            height={20}
+            borderRadius={4}
+            marginTop={6}
+          />
+        </SkeletonPlaceholder.Item>
+      </SkeletonPlaceholder.Item>
+    </SkeletonPlaceholder>
+  );
 
   return (
     <View style={{flex: 1, padding: 10}}>
@@ -211,7 +243,14 @@ const AddOrderScreen = () => {
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <Switch
             value={isSuprokashSelected}
-            onValueChange={setIsSuprokashSelected}
+            onValueChange={value => {
+              setIsSuprokashSelected(value);
+              if (value) {
+                setSelectedPublisher('794');
+              } else {
+                setSelectedPublisher(null);
+              }
+            }}
           />
           <CustomText>Search only Suprokash Publisher</CustomText>
         </View>
@@ -246,7 +285,7 @@ const AddOrderScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
+      {/* <ScrollView
         style={addOrderStyles.booksContainer}
         showsVerticalScrollIndicator={false}>
         {apiBooksLoading && <ActivityIndicator size="large" color="#0000ff" />}
@@ -286,7 +325,63 @@ const AddOrderScreen = () => {
         <Animated.View style={{opacity: fadeAnim}}>
           <CustomText style={commonstyles.errorText}>{message}</CustomText>
         </Animated.View>
-      </ScrollView>
+      </ScrollView> */}
+
+      <View>
+        <FlatList
+          data={filteredBooks}
+          initialNumToRender={10}
+          renderItem={({item: book}) => {
+            const cartItem = cart[book.id];
+            const quantity = cartItem ? cartItem.quantity : 0;
+            return (
+              <TouchableOpacity
+                key={book.id}
+                style={addOrderStyles.bookContainer}
+                onPress={() => handleAddToCart(book)}
+                activeOpacity={0.8}>
+                <View style={{flex: 1}}>
+                  <Book data={book} />
+                </View>
+
+                {quantity > 0 && (
+                  <TouchableOpacity
+                    style={addOrderStyles.quantityBadgeContainer}
+                    onPress={e => {
+                      e.stopPropagation();
+                      handleDecreaseQuantity(book.id);
+                    }}>
+                    <View>
+                      <FontAwesome name="minus" size={16} color="red" />
+                    </View>
+                    <CustomText style={addOrderStyles.quantityText}>
+                      {quantity}
+                    </CustomText>
+                  </TouchableOpacity>
+                )}
+              </TouchableOpacity>
+            );
+          }}
+          keyExtractor={item => item.id}
+          ListEmptyComponent={
+            <Animated.View style={{opacity: fadeAnim}}>
+              <CustomText style={commonstyles.errorText}>{message}</CustomText>
+            </Animated.View>
+          }
+          windowSize={21}
+          maxToRenderPerBatch={15}
+          extraData={isLoadingBooks}
+          ListEmptyComponent={
+            !isLoadingBooks ? (
+              <CustomText style={commonstyles.errorText}>
+                No books found or maybe loading..
+              </CustomText>
+            ) : (
+              <View>{renderSkeleton()}</View>
+            )
+          }
+        />
+      </View>
     </View>
   );
 };
