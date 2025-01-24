@@ -51,10 +51,9 @@ const AddOrderScreen = () => {
     setDebouncedSearchTerm(term);
   }, 300);
 
-  // Monitor search input changes
   const onSearchChange = (text: any) => {
     setSearchTerm(text);
-    handleSearchTermChange(text); // Update debounced term
+    handleSearchTermChange(text);
   };
 
   const {cart, addToCart, decreaseQuantity} = useCart();
@@ -254,7 +253,7 @@ const AddOrderScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <View>
+      <View style={{flex: 1}}>
         <FlatList
           data={filteredBooks}
           initialNumToRender={10}
@@ -308,7 +307,8 @@ const AddOrderScreen = () => {
               </View>
             )
           }
-          windowSize={21}
+          windowSize={29}
+          ListFooterComponent={<View style={{marginBottom: 300}} />}
           maxToRenderPerBatch={15}
           extraData={filteredBooks}
         />

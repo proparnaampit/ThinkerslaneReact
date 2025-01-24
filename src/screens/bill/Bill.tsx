@@ -68,11 +68,7 @@ const Bill = ({route}: any) => {
           <td>${product.publisher_name ? product.publisher_name : 'None'}</td>
           <td>${product.quantity}</td>
           <td>
-            <p>Basic Amount</p>
-            
-          </td>
-          <td>
-            <p>${product.price}</p>
+            <p>₹${product.price}</p>
           </td>
         </tr>
       `,
@@ -179,7 +175,7 @@ const Bill = ({route}: any) => {
               <p><strong>Order Date: </strong>${booking_details.order_date_time}</p>
               <p><strong>Invoice No: </strong>IN-${booking_details.id}</p>
               <p><strong>Invoice Date: </strong>${booking_details.order_date_time}</p>
-              <p><strong>Discount Added: </strong>${booking_details.discount_amount}(${discountPercentage}%)</p>
+              <p><strong>Discount Added: </strong>₹${booking_details.discount_amount}</p>
             </div>
           </div>
         </div>
@@ -190,13 +186,12 @@ const Bill = ({route}: any) => {
             <th>Publisher</th>
             <th>Quantity</th>
             <th>Price</th>
-            <th>Unit Cost</th>
           </tr>
           ${productRows}
         </table>
         <div style="text-align:center">
-          <p><strong>Discount Amount: </strong>${booking_details.discount_amount}(${discountPercentage}%)</p>
-          <p><strong>Grand Total: </strong>${booking_details.amount}</p>
+          <p><strong>Discount Amount: </strong>₹${booking_details.discount_amount} (${discountPercentage}%)</p>
+          <p><strong>Grand Total: </strong>₹${booking_details.amount}</p>
         </div>
         <div class="footer">
           <p>For Thinkerslane<br> Authorized Signatory</p>

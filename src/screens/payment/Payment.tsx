@@ -75,8 +75,6 @@ const PaymentScreen = () => {
     })),
   };
 
-  console.log(payload);
-
   const handlePayment = async () => {
     if (paymentMethod === 'upi') {
       setShowUPIModal(true);
@@ -188,7 +186,7 @@ const PaymentScreen = () => {
           Total: ₹{pricing.total}
         </CustomText>
         <CustomText style={paymentstyles.pricingText}>
-          Discount: %{pricing.discount}
+          Discount: ₹{pricing.discount}
         </CustomText>
         <CustomText style={paymentstyles.grandTotalText}>
           Grand Total: ₹{pricing.grand_total}
