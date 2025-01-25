@@ -23,7 +23,7 @@ import {useGetOrderDetailsQuery} from '../../services/orderService';
 
 const Bill = ({route}: any) => {
   const {details} = route.params;
-
+  const [districtName, setDistrictName] = useState('Not mentioned');
   const {data, error, isLoading} = useGetOrderDetailsQuery({
     order_id: details?.order_id,
   });
@@ -58,6 +58,31 @@ const Bill = ({route}: any) => {
   const {booking_product_details} = data;
   const {total_order_price, discount_amount} = booking_details;
   const discountPercentage = (discount_amount / total_order_price) * 100;
+
+  useEffect(() => {
+    const fetchDistrict = async () => {
+      try {
+        const response = await fetch(
+          `http://www.postalpincode.in/api/pincode/${booking_details?.billing_pin}`,
+        );
+
+        const result = await response.json();
+
+        if (result.Status === 'Success' && result.PostOffice?.length > 0) {
+          setDistrictName(result.PostOffice[0].District || 'Not mentioned');
+        } else {
+          setDistrictName('Not mentioned');
+        }
+      } catch (error) {
+        console.error('Error fetching pincode details:', error);
+        setDistrictName('Not mentioned');
+      }
+    };
+
+    if (booking_details?.billing_pin) {
+      fetchDistrict();
+    }
+  }, [booking_details?.billing_pin]);
 
   const productRows = booking_product_details
     .map(
@@ -166,7 +191,7 @@ const Bill = ({route}: any) => {
           <div class="details-section">
             <div class="details">
               <p><strong>Sold By:</strong><br> 16, Radhanath Mullick Lane, College Street, Kolkata : 700012</p>
-              <p><strong>Billing Address:</strong><br> ${booking_details.name}<br> ${booking_details.billing_address}, P.O- ${booking_details.billing_city}-${booking_details.billing_pin}<br> Dist- Nadia<br> Mobile :${booking_details.mobile}</p>
+              <p><strong>Billing Address:</strong><br> ${booking_details.name}<br> ${booking_details.billing_address}, P.O- ${booking_details.billing_city}-${booking_details.billing_pin}<br> Dist- ${districtName}<br> Mobile :${booking_details.mobile}</p>
             </div>
           </div>
           <div class="details-section">
