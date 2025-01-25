@@ -17,6 +17,22 @@ import {Calendar} from 'react-native-calendars';
 import commonstyles from '../../components/commonstyles';
 import styles from './orderHistStyles';
 
+const getIntermediateDates = (start: any, end: any) => {
+  if (!start || !end) return {};
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const dates: any = {};
+
+  while (startDate < endDate) {
+    startDate.setDate(startDate.getDate() + 1);
+    dates[startDate.toISOString().split('T')[0]] = {
+      color: '#c7a4ff',
+      textColor: 'white',
+    };
+  }
+  return dates;
+};
+
 const OrderHistory = () => {
   const navigation = useNavigation<any>();
   const user_id = useSelector((state: any) => state?.auth?.userId);
@@ -25,23 +41,6 @@ const OrderHistory = () => {
   const currentDate = new Date().toISOString().split('T')[0];
   const [dateRange, setDateRange] = useState<any>({});
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
-
-  if (isLoading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading Order History...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text>Error fetching order history. Please try again later.</Text>
-      </View>
-    );
-  }
 
   const sortedOrders = [...(data?.data || [])].sort(
     (a: any, b: any) => b.booking_details.id - a.booking_details.id,
@@ -145,97 +144,95 @@ const OrderHistory = () => {
       </Modal>
 
       <ScrollView>
-        {filteredOrders.map((order: any, index: any) => (
-          <View key={index} style={styles.orderCard}>
-            <TouchableOpacity
-              onPress={() => handleOrderPress(order.booking_details.id)}
-              style={styles.orderDetails}>
-              <View style={styles.orderRow}>
-                <Ionicons
-                  name="receipt-outline"
-                  size={18}
-                  color={commonstyles.thinkerslane.color}
-                />
-                <Text style={styles.orderId}>
-                  Order ID: {order.booking_details.id}
-                </Text>
-              </View>
-              <View style={styles.orderRow}>
-                <Ionicons
-                  name="key-outline"
-                  size={18}
-                  color={commonstyles.thinkerslane.color}
-                />
-                <Text style={styles.uniqueCode}>
-                  Unique Code: {order.booking_details.unique_code}
-                </Text>
-              </View>
-              <View style={styles.orderRow}>
-                <Ionicons
-                  name="wallet-outline"
-                  size={18}
-                  color={commonstyles.thinkerslane.color}
-                />
-                <Text style={styles.orderAmount}>
-                  Total Amount: ₹{order.booking_details.amount}
-                </Text>
-              </View>
-              <View style={styles.orderRow}>
-                <Ionicons
-                  name="calendar-outline"
-                  size={18}
-                  color={commonstyles.thinkerslane.color}
-                />
-                <Text style={styles.orderDate}>
-                  Order Date: {order.booking_details.order_date_time}
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <Text style={styles.productHeader}>Products:</Text>
-            {order.booking_product_details.map((product: any, idx: any) => (
-              <View key={idx} style={styles.productCard}>
-                <View style={styles.productRow}>
-                  <MaterialIcons name="shopping-cart" size={18} color="#555" />
-                  <Text style={styles.productName}>
-                    Name: {product.product_name}
-                  </Text>
-                </View>
-                <View style={styles.productRow}>
-                  <Ionicons name="cube-outline" size={18} color="#555" />
-                  <Text style={styles.productQuantity}>
-                    Quantity: {product.quantity}
-                  </Text>
-                </View>
-                <View style={styles.productRow}>
-                  <Ionicons name="pricetag-outline" size={18} color="#555" />
-                  <Text style={styles.productPrice}>
-                    Price: ₹{product.price}
-                  </Text>
-                </View>
-              </View>
-            ))}
+        {isLoading ? (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator
+              size="large"
+              color={commonstyles.thinkerslane.color}
+            />
+            <Text style={styles.loaderText}>Loading Orders...</Text>
           </View>
-        ))}
+        ) : (
+          filteredOrders.map((order: any, index: any) => (
+            <View key={index} style={styles.orderCard}>
+              <TouchableOpacity
+                onPress={() => handleOrderPress(order.booking_details.id)}
+                style={styles.orderDetails}>
+                <View style={styles.orderRow}>
+                  <Ionicons
+                    name="receipt-outline"
+                    size={18}
+                    color={commonstyles.thinkerslane.color}
+                  />
+                  <Text style={styles.orderId}>
+                    Order ID: {order.booking_details.id}
+                  </Text>
+                </View>
+                <View style={styles.orderRow}>
+                  <Ionicons
+                    name="key-outline"
+                    size={18}
+                    color={commonstyles.thinkerslane.color}
+                  />
+                  <Text style={styles.uniqueCode}>
+                    Unique Code: {order.booking_details.unique_code}
+                  </Text>
+                </View>
+                <View style={styles.orderRow}>
+                  <Ionicons
+                    name="wallet-outline"
+                    size={18}
+                    color={commonstyles.thinkerslane.color}
+                  />
+                  <Text style={styles.orderAmount}>
+                    Total Amount: ₹{order.booking_details.amount}
+                  </Text>
+                </View>
+                <View style={styles.orderRow}>
+                  <Ionicons
+                    name="calendar-outline"
+                    size={18}
+                    color={commonstyles.thinkerslane.color}
+                  />
+                  <Text style={styles.orderDate}>
+                    Order Date: {order.booking_details.order_date_time}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <Text style={styles.productHeader}>Products:</Text>
+              {order.booking_product_details.map((product: any, idx: any) => (
+                <View key={idx} style={styles.productCard}>
+                  <View style={styles.productRow}>
+                    <MaterialIcons
+                      name="shopping-cart"
+                      size={18}
+                      color="#555"
+                    />
+                    <Text style={styles.productName}>
+                      Name: {product.product_name}
+                    </Text>
+                  </View>
+                  <View style={styles.productRow}>
+                    <Ionicons name="cube-outline" size={18} color="#555" />
+                    <Text style={styles.productQuantity}>
+                      Quantity: {product.quantity}
+                    </Text>
+                  </View>
+                  <View style={styles.productRow}>
+                    <Ionicons name="pricetag-outline" size={18} color="#555" />
+                    <Text style={styles.productPrice}>
+                      Price: ₹{product.price}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          ))
+        )}
       </ScrollView>
     </View>
   );
-};
-
-const getIntermediateDates = (start: any, end: any) => {
-  if (!start || !end) return {};
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-  const dates: any = {};
-
-  while (startDate < endDate) {
-    startDate.setDate(startDate.getDate() + 1);
-    dates[startDate.toISOString().split('T')[0]] = {
-      color: '#c7a4ff',
-      textColor: 'white',
-    };
-  }
-  return dates;
 };
 
 export default OrderHistory;

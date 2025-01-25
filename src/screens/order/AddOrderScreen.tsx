@@ -307,7 +307,7 @@ const AddOrderScreen = () => {
               </View>
             )
           }
-          windowSize={29}
+          windowSize={5}
           ListFooterComponent={<View style={{marginBottom: 300}} />}
           maxToRenderPerBatch={15}
           extraData={filteredBooks}

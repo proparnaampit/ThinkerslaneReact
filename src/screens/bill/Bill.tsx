@@ -29,35 +29,13 @@ const Bill = ({route}: any) => {
   });
 
   const [share, setShare] = useState(false);
-
-  if (isLoading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator
-          size="large"
-          color={commonstyles.thinkerslane.color}
-        />
-        <CustomText style={styles.loaderText}>Generating Bill...</CustomText>
-      </View>
-    );
-  }
-
-  if (share) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator
-          size="large"
-          color={commonstyles.thinkerslane.color}
-        />
-        <CustomText style={styles.loaderText}>Generating PDF...</CustomText>
-      </View>
-    );
-  }
-
-  const {booking_details} = data;
-  const {booking_product_details} = data;
-  const {total_order_price, discount_amount} = booking_details;
-  const discountPercentage = (discount_amount / total_order_price) * 100;
+  const booking_details = data?.booking_details || {};
+  const booking_product_details = data?.booking_product_details || [];
+  const total_order_price = booking_details.total_order_price || 0;
+  const discount_amount = booking_details.discount_amount || 0;
+  const discountPercentage = total_order_price
+    ? ((discount_amount / total_order_price) * 100).toFixed(1)
+    : '0.00';
 
   useEffect(() => {
     const fetchDistrict = async () => {
@@ -275,6 +253,30 @@ const Bill = ({route}: any) => {
   const handleDoneAction = () => {
     navigation.navigate('Dashboard');
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator
+          size="large"
+          color={commonstyles.thinkerslane.color}
+        />
+        <CustomText style={styles.loaderText}>Generating Bill...</CustomText>
+      </View>
+    );
+  }
+
+  if (share) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator
+          size="large"
+          color={commonstyles.thinkerslane.color}
+        />
+        <CustomText style={styles.loaderText}>Generating PDF...</CustomText>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
