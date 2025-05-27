@@ -1,0 +1,85 @@
+import {StyleSheet, Dimensions} from 'react-native';
+
+const informationStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  noteText: {
+    fontSize: 10,
+    color: 'gray',
+    marginBottom: 10,
+  },
+  label: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: 'purple',
+  },
+  picker: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    fontSize: 13,
+  },
+  input: {
+    height: 40,
+    borderWidth: 1,
+    fontSize: 13,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 5,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  fetchButton: {
+    backgroundColor: '#007AFF',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 10,
+    minWidth: 80,
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  fetchButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 16,
+  },
+  radioContainer: {
+    flexDirection: 'row',
+    marginBottom: 22,
+  },
+  radioButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 20,
+  },
+  radioCircle: {
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: 'grey',
+    marginRight: 8,
+  },
+  radioSelected: {
+    backgroundColor: 'red',
+  },
+  radioText: {
+    fontSize: 16,
+  },
+});
+
+export default informationStyles;

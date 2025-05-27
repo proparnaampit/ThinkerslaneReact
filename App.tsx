@@ -7,6 +7,7 @@ import {ActivityIndicator, View} from 'react-native';
 import {PersistGate} from 'redux-persist/integration/react';
 import {loadAuthState} from './src/redux/authSlice';
 import {CartProvider} from './src/context/CartContext';
+import {FormProvider} from './src/screens/context/FormContextType';
 
 export default function App() {
   return (
@@ -15,7 +16,9 @@ export default function App() {
         loading={<ActivityIndicator size="large" color="#0000ff" />}
         persistor={persistor}>
         <CartProvider>
-          <AppWithRedux />
+          <FormProvider>
+            <AppWithRedux />
+          </FormProvider>
         </CartProvider>
       </PersistGate>
       <Toast />
