@@ -27,6 +27,10 @@ export const bookService = createApi({
       query: () => 'https://thinkerslane.com/th1/getPublishers',
       keepUnusedDataFor: 86400,
     }),
+    getAllCategory: builder.query({
+      query: () => 'https://staging.thinkerslane.com/thAdmin/getAllCategory',
+      keepUnusedDataFor: 86400,
+    }),
   }),
 });
 
@@ -34,4 +38,5 @@ export const {
   useFetchAllBooksQuery,
   useFetchBooksQuery,
   useGetAllPublishersQuery,
+  useGetAllCategoryQuery,
 } = bookService;

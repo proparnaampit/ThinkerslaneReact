@@ -1,60 +1,60 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image, Alert, Platform, PermissionsAndroid } from 'react-native';
-import ImagePicker, { Image as PickedImage } from 'react-native-image-crop-picker';
+import React, {useCallback, useEffect} from 'react';
+import {View, Text, TouchableOpacity, Image, Alert} from 'react-native';
+import ImagePicker, {
+  Image as PickedImage,
+} from 'react-native-image-crop-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import galleryStyles from './css/pricing';
+import {useFormContext} from '../context/FormContextType';
 
 interface FileData {
+  id: string;
   uri: string;
   name: string | null;
   type: string | null;
 }
 
 const FilePickerComponent = () => {
-  const [files, setFiles] = useState<FileData[]>([]);
-  const [formData, setFormData] = useState<FormData>(new FormData());
+  const {formData, addImage, removeImage, replaceImage} = useFormContext();
 
-  // Pick multiple images
-  const requestPermissions = async () => {
-    if (Platform.OS !== 'android') return true;
-    try {
-      const granted = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-      ]);
-      return (
-        granted[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE] === PermissionsAndroid.RESULTS.GRANTED &&
-        granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] === PermissionsAndroid.RESULTS.GRANTED
-      );
-    } catch (err) {
-      console.error('Permission error:', err);
-      return false;
-    }
-  };
+  const generateUniqueId = () =>
+    `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
   const pickFile = async () => {
-    
-
     try {
+      const currentImages: any = Array.isArray(formData?.images)
+        ? formData.images
+        : [];
+      console.log(
+        'Current image IDs before pick:',
+        currentImages.map((img: any) => img.id),
+      );
+
       const results: PickedImage[] = await ImagePicker.openPicker({
         mediaType: 'photo',
         multiple: true,
-        maxFiles: 5 - files.length,
+        includeBase64: true,
+        maxFiles: 5 - currentImages.length,
         cropping: false,
         compressImageQuality: 0.8,
       });
 
-      if (files.length + results.length > 5) {
+      if (currentImages.length + results.length > 5) {
         Alert.alert('Limit Reached', 'You can only select up to 5 images.');
         return;
       }
 
-      const formattedResults: FileData[] = results.map((result, index) => ({
-        uri: result.path,
-        name: result.filename ?? `image${Date.now()}_${index}.jpg`,
-        type: result.mime ?? 'image/jpeg',
-      }));
+      const newImages = results.map((result, index) => {
+        const id = generateUniqueId();
+        return {
+          id,
+          name: result.filename ?? `image_${Date.now()}_${index}.jpg`,
+          mimeType: result.mime ?? 'image/jpeg',
+          base64: `data:${result.mime};base64,${result.data}`,
+        };
+      });
 
-      setFiles(prevFiles => [...prevFiles, ...formattedResults]);
+      addImage(newImages);
     } catch (err: any) {
       if (err.message === 'User cancelled image selection') {
         console.log('User cancelled image picker');
@@ -65,60 +65,28 @@ const FilePickerComponent = () => {
     }
   };
 
-  // Remove a file
-  const removeFile = (uri: string) => {
-    setFiles(prevFiles => prevFiles.filter(file => file.uri !== uri));
+  const removeFile = (id: string) => {
+    removeImage(id);
   };
 
-  // Update FormData when files change
-  useEffect(() => {
-    const newFormData = new FormData();
-    files.forEach((file, index) => {
-      const fileData: FileData = {
-        uri: file.uri,
-        name: file.name ?? `image${index}.jpg`,
-        type: file.type ?? 'image/jpeg',
-      };
-      newFormData.append(`file${index}`, fileData as any);
-    });
-    setFormData(newFormData);
-    console.log('FormData updated:', newFormData);
-  }, [files]);
-
-  // Upload files to server
-  const uploadFiles = async () => {
-    try {
-      const response = await fetch('YOUR_API_ENDPOINT', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      const result = await response.json();
-      Alert.alert('Success', 'Images uploaded successfully!');
-      console.log('Upload response:', result);
-    } catch (err) {
-      console.error('Upload error:', err);
-      Alert.alert('Error', 'Failed to upload images. Please try again.');
-    }
-  };
-
-  const replaceFile = async (uri: string) => {
-    
+  const replaceFile = async (id: string) => {
     try {
       const result: PickedImage = await ImagePicker.openPicker({
         mediaType: 'photo',
         multiple: false,
+        includeBase64: true,
         cropping: false,
         compressImageQuality: 0.8,
       });
-      const newFile: FileData = {
-        uri: result.path,
-        name: result.filename ?? `image${Date.now()}.jpg`,
-        type: result.mime ?? 'image/jpeg',
+
+      const newImage = {
+        id, // Reuse the same ID
+        name: result.filename ?? `image_${Date.now()}.jpg`,
+        mimeType: result.mime ?? 'image/jpeg',
+        base64: `data:${result.mime};base64,${result.data}`,
       };
-      setFiles(prevFiles => prevFiles.map(file => (file.uri === uri ? newFile : file)));
+
+      replaceImage(id, newImage);
     } catch (err: any) {
       if (err.message === 'User cancelled image selection') {
         console.log('User cancelled image picker');
@@ -129,190 +97,94 @@ const FilePickerComponent = () => {
     }
   };
 
-  // Create pairs of files for two images per row
+  // Deduplicate images by ID
+  const images = Array.isArray(formData?.images)
+    ? Array.from(
+        new Map(
+          formData.images.map(img => [
+            img.id,
+            {id: img.id, uri: img.base64, name: img.name, type: img.mimeType},
+          ]),
+        ).values(),
+      )
+    : [];
+
   const pairedFiles = [];
-  for (let i = 0; i < files.length; i += 2) {
-    pairedFiles.push(files.slice(i, i + 2));
+  for (let i = 0; i < images.length; i += 2) {
+    pairedFiles.push(images.slice(i, i + 2));
   }
 
-
-
-  // Render each image item
   const renderImageItem = useCallback(
     (item: FileData, index: number) => (
-      <View key={item.uri} style={styles.imageWrapper}>
-        <View style={styles.imageContainer}>
+      <View key={item.id} style={galleryStyles.imageWrapper}>
+        <View style={galleryStyles.imageContainer}>
           <Image
-            source={{ uri: item.uri }}
-            style={styles.image}
+            source={{uri: item.uri}}
+            style={galleryStyles.image}
             resizeMode="cover"
           />
           <TouchableOpacity
-            style={styles.crossButton}
-            onPress={() => removeFile(item.uri)}
-          >
-            <Text style={styles.crossButtonText}>×</Text>
+            style={galleryStyles.crossButton}
+            onPress={() => removeFile(item.id)}>
+            <Text style={galleryStyles.crossButtonText}>×</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.replaceButton}
-            onPress={() => replaceFile(item.uri)}
-          >
-            <Text style={styles.replaceButtonText}>Replace</Text>
+            style={galleryStyles.replaceButton}
+            onPress={() => replaceFile(item.id)}>
+            <Text style={galleryStyles.replaceButtonText}>Replace</Text>
           </TouchableOpacity>
           {index === 0 && (
-            <View style={styles.coverBadge}>
-              <Text style={styles.coverText}>Cover Image</Text>
+            <View style={galleryStyles.coverBadge}>
+              <Text style={galleryStyles.coverText}>Cover Image</Text>
             </View>
           )}
         </View>
-        <Text style={styles.fileName} numberOfLines={1} ellipsizeMode="tail">
+        <Text
+          style={galleryStyles.fileName}
+          numberOfLines={1}
+          ellipsizeMode="tail">
           {item.name}
         </Text>
       </View>
     ),
-    [removeFile, replaceFile]
+    [removeFile, replaceFile],
   );
 
-  // Render each row (two images)
-  const renderRow = ({ item, index }: { item: FileData[]; index: number }) => (
-    <View style={styles.row} key={`row-${index}`}>
+  const renderRow = ({item, index}: {item: FileData[]; index: number}) => (
+    <View style={galleryStyles.row} key={`row-${index}`}>
       {item[0] && renderImageItem(item[0], index * 2)}
       {item[1] && renderImageItem(item[1], index * 2 + 1)}
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>The first image will serve as the cover image</Text>
-      
+    <View style={galleryStyles.container}>
+      <Text style={galleryStyles.noteTextCenter}>
+        The first image will serve as the cover image
+      </Text>
+      <Text style={galleryStyles.noteTextCenter}>
+        ({5 - images.length} image{5 - images.length > 1 ? 's' : ''} remaining)
+      </Text>
+      {pairedFiles.length === 0 && (
+        <TouchableOpacity style={galleryStyles.button} onPress={pickFile}>
+          <Icon name="cloud-upload" size={33} color="black" />
+        </TouchableOpacity>
+      )}
+      {images.length <= 0 && (
+        <Text style={galleryStyles.noteTextCenter}>Browse file to upload</Text>
+      )}
 
-<TouchableOpacity style={styles.button} onPress={pickFile}>
-      <Icon name="cloud-upload" size={33} color="black" />
-    </TouchableOpacity>
-    <Text style={styles.header}>Browse file to upload</Text>
+      {pairedFiles.map((pair, index) => renderRow({item: pair, index}))}
 
-    
+      {images.length >= 1 && (
+        <TouchableOpacity
+          style={[galleryStyles.button, galleryStyles.addMoreButton]}
+          onPress={pickFile}>
+          <Text style={galleryStyles.addMoreButtonText}>Add More Files</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  button: {
-    backgroundColor: 'white',
-    padding: 50,
-    borderRadius: 5,
-    marginVertical: 10,
-    alignItems: 'center',
-    borderWidth: 1, 
-    borderStyle: 'dotted', 
-    borderColor: '#000',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  disabledButton: {
-    backgroundColor: '#aaa',
-  },
-  fileList: {
-    marginVertical: 10,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 5,
-  },
-  imageWrapper: {
-    flex: 1,
-    marginHorizontal: 5,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 10,
-  },
-  imageContainer: {
-    position: 'relative',
-    width: '100%',
-    height: 150,
-    marginBottom: 10,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 5,
-  },
-  crossButton: {
-    position: 'absolute',
-    top: 5,
-    right: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    borderRadius: 15,
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  crossButtonText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  coverBadge: {
-    position: 'absolute',
-    bottom: 5,
-    left: 5,
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 3,
-  },
-  coverText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  fileName: {
-    fontSize: 14,
-    flex: 1,
-    textAlign: 'center',
-  },
-  noFilesText: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginVertical: 20,
-  },
-  replaceButton: {
-    position: 'absolute',
-    bottom: 5,
-    right: 5,
-    backgroundColor: '#007AFF',
-    padding: 5,
-    borderRadius: 3,
-  },
-  replaceButtonText: {
-    color: '#fff',
-    fontSize: 12,
-  },
-});
 
 export default FilePickerComponent;
