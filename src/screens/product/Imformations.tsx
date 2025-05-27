@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
-// Define the expected shape of the book data from Google Books API
+// Define interfaces for type safety
 interface BookData {
   volumeInfo: {
     title?: string;
@@ -19,13 +19,18 @@ interface Category {
   description: string;
 }
 
+interface SubCategory {
+  id: string | number;
+  description: string;
+}
+
 interface Publisher {
-  id: string | number; // Adjust based on API response
-  name: string; // Adjust to match the actual field name (e.g., publisherName)
+  id: string | number;
+  name: string;
 }
 
 const CategoryForm: React.FC = () => {
-  const [category, setCategory] = useState('');
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [isbnNumber, setIsbnNumber] = useState('');
   const [subCategory, setSubCategory] = useState('');
   const [publisher, setPublisher] = useState('');
@@ -51,7 +56,7 @@ const CategoryForm: React.FC = () => {
     }));
   };
 
-  // Function to fetch book data from Google Books API
+  // Fetch book data from Google Books API
   const fetchBookData = async () => {
     if (!isbnNumber) {
       setError('Please enter an ISBN number');
@@ -63,22 +68,16 @@ const CategoryForm: React.FC = () => {
     setFetchedData(null);
 
     try {
-      const response = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbnNumber}`
-      );
+      const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbnNumber}`);
       const data = await response.json();
 
       if (data.items && data.items.length > 0) {
         const bookData = data.items[0] as BookData;
-
-        // Populate form fields with fetched data
         setProductName(bookData.volumeInfo.title || '');
         setPublisher(bookData.volumeInfo.publisher || '');
         setLanguage(bookData.volumeInfo.language || '');
         setShortDescription(bookData.volumeInfo.description || '');
         setLongDescription(bookData.volumeInfo.description || '');
-
-        // Update formData
         updateFormData('productName', bookData.volumeInfo.title || '');
         updateFormData('publisher', bookData.volumeInfo.publisher || '');
         updateFormData('language', bookData.volumeInfo.language || '');
@@ -96,7 +95,7 @@ const CategoryForm: React.FC = () => {
     }
   };
 
-  // Fetch categories and publishers
+  // Fetch categories and publishers on component mount
   useEffect(() => {
     // Fetch categories
     fetch('https://staging.thinkerslane.com/thAdmin/getAllCategory')
@@ -106,22 +105,48 @@ const CategoryForm: React.FC = () => {
       })
       .catch(error => {
         console.error('Error fetching categories:', error);
+        setError('Failed to load categories');
       });
 
-    
+    // Fetch publishers
     fetch('https://staging.thinkerslane.com/th1/getPublishers')
       .then(response => response.json())
       .then(data => {
-       
-        setPublishers(data?.publishers || []); 
+        setPublishers(data?.publishers || []);
+        console.log('Publishers fetched:', data?.publishers || []);
       })
-      
-    
       .catch(error => {
         console.error('Error fetching publishers:', error);
+        setError('Failed to load publishers');
       });
   }, []);
-console.log('Publishers fetched:', publishers);
+
+  // Fetch sub-categories when selectedCategory changes
+  useEffect(() => {
+    if (selectedCategory) {
+      setIsLoading(true);
+      fetch(`https://staging.thinkerslane.com/thAdmin/getSubCategories?categoryId=${selectedCategory}`)
+        .then(response => response.json())
+        .then(data => {
+          setSubCategories(data?.sub_categories || []);
+          setSubCategory(''); // Reset sub-category when category changes
+        })
+        .catch(error => {
+          console.error('Error fetching sub-categories:', error);
+          setSubCategories([]);
+          setSubCategory('');
+          setError('Failed to load sub-categories');
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      setSubCategories([]);
+      setSubCategory('');
+    }
+    console.log('Selected Category:', selectedCategory);
+  }, [selectedCategory]);
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Basic Information</Text>
@@ -212,10 +237,13 @@ console.log('Publishers fetched:', publishers);
         <Picker
           style={styles.picker}
           selectedValue={selectedCategory}
-          onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+          onValueChange={(itemValue) => {
+            setSelectedCategory(itemValue);
+            updateFormData('category', itemValue);
+          }}
         >
           <Picker.Item label="Select a category" value="" />
-          {categories && categories.map(category => (
+          {categories.map(category => (
             <Picker.Item
               key={category.id}
               label={category.description}
@@ -233,12 +261,16 @@ console.log('Publishers fetched:', publishers);
           updateFormData('subCategory', itemValue);
         }}
         style={styles.picker}
+        enabled={subCategories.length > 0}
       >
-        <Picker.Item label="Select Sub-Category" value="" />
-        <Picker.Item label="Mystery" value="mystery" />
-        <Picker.Item label="Biography" value="biography" />
-        <Picker.Item label="Physics" value="physics" />
-        <Picker.Item label="Ancient" value="ancient" />
+        <Picker.Item label="Select a sub-category" value="" />
+        {subCategories.map(subCategory => (
+          <Picker.Item
+            key={subCategory.id}
+            label={subCategory.description}
+            value={subCategory.id}
+          />
+        ))}
       </Picker>
 
       <Text style={styles.label}>Choose Publisher*:</Text>
@@ -251,7 +283,7 @@ console.log('Publishers fetched:', publishers);
         style={styles.picker}
       >
         <Picker.Item label="Select Publisher" value="" />
-        {publishers && publishers.map(publisher => (
+        {publishers.map(publisher => (
           <Picker.Item
             key={publisher.id}
             label={publisher.name}

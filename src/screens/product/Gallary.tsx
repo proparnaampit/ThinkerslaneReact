@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image, Alert, Platform, PermissionsAndroid } from 'react-native';
 import ImagePicker, { Image as PickedImage } from 'react-native-image-crop-picker';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface FileData {
   uri: string;
@@ -182,34 +183,15 @@ const FilePickerComponent = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>The first image will serve as the cover image.</Text>
-      <Text style={styles.header}>Gallery</Text>
-      <Text style={styles.title}>File Picker</Text>
+      <Text style={styles.header}>The first image will serve as the cover image</Text>
+      
 
-      <TouchableOpacity style={styles.button} onPress={pickFile}>
-        <Text style={styles.buttonText}>
-          {files.length < 5 ? `Choose Images (${5 - files.length} remaining)` : 'Replace Images'}
-        </Text>
-      </TouchableOpacity>
+<TouchableOpacity style={styles.button} onPress={pickFile}>
+      <Icon name="cloud-upload" size={33} color="black" />
+    </TouchableOpacity>
+    <Text style={styles.header}>Browse file to upload</Text>
 
-      <TouchableOpacity
-        style={[styles.button, files.length === 0 && styles.disabledButton]}
-        onPress={uploadFiles}
-        disabled={files.length === 0}
-      >
-        <Text style={styles.buttonText}>Upload Images</Text>
-      </TouchableOpacity>
-
-      {files.length > 0 ? (
-        <FlatList
-          data={pairedFiles}
-          renderItem={renderRow}
-          keyExtractor={(_, index) => `row-${index}`}
-          style={styles.fileList}
-        />
-      ) : (
-        <Text style={styles.noFilesText}>No images selected</Text>
-      )}
+    
     </View>
   );
 };
@@ -233,11 +215,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#007AFF',
-    padding: 10,
+    backgroundColor: 'white',
+    padding: 50,
     borderRadius: 5,
     marginVertical: 10,
     alignItems: 'center',
+    borderWidth: 1, 
+    borderStyle: 'dotted', 
+    borderColor: '#000',
   },
   buttonText: {
     color: '#fff',
