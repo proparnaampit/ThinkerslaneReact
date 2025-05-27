@@ -53,7 +53,7 @@ const CustomHeader = () => {
   return (
     <View style={styles.headerContainer}>
       <Image
-        source={require('../assets/calligraphy_Suprokash.png')}
+        source={require('../assets/logo-2.png')}
         style={styles.logo}
       />
       <View style={styles.iconContainer}>

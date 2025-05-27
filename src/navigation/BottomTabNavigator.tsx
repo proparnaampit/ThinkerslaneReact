@@ -23,6 +23,7 @@ import {useLogoutMutation} from '../services/authApi';
 import {saveAuthState} from '../redux/authSlice';
 import {useFetchUserInfoQuery} from '../services/commonService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ProductUpload from '../screens/product/ProductUpload';
 
 const Tab = createBottomTabNavigator();
 
@@ -88,148 +89,159 @@ export default function BottomTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        header: () => <CustomHeader />,
-        tabBarStyle: {
-          position: 'absolute',
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-        },
+      header: () => <CustomHeader />,
+      tabBarStyle: {
+        position: 'absolute',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+      },
       }}>
       <Tab.Screen
-        name="Dashboard"
-        component={DashboardScreen}
-        options={{
-          tabBarIcon: ({color, size}) => (
-            <MaterialIcons
-              name="dashboard"
-              color={color}
-              size={24}
-              style={{zIndex: 10}}
-            />
-          ),
-          headerShown: true,
-        }}
+      name="Dashboard"
+      component={DashboardScreen}
+      options={{
+        tabBarIcon: ({color, size}) => (
+        <MaterialIcons
+          name="dashboard"
+          color={color}
+          size={24}
+          style={{zIndex: 10}}
+        />
+        ),
+        headerShown: true,
+      }}
       />
       <Tab.Screen
-        name="Expenses"
-        component={ExpenseScreen}
-        initialParams={{add: false}}
-        options={{
-          tabBarIcon: ({color, size}) => (
-            <FontAwesome6 name="money-check-dollar" color={color} size={size} />
-          ),
-          headerShown: true,
-        }}
+      name="Expenses"
+      component={ExpenseScreen}
+      initialParams={{add: false}}
+      options={{
+        tabBarIcon: ({color, size}) => (
+        <FontAwesome6 name="money-check-dollar" color={color} size={size} />
+        ),
+        headerShown: true,
+      }}
       />
       <Tab.Screen
-        name="AddExpenses"
-        component={AddExpenseScreen}
-        initialParams={{add: false}}
-        options={{
-          tabBarIcon: ({color, size}) => (
-            <FontAwesome6 name="money-check-dollar" color={color} size={size} />
-          ),
-          tabBarButton: () => null,
-          headerShown: true,
-        }}
+      name="AddExpenses"
+      component={AddExpenseScreen}
+      initialParams={{add: false}}
+      options={{
+        tabBarIcon: ({color, size}) => (
+        <FontAwesome6 name="money-check-dollar" color={color} size={size} />
+        ),
+        tabBarButton: () => null,
+        headerShown: true,
+      }}
       />
       <Tab.Screen
-        name="Orders"
-        component={OrderScreen}
-        initialParams={{add: false}}
-        options={{
-          tabBarIcon: ({color, size}) => (
-            <FontAwesome6 name="money-check-dollar" color={color} size={size} />
-          ),
-          tabBarButton: () => null,
-          headerShown: true,
-        }}
+      name="Orders"
+      component={OrderScreen}
+      initialParams={{add: false}}
+      options={{
+        tabBarIcon: ({color, size}) => (
+        <FontAwesome6 name="money-check-dollar" color={color} size={size} />
+        ),
+        tabBarButton: () => null,
+        headerShown: true,
+      }}
       />
       <Tab.Screen
-        name="AddOrder"
-        component={AddOrderScreen}
-        initialParams={{add: false}}
-        options={{
-          tabBarIcon: ({color, size}) => (
-            <FontAwesome6 name="money-check-dollar" color={color} size={size} />
-          ),
-          tabBarButton: () => null,
-          headerShown: false,
-          tabBarStyle: {display: 'none'},
-        }}
+      name="Product"
+      component={ProductUpload}
+      initialParams={{add: false}}
+      options={{
+        tabBarIcon: ({color, size}) => (
+        <MaterialCommunityIcons name="cloud-upload" color={color} size={size} />
+        ),
+        headerShown: true,
+      }}
       />
       <Tab.Screen
-        name="BookList"
-        component={BookListScreen}
-        initialParams={{add: false}}
-        options={{
-          tabBarIcon: ({color, size}) => (
-            <FontAwesome6 name="book" color={color} size={size} />
-          ),
-          headerShown: true,
-        }}
+      name="AddOrder"
+      component={AddOrderScreen}
+      initialParams={{add: false}}
+      options={{
+        tabBarIcon: ({color, size}) => (
+        <FontAwesome6 name="money-check-dollar" color={color} size={size} />
+        ),
+        tabBarButton: () => null,
+        headerShown: false,
+        tabBarStyle: {display: 'none'},
+      }}
       />
       <Tab.Screen
-        name="Cart"
-        component={Cart}
-        initialParams={{add: false}}
-        options={{
-          tabBarIcon: ({color, size}) => (
-            <FontAwesome6 name="cart-shopping" color={color} size={size} />
-          ),
-          headerShown: true,
-        }}
+      name="BookList"
+      component={BookListScreen}
+      initialParams={{add: false}}
+      options={{
+        tabBarIcon: ({color, size}) => (
+        <FontAwesome6 name="book" color={color} size={size} />
+        ),
+        headerShown: true,
+      }}
       />
       <Tab.Screen
-        name="Checkout"
-        component={Checkout}
-        initialParams={{add: false}}
-        options={{
-          tabBarIcon: ({color, size}) => (
-            <FontAwesome6 name="cart-shopping" color={color} size={size} />
-          ),
-          headerShown: false,
-          tabBarButton: () => null,
-          tabBarStyle: {display: 'none'},
-        }}
+      name="Cart"
+      component={Cart}
+      initialParams={{add: false}}
+      options={{
+        tabBarIcon: ({color, size}) => (
+        <FontAwesome6 name="cart-shopping" color={color} size={size} />
+        ),
+        headerShown: true,
+      }}
       />
       <Tab.Screen
-        name="Payment"
-        component={PaymentScreen}
-        initialParams={{add: false}}
-        options={{
-          tabBarIcon: ({color, size}) => (
-            <FontAwesome6 name="cart-shopping" color={color} size={size} />
-          ),
-          headerShown: false,
-          tabBarButton: () => null,
-          tabBarStyle: {display: 'none'},
-        }}
+      name="Checkout"
+      component={Checkout}
+      initialParams={{add: false}}
+      options={{
+        tabBarIcon: ({color, size}) => (
+        <FontAwesome6 name="cart-shopping" color={color} size={size} />
+        ),
+        headerShown: false,
+        tabBarButton: () => null,
+        tabBarStyle: {display: 'none'},
+      }}
       />
       <Tab.Screen
-        name="Bill"
-        component={Bill}
-        initialParams={{add: false}}
-        options={{
-          tabBarIcon: ({color, size}) => (
-            <FontAwesome6 name="cart-shopping" color={color} size={size} />
-          ),
-          headerShown: false,
-          tabBarButton: () => null,
-          tabBarStyle: {display: 'none'},
-        }}
+      name="Payment"
+      component={PaymentScreen}
+      initialParams={{add: false}}
+      options={{
+        tabBarIcon: ({color, size}) => (
+        <FontAwesome6 name="cart-shopping" color={color} size={size} />
+        ),
+        headerShown: false,
+        tabBarButton: () => null,
+        tabBarStyle: {display: 'none'},
+      }}
       />
       <Tab.Screen
-        name="OrderHistory"
-        component={OrderHistory}
-        initialParams={{add: false}}
-        options={{
-          tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="history" color={color} size={size} />
-          ),
-          headerShown: true,
-          tabBarLabel: 'Orders',
-        }}
+      name="Bill"
+      component={Bill}
+      initialParams={{add: false}}
+      options={{
+        tabBarIcon: ({color, size}) => (
+        <FontAwesome6 name="cart-shopping" color={color} size={size} />
+        ),
+        headerShown: false,
+        tabBarButton: () => null,
+        tabBarStyle: {display: 'none'},
+      }}
+      />
+      <Tab.Screen
+      name="OrderHistory"
+      component={OrderHistory}
+      initialParams={{add: false}}
+      options={{
+        tabBarIcon: ({color, size}) => (
+        <MaterialCommunityIcons name="history" color={color} size={size} />
+        ),
+        headerShown: true,
+        tabBarLabel: 'Orders',
+      }}
       />
     </Tab.Navigator>
   );

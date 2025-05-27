@@ -80,6 +80,7 @@ const OrderHistory = () => {
   };
 
   const filteredOrders = handleDateFilter(sortedOrders);
+  const mainorders = filteredOrders?.slice(-10);
 
   return (
     <View style={styles.container}>
@@ -153,7 +154,7 @@ const OrderHistory = () => {
             <Text style={styles.loaderText}>Loading Orders...</Text>
           </View>
         ) : (
-          filteredOrders.map((order: any, index: any) => (
+          mainorders && mainorders.map((order: any, index: any) => (
             <View key={index} style={styles.orderCard}>
               <TouchableOpacity
                 onPress={() => handleOrderPress(order.booking_details.id)}
