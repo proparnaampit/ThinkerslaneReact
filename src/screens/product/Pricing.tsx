@@ -25,7 +25,10 @@ const PriceInputScreen: React.FC = () => {
       <TextInput
         style={informationStyles.input}
         value={pricingData.price || ''}
-        onChangeText={text => handleInputChange('price', text)}
+          onChangeText={text => {
+    const numericText = text.replace(/[^0-9]/g, '');
+    handleInputChange('price', numericText);
+  }}
         keyboardType="numeric"
         placeholder="Enter original price"
         placeholderTextColor="#999"
@@ -35,7 +38,10 @@ const PriceInputScreen: React.FC = () => {
       <TextInput
         style={informationStyles.input}
         value={pricingData.offered_price || ''}
-        onChangeText={text => handleInputChange('offered_price', text)}
+            onChangeText={text => {
+    const numericText = text.replace(/[^0-9]/g, '');
+    handleInputChange('offered_price', numericText);
+  }}
         keyboardType="numeric"
         placeholder="Enter offered price"
         placeholderTextColor="#999"
