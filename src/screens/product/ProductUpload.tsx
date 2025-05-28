@@ -15,6 +15,7 @@ import SEOInputForm from '../product/SEO';
 import productStyles from './css/productUpload';
 import Toast from 'react-native-toast-message';
 import {validateStep} from '../../utils/formValidation';
+import { useUploadBooksMutation } from '../../services/bookService';
 
 const ProductUploadForm: React.FC<any> = () => {
   const {
@@ -26,6 +27,8 @@ const ProductUploadForm: React.FC<any> = () => {
     resetFormData,
   } = useFormContext();
 
+  const [uploadBooks, { isLoading, error }] = useUploadBooksMutation();
+
   const steps = [
     CategoryForm,
     PriceInputScreen,
@@ -34,20 +37,74 @@ const ProductUploadForm: React.FC<any> = () => {
     SEOInputForm,
   ];
 
-  const onSubmit = () => {
-    Toast.show({
-      type: 'success',
-      text1: 'Product Added Successfully',
-      text2: 'Your product has been added successfully.',
-    });
-    resetFormData();
+const onSubmit = async () => {
+    const payload = {
+      params: {
+        basic_information: {
+          name: formData.information?.productName || '',
+          short_description: formData.information?.shortDescription || '',
+          long_description: formData.information?.longDescription || '',
+          publisher: formData.information?.publisher || '',
+          status: formData.information?.status === 'active' ? 1 : 0,
+          resource_name: formData.information?.authorName || '',
+          resource_type: formData.information?.resourceType || '',
+          category: parseInt(formData.information?.category) || 0,
+          sub_category: formData.information?.subCategory ? parseInt(formData.information.subCategory) : null,
+          language: formData.information?.language || ''
+        },
+        pricing: {
+          price: parseFloat(formData.pricing?.price) || 0,
+          offered_price: parseFloat(formData.pricing?.offered_price) || 0,
+        },
+        attributes: {
+          quantity: parseInt(formData.product?.quantity) || 0,
+          width: parseFloat(formData.product?.width) || 0,
+          height: parseFloat(formData.product?.height) || 0,
+          length: parseFloat(formData.product?.length) || 0,
+          binding: formData.product?.binding || '',
+          weight: parseFloat(formData.product?.weight) || 0,
+        },
+        seo: {
+          seo_title: formData.seo?.seoTitle || '',
+          seo_description: formData.seo?.seoDescription || '',
+          keywords: formData.seo?.keywords || '',
+          promotion_url: formData.seo?.promotionUrl || '',
+        },
+        images: formData.images?.map(img => ({
+          name: img.name || '',
+          mimeType: img.mimeType || '',
+          base64: img.base64 || '',
+        })) || [],
+      },
+    };
+
+console.log('Payload to be sent:', payload);
+// return;
+    try {
+      const result = await uploadBooks(payload).unwrap();
+
+      console.log('API response:', result);
+      // Toast.show({
+      //   type: 'success',
+      //   text1: 'Product Added Successfully',
+      //   text2: 'Your product has been added successfully.',
+      // });
+      // resetFormData?.();
+    } catch (error:any) {
+      console.error('API error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to Add Product',
+        text2: error?.data?.message || 'Something went wrong.',
+      });
+    }
   };
 
   const CurrentStepComponent = steps[currentStep - 1];
 
   return (
     <View style={productStyles.container}>
-      {loading ? (
+      {isLoading ? (
         <View style={productStyles.loadingContainer}>
           <ActivityIndicator size="large" color="#000" />
         </View>

@@ -31,6 +31,13 @@ export const bookService = createApi({
       query: () => 'https://staging.thinkerslane.com/thAdmin/getAllCategory',
       keepUnusedDataFor: 86400,
     }),
+    uploadBooks: builder.mutation({
+      query: payload => ({
+        url: 'https://staging.thinkerslane.com/thAdmin/addProducts',
+        method: 'POST',
+        body: payload,
+      }),
+    }),
   }),
 });
 
@@ -39,4 +46,5 @@ export const {
   useFetchBooksQuery,
   useGetAllPublishersQuery,
   useGetAllCategoryQuery,
+  useUploadBooksMutation,
 } = bookService;

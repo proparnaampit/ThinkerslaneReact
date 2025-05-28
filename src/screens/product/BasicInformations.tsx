@@ -182,8 +182,13 @@ const CategoryForm: React.FC = () => {
           style={[informationStyles.input, {flex: 1}]}
           placeholder="Enter ISBN NUMBER"
           value={isbnNumber}
-          onChangeText={setIsbnNumber}
+          keyboardType="numeric"
+          onChangeText={text => {
+            const numericText = text.replace(/[^0-9]/g, '');
+            setIsbnNumber(numericText);
+          }}
         />
+
         <TouchableOpacity
           style={informationStyles.fetchButton}
           onPress={fetchBookData}
@@ -234,12 +239,12 @@ const CategoryForm: React.FC = () => {
         <Picker.Item label="Author" value="author" style={{fontSize: 13}} />
         <Picker.Item
           label="Edited Type"
-          value="edited_type"
+          value="edited_by"
           style={{fontSize: 13}}
         />
         <Picker.Item
           label="Collected Type"
-          value="collected_type"
+          value="collected_by"
           style={{fontSize: 13}}
         />
       </Picker>
@@ -312,12 +317,16 @@ const CategoryForm: React.FC = () => {
       </Picker>
 
       <Text style={informationStyles.label}>Language:</Text>
-      <TextInput
-        style={informationStyles.input}
-        placeholder="Enter Language"
-        value={language}
-        onChangeText={setLanguage}
-      />
+      <View style={informationStyles.picker}>
+        <Picker
+          selectedValue={language}
+          onValueChange={itemValue => setLanguage(itemValue)}
+          style={informationStyles.picker}>
+          <Picker.Item label="English" value="EN" />
+          <Picker.Item label="Bengali" value="BEN" />
+          <Picker.Item label="Hindi" value="HIN" />
+        </Picker>
+      </View>
 
       <Text style={informationStyles.label}>Status:</Text>
       <View style={informationStyles.radioContainer}>

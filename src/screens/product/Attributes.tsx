@@ -41,7 +41,10 @@ const ProductInputForm = () => {
       <TextInput
         style={informationStyles.input}
         value={productData.weight}
-        onChangeText={text => handleInputChange('weight', text)}
+        onChangeText={text => {
+          const numericText = text.replace(/[^0-9]/g, '');
+          handleInputChange('weight', numericText);
+        }}
         placeholder="Enter weight in grams"
         keyboardType="numeric"
       />
@@ -50,7 +53,10 @@ const ProductInputForm = () => {
       <TextInput
         style={informationStyles.input}
         value={productData.quantity}
-        onChangeText={text => handleInputChange('quantity', text)}
+        onChangeText={text => {
+          const numericText = text.replace(/[^0-9]/g, '');
+          handleInputChange('quantity', numericText);
+        }}
         placeholder="Enter quantity"
         keyboardType="numeric"
       />
@@ -59,7 +65,10 @@ const ProductInputForm = () => {
       <TextInput
         style={informationStyles.input}
         value={productData.width}
-        onChangeText={text => handleInputChange('width', text)}
+        onChangeText={text => {
+          const numericText = text.replace(/[^0-9]/g, '');
+          handleInputChange('width', numericText);
+        }}
         placeholder="Enter width in cm"
         keyboardType="numeric"
       />
@@ -76,7 +85,10 @@ const ProductInputForm = () => {
       <TextInput
         style={informationStyles.input}
         value={productData.length}
-        onChangeText={text => handleInputChange('length', text)}
+        onChangeText={text => {
+          const numericText = text.replace(/[^0-9]/g, '');
+          handleInputChange('length', numericText);
+        }}
         placeholder="Enter length in cm"
         keyboardType="numeric"
       />
@@ -85,7 +97,10 @@ const ProductInputForm = () => {
       <TextInput
         style={informationStyles.input}
         value={productData.height}
-        onChangeText={text => handleInputChange('height', text)}
+        onChangeText={text => {
+          const numericText = text.replace(/[^0-9]/g, '');
+          handleInputChange('height', numericText);
+        }}
         placeholder="Enter height in cm"
         keyboardType="numeric"
       />

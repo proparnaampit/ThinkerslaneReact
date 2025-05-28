@@ -135,7 +135,7 @@ const FilePickerComponent = () => {
           </TouchableOpacity>
           {index === 0 && (
             <View style={galleryStyles.coverBadge}>
-              <Text style={galleryStyles.coverText}>Cover Image</Text>
+              <Text style={galleryStyles.coverText}>Cover</Text>
             </View>
           )}
         </View>
