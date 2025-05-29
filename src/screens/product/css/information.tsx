@@ -19,11 +19,9 @@ const informationStyles = StyleSheet.create({
   label: {
     fontWeight: 'bold',
     marginBottom: 5,
-    color: 'purple',
+    color: '#223d79',
   },
   picker: {
-    borderWidth: 1,
-    borderColor: '#ccc',
     fontSize: 13,
   },
   input: {
@@ -41,7 +39,7 @@ const informationStyles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   fetchButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#223d79',
     padding: 10,
     borderRadius: 5,
     marginLeft: 10,
@@ -69,13 +67,13 @@ const informationStyles = StyleSheet.create({
   radioCircle: {
     height: 20,
     width: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: 'grey',
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: '#223d79',
     marginRight: 8,
   },
   radioSelected: {
-    backgroundColor: 'red',
+    backgroundColor: '#223d79',
   },
   radioText: {
     fontSize: 16,

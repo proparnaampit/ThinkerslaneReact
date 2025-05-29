@@ -3,15 +3,15 @@ import {StyleSheet} from 'react-native';
 const dashboardstyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#fcfdfe',
   },
   title: {
-    fontSize: 24,
+    fontSize: 17,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
     marginTop: 20,
     textAlign: 'center',
-    color: '#565656',
+    color: 'black',
   },
   dashboard: {},
   buttonContainer: {

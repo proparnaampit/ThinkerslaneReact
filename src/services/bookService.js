@@ -28,12 +28,12 @@ export const bookService = createApi({
       keepUnusedDataFor: 86400,
     }),
     getAllCategory: builder.query({
-      query: () => 'https://staging.thinkerslane.com/thAdmin/getAllCategory',
+      query: () => 'https://thinkerslane.com/thAdmin/getAllCategory',
       keepUnusedDataFor: 86400,
     }),
     uploadBooks: builder.mutation({
       query: payload => ({
-        url: 'https://staging.thinkerslane.com/thAdmin/addProducts',
+        url: 'https://thinkerslane.com/thAdmin/addProducts',
         method: 'POST',
         body: payload,
       }),

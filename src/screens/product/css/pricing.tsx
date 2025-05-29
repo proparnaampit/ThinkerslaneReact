@@ -82,8 +82,8 @@ const galleryStyles = StyleSheet.create({
   coverBadge: {
     position: 'absolute',
     bottom: 5,
-    left: 5,
-    backgroundColor: 'black',
+    flexDirection: 'row',
+    backgroundColor: '#223d79',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 3,
@@ -92,6 +92,7 @@ const galleryStyles = StyleSheet.create({
   coverText: {
     color: '#fff',
     fontSize: 12,
+    left: 5,
     fontWeight: '600',
   },
   fileName: {
@@ -109,7 +110,7 @@ const galleryStyles = StyleSheet.create({
     position: 'absolute',
     bottom: 5,
     right: 5,
-    backgroundColor: 'black',
+    backgroundColor: '#223d79',
     padding: 5,
     borderRadius: 3,
   },
@@ -129,7 +130,7 @@ const galleryStyles = StyleSheet.create({
     marginBottom: 10,
   },
   addMoreButton: {
-    backgroundColor: 'black',
+    backgroundColor: '#223d79',
     alignSelf: 'center',
     paddingVertical: 5,
     paddingHorizontal: 25,

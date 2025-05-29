@@ -49,7 +49,7 @@ const productStyles = StyleSheet.create({
     fontWeight: '500',
   },
   continueButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#223d79',
     paddingVertical: 5,
     paddingHorizontal: 5,
     borderRadius: 10,

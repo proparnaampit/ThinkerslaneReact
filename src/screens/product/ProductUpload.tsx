@@ -15,7 +15,7 @@ import SEOInputForm from '../product/SEO';
 import productStyles from './css/productUpload';
 import Toast from 'react-native-toast-message';
 import {validateStep} from '../../utils/formValidation';
-import { useUploadBooksMutation } from '../../services/bookService';
+import {useUploadBooksMutation} from '../../services/bookService';
 
 const ProductUploadForm: React.FC<any> = () => {
   const {
@@ -27,7 +27,7 @@ const ProductUploadForm: React.FC<any> = () => {
     resetFormData,
   } = useFormContext();
 
-  const [uploadBooks, { isLoading, error }] = useUploadBooksMutation();
+  const [uploadBooks, {isLoading, error}] = useUploadBooksMutation();
 
   const steps = [
     CategoryForm,
@@ -37,7 +37,7 @@ const ProductUploadForm: React.FC<any> = () => {
     SEOInputForm,
   ];
 
-const onSubmit = async () => {
+  const onSubmit = async () => {
     const payload = {
       params: {
         basic_information: {
@@ -49,8 +49,10 @@ const onSubmit = async () => {
           resource_name: formData.information?.authorName || '',
           resource_type: formData.information?.resourceType || '',
           category: parseInt(formData.information?.category) || 0,
-          sub_category: formData.information?.subCategory ? parseInt(formData.information.subCategory) : null,
-          language: formData.information?.language || ''
+          sub_category: formData.information?.subCategory
+            ? parseInt(formData.information.subCategory)
+            : null,
+          language: formData.information?.language || '',
         },
         pricing: {
           price: parseFloat(formData.pricing?.price) || 0,
@@ -70,27 +72,32 @@ const onSubmit = async () => {
           keywords: formData.seo?.keywords || '',
           promotion_url: formData.seo?.promotionUrl || '',
         },
-        images: formData.images?.map(img => ({
-          name: img.name || '',
-          mimeType: img.mimeType || '',
-          base64: img.base64 || '',
-        })) || [],
+        images:
+          formData.images?.map(img => ({
+            name: img.name || '',
+            mimeType: img.mimeType || '',
+            base64: img.base64 || '',
+          })) || [],
       },
     };
 
-console.log('Payload to be sent:', payload);
-// return;
     try {
       const result = await uploadBooks(payload).unwrap();
 
-      console.log('API response:', result);
-      // Toast.show({
-      //   type: 'success',
-      //   text1: 'Product Added Successfully',
-      //   text2: 'Your product has been added successfully.',
-      // });
-      // resetFormData?.();
-    } catch (error:any) {
+      if (result?.status == 200) {
+        Toast.show({
+          type: 'success',
+          text1: 'Product Added Successfully',
+          text2: 'Your product has been added successfully.',
+        });
+        resetFormData?.();
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Failed to Add Product',
+        });
+      }
+    } catch (error: any) {
       console.error('API error:', error);
       Toast.show({
         type: 'error',

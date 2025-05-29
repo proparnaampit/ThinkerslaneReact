@@ -196,7 +196,7 @@ const CategoryForm: React.FC = () => {
           {isLoading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Text style={informationStyles.fetchButtonText}>Fetch</Text>
+            <Text style={informationStyles.fetchButtonText}>Search</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -232,22 +232,31 @@ const CategoryForm: React.FC = () => {
       />
 
       <Text style={informationStyles.label}>Resource Type *:</Text>
-      <Picker
-        selectedValue={resourceType}
-        onValueChange={setResourceType}
-        style={[informationStyles.picker, {fontSize: 13}]}>
-        <Picker.Item label="Author" value="author" style={{fontSize: 13}} />
-        <Picker.Item
-          label="Edited Type"
-          value="edited_by"
-          style={{fontSize: 13}}
-        />
-        <Picker.Item
-          label="Collected Type"
-          value="collected_by"
-          style={{fontSize: 13}}
-        />
-      </Picker>
+      <View
+        style={{
+          borderWidth: 0.5,
+          borderColor: '#ccc',
+          borderRadius: 5,
+          justifyContent: 'center',
+        }}>
+        <Picker
+          selectedValue={resourceType}
+          onValueChange={setResourceType}
+          style={[informationStyles.picker, {fontSize: 13, flex: 1}]}
+          itemStyle={{fontSize: 13}}>
+          <Picker.Item label="Author" value="author" style={{fontSize: 13}} />
+          <Picker.Item
+            label="Edited Type"
+            value="edited_by"
+            style={{fontSize: 13}}
+          />
+          <Picker.Item
+            label="Collected Type"
+            value="collected_by"
+            style={{fontSize: 13}}
+          />
+        </Picker>
+      </View>
 
       <Text style={informationStyles.label}>Author Name *:</Text>
       <TextInput
@@ -263,70 +272,92 @@ const CategoryForm: React.FC = () => {
       />
 
       <Text style={informationStyles.label}>Choose Category *:</Text>
-      <Picker
-        style={informationStyles.picker}
-        selectedValue={selectedCategory}
-        onValueChange={setSelectedCategory}>
-        {categories.map(category => (
-          <Picker.Item
-            key={category.id}
-            label={category.description}
-            value={category.id}
-            style={{fontSize: 13}}
-          />
-        ))}
-      </Picker>
+      <View
+        style={{
+          borderWidth: 0.5,
+          borderColor: '#ccc',
+          borderRadius: 5,
+          justifyContent: 'center',
+        }}>
+        <Picker
+          style={informationStyles.picker}
+          selectedValue={selectedCategory}
+          onValueChange={setSelectedCategory}>
+          {categories.map(category => (
+            <Picker.Item
+              key={category.id}
+              label={category.description}
+              value={category.id}
+              style={{fontSize: 13}}
+            />
+          ))}
+        </Picker>
+      </View>
 
       {selectedCategory !== '' &&
         categories.some(item => item.parent_id === selectedCategory) && (
           <>
             <Text style={informationStyles.label}>Choose Sub-Category:</Text>
-            <Picker
-              selectedValue={subCategory}
-              onValueChange={setSubCategory}
-              style={informationStyles.picker}>
-              <Picker.Item label="Select Sub-Category" value="" />
-              {categories
-                .filter(item => item.parent_id === selectedCategory)
-                .map(sub => (
-                  <Picker.Item
-                    key={sub.id}
-                    label={sub.description}
-                    value={sub.id}
-                    style={{fontSize: 13}}
-                  />
-                ))}
-            </Picker>
+            <View
+              style={{
+                borderWidth: 0.5,
+                borderColor: '#ccc',
+                borderRadius: 5,
+                justifyContent: 'center',
+              }}>
+              <Picker
+                selectedValue={subCategory}
+                onValueChange={setSubCategory}
+                style={informationStyles.picker}>
+                <Picker.Item label="Select Sub-Category" value="" />
+                {categories
+                  .filter(item => item.parent_id === selectedCategory)
+                  .map(sub => (
+                    <Picker.Item
+                      key={sub.id}
+                      label={sub.description}
+                      value={sub.id}
+                      style={{fontSize: 13}}
+                    />
+                  ))}
+              </Picker>
+            </View>
           </>
         )}
 
       <Text style={informationStyles.label}>Choose Publisher *:</Text>
-      <Picker
-        selectedValue={publisher}
-        onValueChange={setPublisher}
-        style={informationStyles.picker}>
-        <Picker.Item label="Select Publisher" value="" />
-        {publishers.map(publisher => (
-          <Picker.Item
-            key={publisher.id}
-            label={publisher.name}
-            value={publisher.id}
-            style={{fontSize: 13}}
-          />
-        ))}
-      </Picker>
-
-      <Text style={informationStyles.label}>Language:</Text>
-      <View style={informationStyles.picker}>
+      <View
+        style={{
+          borderWidth: 0.5,
+          borderColor: '#ccc',
+          borderRadius: 5,
+          justifyContent: 'center',
+        }}>
         <Picker
-          selectedValue={language}
-          onValueChange={itemValue => setLanguage(itemValue)}
+          selectedValue={publisher}
+          onValueChange={setPublisher}
           style={informationStyles.picker}>
-          <Picker.Item label="English" value="EN" />
-          <Picker.Item label="Bengali" value="BEN" />
-          <Picker.Item label="Hindi" value="HIN" />
+          <Picker.Item label="Select Publisher" value="" />
+          {publishers.map(publisher => (
+            <Picker.Item
+              key={publisher.id}
+              label={publisher.name}
+              value={publisher.id}
+              style={{fontSize: 13}}
+            />
+          ))}
         </Picker>
       </View>
+
+      <Text style={informationStyles.label}>Language:</Text>
+      <Picker
+        selectedValue={language}
+        onValueChange={itemValue => setLanguage(itemValue)}
+        style={informationStyles.picker}>
+        <Picker.Item label="English" value="EN" />
+        <Picker.Item label="Bengali" value="BEN" />
+        <Picker.Item label="Hindi" value="HIN" />
+      </Picker>
 
       <Text style={informationStyles.label}>Status:</Text>
       <View style={informationStyles.radioContainer}>

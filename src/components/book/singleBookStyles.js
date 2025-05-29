@@ -28,7 +28,6 @@ const singleBookStyles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: 'bold',
     flexWrap: 'wrap',
     width: '90%',
     color: '#333',
@@ -38,14 +37,13 @@ const singleBookStyles = StyleSheet.create({
     fontWeight: 'bold',
     flexWrap: 'wrap',
     width: '90%',
-    color: 'grey',
+    color: '#223d79',
   },
   publisher: {
     fontSize: 16,
-    fontWeight: 'bold',
     flexWrap: 'wrap',
     width: '90%',
-    color: 'red',
+    color: '#223d79',
   },
   description: {
     fontSize: 14,
@@ -53,8 +51,7 @@ const singleBookStyles = StyleSheet.create({
     marginTop: 4,
   },
   price: {
-    color: 'red',
-    fontWeight: 'bold',
+    color: '#223d79',
     flexDirection: 'row',
   },
   priceText: {
@@ -65,16 +62,14 @@ const singleBookStyles = StyleSheet.create({
   },
   stock: {
     fontSize: 14,
-    color: 'green',
-    marginTop: 4,
+    color: '#223d79',
     fontWeight: 'bold',
   },
   stockLabel: {
     position: 'absolute',
-    bottom: 10,
-    right: 10,
+    top: 10,
+    left: 10,
     fontSize: 14,
-    fontWeight: 'bold',
   },
 });
 

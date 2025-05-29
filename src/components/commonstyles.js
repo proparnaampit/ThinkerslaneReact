@@ -4,7 +4,7 @@ const commonstyles = StyleSheet.create({
   button: {
     borderRadius: 10,
     paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 12,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 15,
@@ -24,7 +24,7 @@ const commonstyles = StyleSheet.create({
     fontFamily: 'monospace',
   },
   orderButtonText: {
-    color: '#a92737',
+    color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
     fontFamily: 'monospace',
@@ -33,20 +33,19 @@ const commonstyles = StyleSheet.create({
     backgroundColor: '#0f963a',
   },
   normalButton: {
-    backgroundColor: '#BE3240',
+    backgroundColor: '#223d79',
   },
   cancelButton: {
     backgroundColor: '#ba0719',
   },
   expenseButton: {
-    backgroundColor: '#a92737',
+    backgroundColor: '#223d79',
   },
   orderButton: {
-    borderColor: '#8e2334',
-    borderWidth: 1,
+    backgroundColor: '#972831',
   },
   thinkerslane: {
-    color: '#a92737',
+    color: '#223d79',
   },
   loaderContainer: {
     position: 'absolute',
@@ -54,7 +53,7 @@ const commonstyles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    backgroundColor: 'rgba(118, 118, 118, 0.5)', // Semi-transparent background
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000, // Ensure the loader appears on top

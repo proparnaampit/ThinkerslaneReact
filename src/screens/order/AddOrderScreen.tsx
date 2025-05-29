@@ -161,7 +161,7 @@ const AddOrderScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <FontAwesome6
             name="arrow-left-long"
-            color={commonstyles.thinkerslane.color}
+            color={'#223d79'}
             size={24}
             style={{margin: 10}}
           />
@@ -171,7 +171,7 @@ const AddOrderScreen = () => {
           onPress={handleCartAction}>
           <FontAwesome6
             name="cart-shopping"
-            color={commonstyles.thinkerslane.color}
+            color={'#223d79'}
             size={24}
             style={{margin: 10}}
           />
@@ -236,7 +236,7 @@ const AddOrderScreen = () => {
 
         <TouchableOpacity
           style={{
-            backgroundColor: 'red',
+            backgroundColor: '#223d79',
             padding: 10,
             borderRadius: 8,
             marginTop: 15,
@@ -278,7 +278,7 @@ const AddOrderScreen = () => {
                       handleDecreaseQuantity(book.id);
                     }}>
                     <View>
-                      <FontAwesome name="minus" size={16} color="red" />
+                      <FontAwesome name="minus" size={16} color="#223d79" />
                     </View>
                     <CustomText style={addOrderStyles.quantityText}>
                       {quantity}
