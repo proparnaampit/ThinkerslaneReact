@@ -4,6 +4,7 @@ import DashboardScreen from '../screens/dashboard/Dashboard';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Feather from 'react-native-vector-icons/Feather';
 import ExpenseScreen from '../screens/expenses/ExpenseScreen';
 import CustomHeader from '../components/Header';
 import {ActivityIndicator, View, ToastAndroid} from 'react-native';
@@ -24,6 +25,8 @@ import {saveAuthState} from '../redux/authSlice';
 import {useFetchUserInfoQuery} from '../services/commonService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProductUpload from '../screens/product/ProductUpload';
+import BookDetails from '../screens/bookdetails/bookdetails';
+import UpdateScreen from '../screens/update/update';
 
 const Tab = createBottomTabNavigator();
 
@@ -102,7 +105,7 @@ export default function BottomTabNavigator() {
         tabBarInactiveTintColor: '#717f90',
         tabBarShowLabel: false,
       }}>
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Dashboard"
         component={DashboardScreen}
         options={{
@@ -111,8 +114,8 @@ export default function BottomTabNavigator() {
           ),
           headerShown: true,
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="Expenses"
         component={ExpenseScreen}
         initialParams={{add: false}}
@@ -122,8 +125,8 @@ export default function BottomTabNavigator() {
           ),
           headerShown: true,
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="AddExpenses"
         component={AddExpenseScreen}
         initialParams={{add: false}}
@@ -134,8 +137,8 @@ export default function BottomTabNavigator() {
           tabBarButton: () => null,
           headerShown: true,
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="Orders"
         component={OrderScreen}
         initialParams={{add: false}}
@@ -146,7 +149,7 @@ export default function BottomTabNavigator() {
           tabBarButton: () => null,
           headerShown: true,
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Product"
         component={ProductUpload}
@@ -163,6 +166,33 @@ export default function BottomTabNavigator() {
         }}
       />
       <Tab.Screen
+        name="BookDetails"
+        component={BookDetails}
+        initialParams={{add: false}}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <MaterialCommunityIcons
+              name="book-open-page-variant"
+              color={color}
+              size={size}
+            />
+          ),
+          headerShown: true,
+        }}
+      />
+
+      <Tab.Screen
+        name="Update"
+        component={UpdateScreen}
+        initialParams={{add: false}}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <Feather name="edit" color={color} size={size} />
+          ),
+          headerShown: true,
+        }}
+      />
+      {/* <Tab.Screen
         name="AddOrder"
         component={AddOrderScreen}
         initialParams={{add: false}}
@@ -174,8 +204,8 @@ export default function BottomTabNavigator() {
           headerShown: false,
           tabBarStyle: {display: 'none'},
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="BookList"
         component={BookListScreen}
         initialParams={{add: false}}
@@ -185,8 +215,8 @@ export default function BottomTabNavigator() {
           ),
           headerShown: true,
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="Cart"
         component={Cart}
         initialParams={{add: false}}
@@ -196,8 +226,8 @@ export default function BottomTabNavigator() {
           ),
           headerShown: true,
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="Checkout"
         component={Checkout}
         initialParams={{add: false}}
@@ -209,8 +239,8 @@ export default function BottomTabNavigator() {
           tabBarButton: () => null,
           tabBarStyle: {display: 'none'},
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="Payment"
         component={PaymentScreen}
         initialParams={{add: false}}
@@ -247,7 +277,7 @@ export default function BottomTabNavigator() {
           headerShown: true,
           tabBarLabel: 'Orders',
         }}
-      />
+      /> */}
     </Tab.Navigator>
   );
 }
