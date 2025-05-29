@@ -8,6 +8,7 @@ import {PersistGate} from 'redux-persist/integration/react';
 import {loadAuthState} from './src/redux/authSlice';
 import {CartProvider} from './src/context/CartContext';
 import {FormProvider} from './src/screens/context/FormContextType';
+import {UpdateProvider} from './src/context/updateContext';
 
 export default function App() {
   return (
@@ -17,7 +18,9 @@ export default function App() {
         persistor={persistor}>
         <CartProvider>
           <FormProvider>
-            <AppWithRedux />
+            <UpdateProvider>
+              <AppWithRedux />
+            </UpdateProvider>
           </FormProvider>
         </CartProvider>
       </PersistGate>
