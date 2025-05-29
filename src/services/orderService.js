@@ -14,7 +14,7 @@ export const orderService = createApi({
         pricing,
         booking_products,
       }) => ({
-        url: 'addOrder',
+        url: 'addOrderTh',
         method: 'POST',
         body: {
           params: {
@@ -37,13 +37,13 @@ export const orderService = createApi({
     }),
     getOrderHistory: builder.query({
       query: ({user_id}) => ({
-        url: `getOrder?user_id=${user_id}`,
+        url: `getOrderTh?user_id=${user_id}`,
         method: 'GET',
       }),
       providesTags: ['Order'],
     }),
     getAllUsers: builder.query({
-      query: () => `https://thinkerslane.com/th1/getAllUsers`,
+      query: () => `getAllUsers`,
       keepUnusedDataFor: 0,
       providesTags: ['Order'],
     }),

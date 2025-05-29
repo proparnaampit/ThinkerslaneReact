@@ -20,6 +20,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomText from '../../components/CustomText';
 import DeviceInfo from 'react-native-device-info';
 import {loginUser} from '../../services/authService';
+import informationStyles from '../product/css/information';
+import backImage from '../../assets/back.png';
 
 const LoginScreen = () => {
   const dispatch = useDispatch();
@@ -172,18 +174,13 @@ const LoginScreen = () => {
   };
 
   return (
-    <ImageBackground style={loginStyles.container}>
-      <Image
-        source={require('../../assets/logo_png.png')}
-        style={loginStyles.logo}
-      />
+    <ImageBackground style={loginStyles.container} source={backImage}>
       <Image
         source={require('../../assets/calligraphy_Suprokash.png')}
         style={loginStyles.logo}
       />
       <View style={loginStyles.overlay} />
       <View style={loginStyles.logoContainer}>
-        <CustomText style={loginStyles.signInText}>Sign In</CustomText>
         {countdown && (
           <View style={loginStyles.countdownContainer}>
             <CustomText style={loginStyles.countdownText}>
@@ -198,13 +195,13 @@ const LoginScreen = () => {
           style={[
             loginStyles.inputContainer,
             {
-              borderBottomColor: isUsernameFocused ? '#4CAF50' : 'red',
+              borderBottomColor: isUsernameFocused ? '#4CAF50' : '#223d79',
             },
           ]}>
           <Ionicons
             name="person"
             size={20}
-            color="#BE3240"
+            color="#223d79"
             style={loginStyles.icon}
           />
           <TextInput
@@ -223,13 +220,13 @@ const LoginScreen = () => {
           style={[
             loginStyles.inputContainer,
             {
-              borderBottomColor: isPasswordFocused ? '#4CAF50' : 'red',
+              borderBottomColor: isPasswordFocused ? '#4CAF50' : '#223d79',
             },
           ]}>
           <Ionicons
             name="lock-closed"
             size={20}
-            color="#BE3240"
+            color="#223d79"
             style={loginStyles.icon}
           />
           <TextInput
@@ -274,7 +271,12 @@ const LoginScreen = () => {
             <CustomText style={loginStyles.modalText}>
               Please contact the admin for the username and password.
             </CustomText>
-            <Button title="Close" onPress={() => setModalVisible(false)} />
+
+            <TouchableOpacity
+              style={loginStyles.modalButton}
+              onPress={() => setModalVisible(false)}>
+              <CustomText style={loginStyles.modalButtonText}>Close</CustomText>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>

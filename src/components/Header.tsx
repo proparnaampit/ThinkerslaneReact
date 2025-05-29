@@ -1,16 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import {
-  View,
-  Image,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
+import {View, Image, StyleSheet, Modal, TouchableOpacity} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {logout as reduxLogout} from '../redux/authSlice';
 import Toast from 'react-native-toast-message';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {saveAuthState} from '../redux/authSlice';
 import CustomText from './CustomText';
 import DeviceInfo from 'react-native-device-info';
@@ -52,22 +46,14 @@ const CustomHeader = () => {
   const userImage = data?.userDeatils?.image;
   return (
     <View style={styles.headerContainer}>
-      <Image
-        source={require('../assets/logo-2.png')}
-        style={styles.logo}
-      />
+      <Image source={require('../assets/logo-2.png')} style={styles.logo} />
       <View style={styles.iconContainer}>
         <CustomText style={{marginRight: 10}}>
           {data?.userDeatils?.name}
         </CustomText>
 
         <TouchableOpacity onPress={toggleDropdown}>
-          <Image
-            source={
-              userImage ? {uri: userImage} : require('../assets/profile.png')
-            }
-            style={styles.profileImage}
-          />
+          <Ionicons name="person" size={24} color="black" />
         </TouchableOpacity>
       </View>
 

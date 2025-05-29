@@ -12,7 +12,6 @@ const allExpensestyles = StyleSheet.create({
   },
   totalText: {
     fontSize: 18,
-    fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 10,
   },
@@ -34,9 +33,9 @@ const allExpensestyles = StyleSheet.create({
   },
   filterLabel: {
     fontSize: 14,
-    fontWeight: 'bold',
   },
   picker: {
+    fontSize: 14,
     width: '100%',
   },
   tableHeader: {
@@ -48,9 +47,8 @@ const allExpensestyles = StyleSheet.create({
   },
   headerCell: {
     flex: 1,
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'left',
+    fontSize: 15,
+    textAlign: 'center',
     color: '#333',
   },
   row: {

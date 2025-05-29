@@ -4,6 +4,8 @@ import ImagePicker, {
   Image as PickedImage,
 } from 'react-native-image-crop-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import galleryStyles from './css/pricing';
 import {useFormContext} from '../context/FormContextType';
 
@@ -131,10 +133,15 @@ const FilePickerComponent = () => {
           <TouchableOpacity
             style={galleryStyles.replaceButton}
             onPress={() => replaceFile(item.id)}>
-            <Text style={galleryStyles.replaceButtonText}>Replace</Text>
+            <MaterialCommunityIcons
+              name="file-replace"
+              size={14}
+              color="white"
+            />
           </TouchableOpacity>
           {index === 0 && (
             <View style={galleryStyles.coverBadge}>
+              <AntDesign name="star" size={14} color="white" />
               <Text style={galleryStyles.coverText}>Cover</Text>
             </View>
           )}

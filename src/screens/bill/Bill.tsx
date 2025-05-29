@@ -162,7 +162,7 @@ const Bill = ({route}: any) => {
       </head>
       <body>
         <div class="header">
-          <img src="https://staging.thinkerslane.com/public/assets/images/logo-2.png" alt="Logo" />
+          <img src="https://thinkerslane.com/public/assets/images/logo-2.png" alt="Logo" />
           <h1>Tax Invoice/Bill of Supply/Cash Memo</h1>
         </div>
         <div class="details-container">

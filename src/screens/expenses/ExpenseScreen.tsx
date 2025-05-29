@@ -158,7 +158,6 @@ const ExpenseScreen = () => {
         <TouchableOpacity
           style={[commonstyles.button, commonstyles.expenseButton]}
           onPress={handleAddExpense}>
-          <FontAwesome name="money" size={24} style={{color: 'white'}} />
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <FontAwesome
               name="plus-circle"
@@ -169,9 +168,9 @@ const ExpenseScreen = () => {
           </View>
         </TouchableOpacity>
       </View>
-      <Text style={allExpensestyles.totalText}>
+      <CustomText style={allExpensestyles.totalText}>
         Total Expenses: Rs.{totalExpenses.toFixed(2)}
-      </Text>
+      </CustomText>
       <View style={allExpensestyles.filterRow}>
         <View style={allExpensestyles.pickerContainer}>
           <Picker
@@ -180,7 +179,12 @@ const ExpenseScreen = () => {
             onValueChange={itemValue => setSelectedCategory(itemValue)}>
             <Picker.Item label="Category" value="Choose Category" />
             {categories.map(category => (
-              <Picker.Item key={category} label={category} value={category} />
+              <Picker.Item
+                key={category}
+                label={category}
+                value={category}
+                style={{fontSize: 12}}
+              />
             ))}
           </Picker>
         </View>
@@ -192,7 +196,12 @@ const ExpenseScreen = () => {
             onValueChange={itemValue => setSelectedMonth(itemValue)}>
             <Picker.Item label="Month" value="Choose Month" />
             {months.map(month => (
-              <Picker.Item key={month} label={month} value={month} />
+              <Picker.Item
+                key={month}
+                label={month}
+                value={month}
+                style={{fontSize: 12}}
+              />
             ))}
           </Picker>
         </View>
@@ -205,14 +214,14 @@ const ExpenseScreen = () => {
             size={24}
             style={allExpensestyles.resetIcon}
           />
-          <Text>Reset Filter</Text>
+          <CustomText>Reset</CustomText>
         </TouchableOpacity>
       </View>
       <View style={allExpensestyles.tableHeader}>
-        <Text style={allExpensestyles.headerCell}>Date</Text>
-        <Text style={allExpensestyles.headerCell}>Time</Text>
-        <Text style={allExpensestyles.headerCell}>Category</Text>
-        <Text style={allExpensestyles.headerCell}>Amount</Text>
+        <CustomText style={allExpensestyles.headerCell}>Date</CustomText>
+        <CustomText style={allExpensestyles.headerCell}>Time</CustomText>
+        <CustomText style={allExpensestyles.headerCell}>Category</CustomText>
+        <CustomText style={allExpensestyles.headerCell}>Amount</CustomText>
       </View>
 
       {expensesLoading ? (

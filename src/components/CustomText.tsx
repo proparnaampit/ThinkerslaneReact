@@ -9,7 +9,7 @@ const CustomText = ({style, children, ...props}: any) => (
 
 const styles = StyleSheet.create({
   text: {
-    fontFamily: 'sans-serif',
+    fontFamily: 'Avenir Regular',
     color: 'black',
   },
 });

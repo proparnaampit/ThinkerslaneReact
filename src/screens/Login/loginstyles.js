@@ -5,6 +5,7 @@ const loginStyles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    backgroundColor: '#000',
   },
   title: {
     fontSize: 24,
@@ -28,7 +29,7 @@ const loginStyles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 10,
     zIndex: 2,
-    fontFamily: 'monospace',
+    fontFamily: 'Avenir Regular',
     fontSize: 16,
     left: 30,
   },
@@ -68,7 +69,7 @@ const loginStyles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.13)',
     zIndex: 1,
   },
   signInText: {
@@ -93,8 +94,7 @@ const loginStyles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     textTransform: 'uppercase',
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 14,
   },
   modalBackground: {
     flex: 1,
@@ -113,6 +113,20 @@ const loginStyles = StyleSheet.create({
     marginBottom: 20,
     fontSize: 16,
     textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#223d79',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginTop: 15,
+    alignItems: 'center',
+  },
+
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

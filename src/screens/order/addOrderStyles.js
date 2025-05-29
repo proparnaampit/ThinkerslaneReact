@@ -23,11 +23,12 @@ const addOrderStyles = StyleSheet.create({
     marginHorizontal: 10,
   },
   totalCart: {
-    fontSize: 18,
-    backgroundColor: 'green',
+    fontSize: 13,
+    backgroundColor: '#223d79',
     color: 'white',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    height: 20,
+    textAlign: 'center',
+    width: 20,
     borderRadius: 15,
   },
   searchInput: {
@@ -100,9 +101,9 @@ const addOrderStyles = StyleSheet.create({
   },
   quantityText: {
     marginHorizontal: 4,
-    fontSize: 22,
+    fontSize: 15,
     fontWeight: 'bold',
-    color: 'black',
+    color: '#223d79',
   },
 });
 
