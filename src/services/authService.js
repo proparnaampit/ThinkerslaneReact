@@ -17,7 +17,6 @@ export const loginUser = (
     device_id: deviceId,
     location,
   }).then(response => {
-    console.log('response', response);
     if (response.error && response.error.data?.messages?.error) {
       Toast.show({
         text1: 'Login Failed',

@@ -33,19 +33,27 @@ const informationStyles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 5,
   },
+  ISBNinput: {
+    height: 40,
+    borderWidth: 1,
+    fontSize: 13,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: 10,
   },
   fetchButton: {
     backgroundColor: '#223d79',
     padding: 10,
     borderRadius: 5,
-    marginLeft: 10,
+    marginLeft: 5,
     minWidth: 80,
     alignItems: 'center',
-    marginBottom: 5,
   },
   fetchButtonText: {
     color: '#fff',
@@ -77,6 +85,16 @@ const informationStyles = StyleSheet.create({
   },
   radioText: {
     fontSize: 16,
+  },
+  pickerContainer: {
+    borderWidth: 0.5,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    justifyContent: 'center',
+  },
+  cameraButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
