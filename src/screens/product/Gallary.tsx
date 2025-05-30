@@ -82,7 +82,7 @@ const FilePickerComponent = () => {
       });
 
       const newImage = {
-        id, // Reuse the same ID
+        id,
         name: result.filename ?? `image_${Date.now()}.jpg`,
         mimeType: result.mime ?? 'image/jpeg',
         base64: `data:${result.mime};base64,${result.data}`,
@@ -99,11 +99,10 @@ const FilePickerComponent = () => {
     }
   };
 
-  // Deduplicate images by ID
   const images = Array.isArray(formData?.images)
     ? Array.from(
         new Map(
-          formData.images.map(img => [
+          formData.images.map((img: any) => [
             img.id,
             {id: img.id, uri: img.base64, name: img.name, type: img.mimeType},
           ]),

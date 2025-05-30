@@ -27,6 +27,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProductUpload from '../screens/product/ProductUpload';
 import BookDetails from '../screens/bookdetails/bookdetails';
 import UpdateScreen from '../screens/update/update';
+import DashboardScreenThinkerslane from '../screens/dashboard/DashboardThinkerslane';
 
 const Tab = createBottomTabNavigator();
 
@@ -105,16 +106,16 @@ export default function BottomTabNavigator() {
         tabBarInactiveTintColor: '#717f90',
         tabBarShowLabel: false,
       }}>
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Dashboard"
-        component={DashboardScreen}
+        component={DashboardScreenThinkerslane}
         options={{
           tabBarIcon: ({color, size}) => (
             <Entypo name="home" color={color} size={24} style={{zIndex: 10}} />
           ),
           headerShown: true,
         }}
-      /> */}
+      />
       {/* <Tab.Screen
         name="Expenses"
         component={ExpenseScreen}

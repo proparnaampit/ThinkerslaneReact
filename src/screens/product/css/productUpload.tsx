@@ -28,10 +28,7 @@ const productStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: Math.max(height * 0.02, 12),
     backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: 'grey',
   },
   backButton: {
     backgroundColor: '#f3f4f6',
@@ -56,7 +53,6 @@ const productStyles = StyleSheet.create({
     minWidth: Math.max(width * 0.35, 120),
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: Math.max(height * 0.02, 30),
   },
   continueButtonText: {
     color: '#fff',
