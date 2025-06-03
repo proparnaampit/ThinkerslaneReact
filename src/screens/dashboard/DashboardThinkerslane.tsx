@@ -6,16 +6,17 @@ import dashboardstyles from './dashboardstyles';
 import commonstyles from '../../components/commonstyles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomText from '../../components/CustomText';
-
+import Feather from 'react-native-vector-icons/Feather';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 const DashboardScreenThinkerslane = () => {
   const navigation: any = useNavigation();
 
   const handleAddExpense = () => {
-    navigation.navigate('AddExpenses');
+    navigation.navigate('Product');
   };
 
   const handleAddOrder = () => {
-    navigation.navigate('AddOrder');
+    navigation.navigate('Update');
   };
 
   const [location, setLocation] = useState('');
@@ -67,13 +68,13 @@ const DashboardScreenThinkerslane = () => {
           ]}
           onPress={handleAddExpense}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <FontAwesome
-              name="plus-circle"
+            <Feather
+              name="upload"
               size={16}
               style={{color: 'white', marginRight: 7}}
             />
             <CustomText style={[commonstyles.buttonText, {fontSize: 14}]}>
-              Add Expenses
+              Upload Book
             </CustomText>
           </View>
         </TouchableOpacity>
@@ -86,13 +87,13 @@ const DashboardScreenThinkerslane = () => {
           ]}
           onPress={handleAddOrder}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <FontAwesome
-              name="plus-circle"
+            <AntDesign
+              name="edit"
               size={16}
               style={{color: 'white', marginRight: 7}}
             />
             <CustomText style={commonstyles.orderButtonText}>
-              Add Order
+              edit product
             </CustomText>
           </View>
         </TouchableOpacity>

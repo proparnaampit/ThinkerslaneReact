@@ -16,22 +16,18 @@ export const validateStep = (step: number, formData: any) => {
       showToast('Product Name is required');
       return false;
     }
-
     if (!info.shortDescription?.trim()) {
       showToast('Short Description is required');
       return false;
     }
-
     if (!info.resourceType?.trim()) {
       showToast('Resource Type is required');
       return false;
     }
-
     if (!info.publisher?.trim()) {
       showToast('Publisher is required');
       return false;
     }
-
     if (!info.category?.trim()) {
       showToast('Category is required');
       return false;
@@ -47,25 +43,20 @@ export const validateStep = (step: number, formData: any) => {
       showToast('Original Price is required');
       return false;
     }
-
     if (!pricing.offered_price?.trim()) {
       showToast('Offered Price is required');
       return false;
     }
-
     const price = parseFloat(pricing.price);
     const offeredPrice = parseFloat(pricing.offered_price);
-
     if (isNaN(price) || price <= 0) {
       showToast('Original Price must be a valid positive number');
       return false;
     }
-
     if (isNaN(offeredPrice) || offeredPrice <= 0) {
       showToast('Offered Price must be a valid positive number');
       return false;
     }
-
     if (offeredPrice > price) {
       showToast('Offered Price cannot be greater than Original Price');
       return false;
@@ -78,6 +69,5 @@ export const validateStep = (step: number, formData: any) => {
       return false;
     }
   }
-
   return true;
 };

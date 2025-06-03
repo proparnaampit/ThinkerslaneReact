@@ -7,7 +7,7 @@ import {
   Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {useCart} from '../../context/CartContext';
+import {useCart} from '../../contexts/CartContext';
 import {Picker} from '@react-native-picker/picker';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import CustomText from '../../components/CustomText';

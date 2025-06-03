@@ -38,7 +38,6 @@ const productStyles = StyleSheet.create({
     minWidth: Math.max(width * 0.35, 120),
     alignItems: 'center',
     justifyContent: 'flex-start',
-    marginBottom: 23,
   },
   backButtonText: {
     color: '#374151',

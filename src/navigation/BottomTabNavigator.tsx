@@ -25,7 +25,7 @@ import {saveAuthState} from '../redux/authSlice';
 import {useFetchUserInfoQuery} from '../services/commonService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProductUpload from '../screens/product/ProductUpload';
-import BookDetails from '../screens/bookdetails/bookdetails';
+import BookDetails from '../screens/bookDetails/bookdetails';
 import UpdateScreen from '../screens/update/update';
 import DashboardScreenThinkerslane from '../screens/dashboard/DashboardThinkerslane';
 
@@ -193,6 +193,7 @@ export default function BottomTabNavigator() {
           headerShown: true,
         }}
       />
+
       {/* <Tab.Screen
         name="AddOrder"
         component={AddOrderScreen}

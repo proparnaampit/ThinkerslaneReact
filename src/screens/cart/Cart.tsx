@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {View, TouchableOpacity, ScrollView} from 'react-native';
-import {useCart} from '../../context/CartContext';
+import {useCart} from '../../contexts/CartContext';
 import {useNavigation} from '@react-navigation/native';
 import cartStyles from './cartStyles';
 import commonstyles from '../../components/commonstyles';
