@@ -17,7 +17,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import CustomText from '../../components/CustomText';
 import Book from '../../components/book/Book';
-import {useCart} from '../../context/CartContext';
+import {useCart} from '../../contexts/CartContext';
 import {Dropdown} from 'react-native-element-dropdown';
 import {
   useFetchBooksQuery,

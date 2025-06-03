@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Image, TouchableOpacity} from 'react-native';
 import CustomText from '../CustomText';
 import cartBookStyles from './cartBookStyles';
-import {useCart} from '../../context/CartContext';
+import {useCart} from '../../contexts/CartContext';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FastImage from 'react-native-fast-image';
 

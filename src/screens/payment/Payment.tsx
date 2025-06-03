@@ -14,7 +14,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import commonstyles from '../../components/commonstyles';
 import cartStyles from '../cart/cartStyles';
 import CustomText from '../../components/CustomText';
-import {useCart} from '../../context/CartContext';
+import {useCart} from '../../contexts/CartContext';
 import {useSelector} from 'react-redux';
 import {BlurView} from '@react-native-community/blur';
 import LottieView from 'lottie-react-native';
