@@ -6,7 +6,7 @@ import commonstyles from '../commonstyles';
 import {useNavigation} from '@react-navigation/native';
 
 const AddOrderButton: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
 
   const handlePress = () => {
     navigation.navigate('AddOrder');

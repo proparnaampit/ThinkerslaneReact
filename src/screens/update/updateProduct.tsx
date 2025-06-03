@@ -11,7 +11,7 @@ import productStyles from '../product/css/productUpload';
 import {validateStep} from '../../utils/formValidation';
 import {useUploadBooksMutation} from '../../services/bookService';
 
-const ProductUploadForm: React.FC = () => {
+const ProductUpdate: React.FC = () => {
   const {
     formData,
     currentStep,
@@ -190,4 +190,4 @@ const ProductUploadForm: React.FC = () => {
   );
 };
 
-export default ProductUploadForm;
+export default ProductUpdate;
