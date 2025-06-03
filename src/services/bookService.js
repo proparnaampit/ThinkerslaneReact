@@ -38,6 +38,11 @@ export const bookService = createApi({
         body: payload,
       }),
     }),
+    getBookDataByCodeFromServer: builder.query({
+      query: isbn =>
+        `https://staging.thinkerslane.com/thAdmin/getBookByIsbn?isbn_number=${isbn}`,
+      keepUnusedDataFor: 86400,
+    }),
   }),
 });
 
@@ -47,4 +52,5 @@ export const {
   useGetAllPublishersQuery,
   useGetAllCategoryQuery,
   useUploadBooksMutation,
+  useGetBookDataByCodeFromServerQuery,
 } = bookService;

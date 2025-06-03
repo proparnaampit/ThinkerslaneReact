@@ -1,9 +1,17 @@
 import {StyleSheet, Dimensions} from 'react-native';
+const {width, height} = Dimensions.get('window');
 
 const informationStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  containerForBookDetails: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: Math.max(width * 0.04, 10),
+    borderColor: '#e5e7eb',
+    width: '100%',
   },
   header: {
     fontSize: 16,

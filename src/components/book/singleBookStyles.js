@@ -65,6 +65,10 @@ const singleBookStyles = StyleSheet.create({
     color: '#223d79',
     fontWeight: 'bold',
   },
+  isbn: {
+    fontSize: 12,
+    color: '#223d79',
+  },
   stockLabel: {
     position: 'absolute',
     top: 10,

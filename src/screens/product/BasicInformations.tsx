@@ -16,11 +16,7 @@ import informationStyles from './css/information';
 import {useFormContext} from '../context/FormContextType';
 import CustomPicker from '../../components/common/CustomPicker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  Camera,
-  useCameraDevice,
-  useCodeScanner,
-} from 'react-native-vision-camera';
+import {Camera} from 'react-native-vision-camera';
 import BarcodeScanner from '../../components/common/CameraScanner';
 
 const CategoryForm: React.FC = () => {
