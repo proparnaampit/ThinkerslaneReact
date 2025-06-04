@@ -54,7 +54,7 @@ const singleBookStyles = StyleSheet.create({
     marginBottom: 4,
   },
   isbn: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#555',
     marginBottom: 4,
   },

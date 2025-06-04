@@ -80,6 +80,7 @@ const ProductUploadForm: React.FC<any> = () => {
           })) || [],
       },
     };
+    console.log(payload);
 
     try {
       const result = await uploadBooks(payload).unwrap();
