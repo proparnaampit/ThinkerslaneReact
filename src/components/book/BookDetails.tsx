@@ -10,9 +10,9 @@ import {useNavigation} from '@react-navigation/native';
 const BookDetailsComp = ({data, onClose}: any) => {
   if (!data) return null;
   const navigation: any = useNavigation();
-  const shortDescription = data.short_description || '';
+  const description = data.description || '';
 
-  const plainTextDescription = shortDescription
+  const plainTextDescription = description
     .replace(/<[^>]*>/g, '')
     .replace(/\\r|\\n/g, ' ')
     .split(' ')
@@ -93,77 +93,78 @@ const BookDetailsComp = ({data, onClose}: any) => {
         </CustomText>
         {data.binding && (
           <CustomText style={singleBookStyles.isbn}>
-            binding: {data.binding}
+            Binding: {data.binding}
           </CustomText>
         )}
 
         {data.width && (
           <CustomText style={singleBookStyles.isbn}>
-            width: {data.width}
+            Width: {data.width}
           </CustomText>
         )}
 
         {data.height && (
           <CustomText style={singleBookStyles.isbn}>
-            height: {data.height}
+            Height: {data.height}
           </CustomText>
         )}
 
         {data.length && (
           <CustomText style={singleBookStyles.isbn}>
-            length: {data.length}
+            <CustomText style={singleBookStyles.isbnBold}>Length:</CustomText>{' '}
+            {data.length}
           </CustomText>
         )}
         {data.created_at && (
           <CustomText style={singleBookStyles.isbn}>
-            created at: {data.created_at}
+            Created at: {data.created_at}
           </CustomText>
         )}
 
         {data.updated_at && (
           <CustomText style={singleBookStyles.isbn}>
-            updated at: {data.updated_at}
+            Updated at: {data.updated_at}
           </CustomText>
         )}
 
         {data.publish_date && (
           <CustomText style={singleBookStyles.isbn}>
-            publish date: {data.publish_date}
+            Publish date: {data.publish_date}
           </CustomText>
         )}
 
         {data.edited_by && (
           <CustomText style={singleBookStyles.isbn}>
-            edited by: {data.edited_by}
+            Edited by: {data.edited_by}
           </CustomText>
         )}
         {data.category.name && (
           <CustomText style={singleBookStyles.isbn}>
-            category name: {data.category.name}
+            Category name: {data.category.name}
           </CustomText>
         )}
 
         {data.langauge && (
           <CustomText style={singleBookStyles.isbn}>
-            langauge: {data.langauge}
+            Langauge: {data.langauge}
           </CustomText>
         )}
 
         {data.description && (
           <CustomText style={singleBookStyles.isbn}>
-            description: {data.description}
+            Description: {plainTextDescription}
           </CustomText>
         )}
 
         {data.short_description && (
           <CustomText style={singleBookStyles.isbn}>
-            short description: {data.short_description}
+            Short description: {data.short_description}
           </CustomText>
         )}
 
         {data.affiliateLink && (
           <CustomText style={singleBookStyles.isbn}>
-            affiliateLink: {data.affiliateLink}
+            AffiliateLink: {data.affiliateLink}
           </CustomText>
         )}
 
