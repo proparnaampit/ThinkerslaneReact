@@ -18,6 +18,7 @@ import CustomPicker from '../../components/common/CustomPicker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Camera} from 'react-native-vision-camera';
 import BarcodeScanner from '../../components/common/CameraScanner';
+import {useGetBookDataByCodeFromServerQuery} from '../../services/bookService';
 
 const CategoryForm: React.FC = () => {
   const {formData, updateFormData} = useFormContext();
@@ -143,7 +144,7 @@ const CategoryForm: React.FC = () => {
     }
   };
 
-  const fetchBookDataByCode = async code => {
+  const fetchBookDataByCode = async (code: any) => {
     if (!code) {
       setError('Please enter an ISBN number');
       return;

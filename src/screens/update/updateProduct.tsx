@@ -1,15 +1,15 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, TouchableOpacity, ActivityIndicator} from 'react-native';
 import Toast from 'react-native-toast-message';
-import {useFormContext} from '../../context/updateContext';
-import CategoryForm from '../product/BasicInformations';
+import {useFormContext} from '../context/FormContextType';
+import CategoryForm from './updateInformation';
 import PriceInputScreen from '../product/Pricing';
 import FilePickerComponent from '../product/Gallary';
 import ProductInputForm from '../product/Attributes';
 import SEOInputForm from '../product/SEO';
 import productStyles from '../product/css/productUpload';
 import {validateStep} from '../../utils/formValidation';
-import {useUploadBooksMutation} from '../../services/bookService';
+import {useRoute} from '@react-navigation/native';
 
 const ProductUpdate: React.FC = () => {
   const {
@@ -18,11 +18,57 @@ const ProductUpdate: React.FC = () => {
     nextStep,
     previousStep,
     loading,
+    updateFormData,
     setLoading,
     resetFormData,
+    addImage,
   } = useFormContext();
+  const route = useRoute();
+  const {bookData}: any = route.params || {};
 
-  const [uploadBooks, {isLoading: isSubmitting}] = useUploadBooksMutation();
+  const mapBookToFormData = (bookData: any) => {
+    return {
+      information: {
+        isbnNumber: bookData.isbn_number,
+        productName: bookData.name,
+        shortDescription: bookData.short_description,
+        longDescription: bookData.description,
+        resourceType: bookData.type,
+        language: bookData.language,
+        publisher: bookData.publisher_id?.toString(),
+        status: bookData.status,
+        category: bookData.category?.id?.toString(),
+        subCategory: bookData.sub_category_id?.toString(),
+        authorName: bookData.author || bookData['edited_by'],
+      },
+      pricing: {
+        price: bookData.price,
+        offered_price: bookData.offered_price,
+      },
+      product: {
+        quantity: bookData.quantity,
+        width: bookData.width,
+        height: bookData.height,
+        length: bookData.length,
+        binding: bookData.binding,
+        weight: bookData.weight,
+      },
+      seo: {
+        seoTitle: bookData.seo_details?.seo_title,
+        seoDescription: bookData.seo_details?.seo_description,
+        ogTitle: bookData.seo_details?.og_title,
+        ogDescription: bookData.seo_details?.og_description,
+        keywords: bookData.seo_details?.keyword,
+        promotionUrl: bookData.seo_details?.promotion_url,
+      },
+      images: (bookData.images || []).map((img: string, index: number) => ({
+        id: `book-image-${index}`,
+        name: img,
+        mimeType: 'image/jpeg',
+        base64: '',
+      })),
+    };
+  };
 
   const steps = [
     CategoryForm,
@@ -97,34 +143,34 @@ const ProductUpdate: React.FC = () => {
       },
     };
 
-    try {
-      const result = await uploadBooks(payload).unwrap();
+    // try {
+    //   const result = await uploadBooks(payload).unwrap();
 
-      if (result?.status === 200) {
-        Toast.show({
-          type: 'success',
-          text1: 'Product Added Successfully',
-          text2: 'Your product has been added successfully.',
-        });
-        resetFormData();
-      } else {
-        Toast.show({
-          type: 'error',
-          text1: 'Failed to Add Product',
-          text2: result?.message || 'An unexpected error occurred.',
-        });
-      }
-    } catch (error: any) {
-      console.error('API error:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Failed to Add Product',
-        text2:
-          error?.data?.message || 'Something went wrong. Please try again.',
-      });
-    } finally {
-      setLoading(false);
-    }
+    //   if (result?.status === 200) {
+    //     Toast.show({
+    //       type: 'success',
+    //       text1: 'Product Added Successfully',
+    //       text2: 'Your product has been added successfully.',
+    //     });
+    //     resetFormData();
+    //   } else {
+    //     Toast.show({
+    //       type: 'error',
+    //       text1: 'Failed to Add Product',
+    //       text2: result?.message || 'An unexpected error occurred.',
+    //     });
+    //   }
+    // } catch (error: any) {
+    //   console.error('API error:', error);
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: 'Failed to Add Product',
+    //     text2:
+    //       error?.data?.message || 'Something went wrong. Please try again.',
+    //   });
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   const handleNextStep = () => {
@@ -139,14 +185,25 @@ const ProductUpdate: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (bookData) {
+      const mappedData = mapBookToFormData(bookData);
+
+      updateFormData('information', mappedData.information);
+      updateFormData('pricing', mappedData.pricing);
+      updateFormData('product', mappedData.product);
+      updateFormData('seo', mappedData.seo);
+      addImage(mappedData.images);
+    }
+  }, [bookData]);
+
   const CurrentStepComponent = steps[currentStep - 1];
 
   return (
     <View style={productStyles.container}>
-      {loading || isSubmitting ? (
+      {loading ? (
         <View style={productStyles.loadingContainer}>
           <ActivityIndicator size="large" color="#223d79" />
-          <Text style={productStyles.loadingText}>Submitting...</Text>
         </View>
       ) : (
         <>
@@ -179,7 +236,7 @@ const ProductUpdate: React.FC = () => {
               <TouchableOpacity
                 onPress={onSubmit}
                 style={productStyles.submitButton}
-                disabled={loading || isSubmitting}>
+                disabled={loading}>
                 <Text style={productStyles.submitButtonText}>Complete</Text>
               </TouchableOpacity>
             )}
