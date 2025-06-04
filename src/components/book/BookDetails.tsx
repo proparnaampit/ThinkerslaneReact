@@ -11,6 +11,7 @@ const BookDetailsComp = ({data, onClose}: any) => {
   if (!data) return null;
   const navigation: any = useNavigation();
   const shortDescription = data.short_description || '';
+
   const plainTextDescription = shortDescription
     .replace(/<[^>]*>/g, '')
     .replace(/\\r|\\n/g, ' ')
@@ -64,9 +65,11 @@ const BookDetailsComp = ({data, onClose}: any) => {
           </CustomText>
         ) : null}
 
-        <CustomText style={singleBookStyles.publisher}>
-          Publisher: {publisher}
-        </CustomText>
+        {data.publisher && (
+          <CustomText style={singleBookStyles.isbn}>
+            publisher: {data.publisher}
+          </CustomText>
+        )}
 
         <CustomText style={singleBookStyles.stock}>
           Available Quantity: {isInStock ? data.quantity : 'Out of Stock'}
@@ -79,14 +82,90 @@ const BookDetailsComp = ({data, onClose}: any) => {
             </CustomText>
           </View>
         )}
+        {data.offered_price && (
+          <CustomText style={singleBookStyles.isbn}>
+            offeredPrice: {data.offered_price}
+          </CustomText>
+        )}
 
         <CustomText style={singleBookStyles.isbn}>
           ISBN: {data?.isbn_number ? data?.isbn_number : null}
         </CustomText>
+        {data.binding && (
+          <CustomText style={singleBookStyles.isbn}>
+            binding: {data.binding}
+          </CustomText>
+        )}
 
-        <CustomText style={singleBookStyles.description}>
-          {plainTextDescription}
-        </CustomText>
+        {data.width && (
+          <CustomText style={singleBookStyles.isbn}>
+            width: {data.width}
+          </CustomText>
+        )}
+
+        {data.height && (
+          <CustomText style={singleBookStyles.isbn}>
+            height: {data.height}
+          </CustomText>
+        )}
+
+        {data.length && (
+          <CustomText style={singleBookStyles.isbn}>
+            length: {data.length}
+          </CustomText>
+        )}
+        {data.created_at && (
+          <CustomText style={singleBookStyles.isbn}>
+            created at: {data.created_at}
+          </CustomText>
+        )}
+
+        {data.updated_at && (
+          <CustomText style={singleBookStyles.isbn}>
+            updated at: {data.updated_at}
+          </CustomText>
+        )}
+
+        {data.publish_date && (
+          <CustomText style={singleBookStyles.isbn}>
+            publish date: {data.publish_date}
+          </CustomText>
+        )}
+
+        {data.edited_by && (
+          <CustomText style={singleBookStyles.isbn}>
+            edited by: {data.edited_by}
+          </CustomText>
+        )}
+        {data.category.name && (
+          <CustomText style={singleBookStyles.isbn}>
+            category name: {data.category.name}
+          </CustomText>
+        )}
+
+        {data.langauge && (
+          <CustomText style={singleBookStyles.isbn}>
+            langauge: {data.langauge}
+          </CustomText>
+        )}
+
+        {data.description && (
+          <CustomText style={singleBookStyles.isbn}>
+            description: {data.description}
+          </CustomText>
+        )}
+
+        {data.short_description && (
+          <CustomText style={singleBookStyles.isbn}>
+            short description: {data.short_description}
+          </CustomText>
+        )}
+
+        {data.affiliateLink && (
+          <CustomText style={singleBookStyles.isbn}>
+            affiliateLink: {data.affiliateLink}
+          </CustomText>
+        )}
 
         <TouchableOpacity
           onPress={handleEditBook}
