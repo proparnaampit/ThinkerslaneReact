@@ -4,6 +4,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
   ScrollView,
 } from 'react-native';
 import {skipToken} from '@reduxjs/toolkit/query';
@@ -57,8 +58,9 @@ const BookDetails = () => {
 
   return (
     <ScrollView style={informationStyles.containerForBookDetails}>
-      <Text style={informationStyles.header}>Basic Information</Text>
-      <Text style={informationStyles.label}>ISBN NUMBER:</Text>
+      <Text style={informationStyles.header}>Book Details</Text>
+      {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
+      <Text style={informationStyles.label}>Search by ISBN Number:</Text>
       <View style={informationStyles.inputContainer}>
         <TextInput
           style={[informationStyles.ISBNinput, {flex: 1}]}
@@ -89,17 +91,19 @@ const BookDetails = () => {
         </TouchableOpacity>
       </View>
 
+      <View style={{flex: 1}}>
+        <BarcodeScanner
+          isVisible={showCamera}
+          onCodeScanned={handleCodeScanned}
+          onClose={() => setShowCamera(false)}
+        />
+      </View>
+
       <View>
         {mainData && mainData?.book?.id && (
           <BookDetailsComp data={mainData?.book} onClose={onClose} />
         )}
       </View>
-
-      <BarcodeScanner
-        isVisible={showCamera}
-        onCodeScanned={handleCodeScanned}
-        onClose={() => setShowCamera(false)}
-      />
     </ScrollView>
   );
 };

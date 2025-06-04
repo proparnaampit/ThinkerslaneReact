@@ -63,6 +63,16 @@ const informationStyles = StyleSheet.create({
     minWidth: 80,
     alignItems: 'center',
   },
+  fetchButtonDetails: {
+    backgroundColor: '#223d79',
+    padding: 8,
+    marginTop: 20,
+    borderRadius: 5,
+    width: '70%',
+    justifyContent: 'space-between',
+    margin: 'auto',
+    alignItems: 'center',
+  },
   fetchButtonText: {
     color: '#fff',
     fontWeight: 'bold',

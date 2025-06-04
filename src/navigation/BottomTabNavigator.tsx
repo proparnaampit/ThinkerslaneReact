@@ -186,9 +186,7 @@ export default function BottomTabNavigator() {
         component={ProductUpdate}
         initialParams={{add: false}}
         options={{
-          tabBarIcon: ({color, size}) => (
-            <Feather name="edit" color={color} size={size} />
-          ),
+          tabBarButton: () => null,
           headerShown: true,
         }}
       />
