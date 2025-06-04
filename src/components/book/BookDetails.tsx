@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import CustomText from '../CustomText';
 import singleBookStyles from './singleBookStyles';
 import FastImage from 'react-native-fast-image';
@@ -10,9 +10,6 @@ import {useNavigation} from '@react-navigation/native';
 const BookDetailsComp = ({data, onClose}: any) => {
   if (!data) return null;
   const navigation: any = useNavigation();
-  const imageUrl = data.images?.[0]
-    ? `https://staging.thinkerslane.com/public/uploads/admin/books/${data.image}`
-    : null;
   const shortDescription = data.short_description || '';
   const plainTextDescription = shortDescription
     .replace(/<[^>]*>/g, '')
@@ -20,7 +17,9 @@ const BookDetailsComp = ({data, onClose}: any) => {
     .split(' ')
     .slice(0, 20)
     .join(' ');
-
+  const imageUrl = data.images?.[0]
+    ? `https://staging.thinkerslane.com/public/uploads/admin/books/${data.image}`
+    : null;
   const publisher =
     data.publisher_name || data?.publisher_details?.name || 'Not Assigned';
 
@@ -69,6 +68,10 @@ const BookDetailsComp = ({data, onClose}: any) => {
           Publisher: {publisher}
         </CustomText>
 
+        <CustomText style={singleBookStyles.stock}>
+          Available Quantity: {isInStock ? data.quantity : 'Out of Stock'}
+        </CustomText>
+
         {isInStock && (
           <View style={singleBookStyles.price}>
             <CustomText style={singleBookStyles.priceText}>
@@ -77,9 +80,6 @@ const BookDetailsComp = ({data, onClose}: any) => {
           </View>
         )}
 
-        <CustomText style={singleBookStyles.stock}>
-          Available Quantity: {isInStock ? data.quantity : 'Out of Stock'}
-        </CustomText>
         <CustomText style={singleBookStyles.isbn}>
           ISBN: {data?.isbn_number ? data?.isbn_number : null}
         </CustomText>
@@ -87,9 +87,10 @@ const BookDetailsComp = ({data, onClose}: any) => {
         <CustomText style={singleBookStyles.description}>
           {plainTextDescription}
         </CustomText>
+
         <TouchableOpacity
           onPress={handleEditBook}
-          style={informationStyles.fetchButton}>
+          style={informationStyles.fetchButtonDetails}>
           <CustomText style={informationStyles.fetchButtonText}>
             Edit
           </CustomText>

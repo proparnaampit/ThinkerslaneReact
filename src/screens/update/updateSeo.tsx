@@ -60,54 +60,14 @@ const SEOInputForm: React.FC = () => {
           promotionUrl: book.promotion_url || '',
         };
 
-        setSeoTitle(newSEO.seoTitle);
-        setSeoDescription(newSEO.seoDescription);
-        setKeywords(newSEO.keywords);
-        setPromotionUrl(newSEO.promotionUrl);
         updateFormData('seo', newSEO);
         Toast.show({
           type: 'success',
           text1: 'Success',
           text2: 'SEO data fetched successfully',
         });
-      } else {
-        // Fallback to Google Books API
-        const googleResponse = await fetch(
-          `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`,
-        );
-        const googleData = await googleResponse.json();
-
-        if (googleData.items && googleData.items.length > 0) {
-          const book = googleData.items[0].volumeInfo;
-          const newSEO = {
-            seoTitle: book.title || '',
-            seoDescription: book.description || '',
-            keywords: book.title ? book.title.split(' ').join(', ') : '',
-            promotionUrl: '',
-          };
-
-          setSeoTitle(newSEO.seoTitle);
-          setSeoDescription(newSEO.seoDescription);
-          setKeywords(newSEO.keywords);
-          setPromotionUrl(newSEO.promotionUrl);
-          updateFormData('seo', newSEO);
-          Toast.show({
-            type: 'success',
-            text1: 'Success',
-            text2: 'SEO data fetched from Google Books',
-          });
-        } else {
-          setError('No SEO data found for this ISBN');
-          Toast.show({
-            type: 'error',
-            text1: 'Error',
-            text2: 'No SEO data found for this ISBN',
-          });
-        }
       }
     } catch (err) {
-      console.error('Fetch Error:', err);
-      setError('Error fetching SEO data');
       Toast.show({
         type: 'error',
         text1: 'Error',
@@ -138,14 +98,6 @@ const SEOInputForm: React.FC = () => {
     }
     updateFormData('seo', {[field]: value});
   };
-
-  useEffect(() => {
-    // Sync local state with formData if it changes externally (e.g., via ISBN fetch)
-    setSeoTitle(formData.seo?.seoTitle || '');
-    setSeoDescription(formData.seo?.seoDescription || '');
-    setKeywords(formData.seo?.keywords || '');
-    setPromotionUrl(formData.seo?.promotionUrl || '');
-  }, [formData.seo]);
 
   return (
     <ScrollView style={informationStyles.container}>
