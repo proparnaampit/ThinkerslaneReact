@@ -58,6 +58,12 @@ const singleBookStyles = StyleSheet.create({
     color: '#555',
     marginBottom: 4,
   },
+  isbnBold: {
+    fontSize: 13,
+    color: '#555',
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
   description: {
     fontSize: 12,
     color: '#444',
