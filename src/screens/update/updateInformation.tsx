@@ -13,10 +13,8 @@ import {
   useGetAllCategoryQuery,
 } from '../../services/bookService';
 import informationStyles from '../product/css/information';
-import {useFormContext} from '../../context/updateContext';
+import {useFormContext} from '../context/FormContextType';
 import CustomPicker from '../../components/common/CustomPicker';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Camera} from 'react-native-vision-camera';
 import BarcodeScanner from '../../components/common/CameraScanner';
 
 const CategoryForm: React.FC = () => {
@@ -24,6 +22,7 @@ const CategoryForm: React.FC = () => {
   const {data: publishersData} = useGetAllPublishersQuery({});
   const {data: categoriesData} = useGetAllCategoryQuery({});
 
+  console.log('formData', formData);
   const [isbnNumber, setIsbnNumber] = useState(
     formData.information?.isbnNumber || '',
   );
@@ -60,72 +59,27 @@ const CategoryForm: React.FC = () => {
   const [publishers, setPublishers] = useState<any[]>([]);
   const [showCamera, setShowCamera] = useState(false);
 
-  const normalize = (str: any) =>
-    str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase();
-
-  const fetchBookDataByIsbn = async (isbn: string) => {
-    if (!isbn) {
+  const fetchBookDataByCode = async code => {
+    if (!code) {
       setError('Please enter an ISBN number');
       return;
     }
     setIsLoading(true);
     setError('');
+    const normalize = (str: any) =>
+      str
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
 
     try {
-      const thinkersLaneResponse = await fetch(
-        `https://staging.thinkerslane.com/thAdmin/getBookByIsbn?isbn_number=${isbn}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
+      const response = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=isbn:${code}`,
       );
-      const thinkersLaneData = await thinkersLaneResponse.json();
+      const data = await response.json();
 
-      // Check if ThinkersLane API returns valid data
-      if (thinkersLaneData?.status === 200 && thinkersLaneData?.book) {
-        const book = thinkersLaneData.book;
-
-        // Map publisher_id directly since the API provides it
-        const publisherId = book.publisher_id || '';
-
-        const newInfo = {
-          productName: book.name || '',
-          publisher: publisherId,
-          language: book.language || '',
-          shortDescription: book.short_description || '',
-          longDescription: book.description || '',
-          authorName: book.author || '',
-        };
-
-        // Update state to populate form inputs
-        setProductName(newInfo.productName);
-        setPublisher(newInfo.publisher);
-        setLanguage(newInfo.language);
-        setShortDescription(newInfo.shortDescription);
-        setLongDescription(newInfo.longDescription);
-
-        // Update form context
-        updateFormData('information', {
-          ...formData.information,
-          isbnNumber: isbn,
-          ...newInfo,
-        });
-        return; // Exit if ThinkersLane API returns valid data
-      }
-
-      // Fallback to Google Books API if ThinkersLane API returns no data
-      const googleResponse = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`,
-      );
-      const googleData = await googleResponse.json();
-
-      if (googleData.items && googleData.items.length > 0) {
-        const item = googleData.items[0];
+      if (data.items && data.items.length > 0) {
+        const item = data.items[0];
         const volumeId = item.id;
 
         const detailRes = await fetch(
@@ -136,6 +90,7 @@ const CategoryForm: React.FC = () => {
 
         const publisherName = book.publisher || '';
         const words = publisherName.trim().split(/\s+/);
+
         let matchedPublisher = null;
 
         for (let i = 1; i <= Math.min(3, words.length); i++) {
@@ -187,30 +142,16 @@ const CategoryForm: React.FC = () => {
     }
   };
 
-  const fetchBookData = () => {
-    fetchBookDataByIsbn(isbnNumber);
-  };
-
-  const fetchBookDataByCode = (code: string) => {
+  const handleCodeScanned = (code: string) => {
     setIsbnNumber(code);
     Toast.show({
       type: 'success',
       text1: `Barcode found ${code}`,
     });
     if (code) {
-      fetchBookDataByIsbn(code);
+      fetchBookDataByCode(code);
     }
     setShowCamera(false);
-  };
-
-  const openCamera = async () => {
-    const permission = await Camera.requestCameraPermission();
-    if (permission === 'denied') {
-      setError('Camera permission denied');
-      return;
-    }
-    setIsbnNumber('');
-    setShowCamera(prev => !prev);
   };
 
   useEffect(() => {
@@ -250,52 +191,27 @@ const CategoryForm: React.FC = () => {
 
   return (
     <ScrollView style={informationStyles.container}>
-      <Text style={informationStyles.header}>Basic Information</Text>
+      <Text style={informationStyles.header}>Update Book</Text>
       <Text style={informationStyles.label}>ISBN NUMBER:</Text>
       <View style={informationStyles.inputContainer}>
         <TextInput
-          style={[informationStyles.ISBNinput, {flex: 1}]}
+          style={[informationStyles.ISBNinputDisabled, {flex: 1}]}
           placeholder="Enter ISBN NUMBER"
-          value={isbnNumber}
+          value={'12'}
           keyboardType="numeric"
-          onChangeText={text => {
-            const numericText = text.replace(/[^0-9]/g, '');
-            setIsbnNumber(numericText);
-          }}
+          editable={false}
         />
-
-        <TouchableOpacity
-          style={[informationStyles.cameraButton, {marginLeft: 5}]}
-          onPress={openCamera}>
-          <MaterialCommunityIcons
-            name="barcode-scan"
-            size={32}
-            color={showCamera ? 'red' : '#223d79'}
-            style={{marginLeft: 5}}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={informationStyles.fetchButton}
-          onPress={fetchBookData}
-          disabled={isLoading}>
-          {isLoading ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Text style={informationStyles.fetchButtonText}>Search</Text>
-          )}
-        </TouchableOpacity>
       </View>
 
       <BarcodeScanner
         isVisible={showCamera}
-        onCodeScanned={fetchBookDataByCode}
+        onCodeScanned={handleCodeScanned}
         onClose={() => setShowCamera(false)}
       />
 
       <Text style={informationStyles.noteText}>
-        ISBN can fetch the book minimal details, enter ISBN number to fetch or
-        fill up manually
+        Because you are editing book, you cannot chage the ISBN here. It is
+        restricted
       </Text>
 
       {error ? <Text style={informationStyles.errorText}>{error}</Text> : null}

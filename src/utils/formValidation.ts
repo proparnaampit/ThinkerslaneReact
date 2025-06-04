@@ -12,6 +12,10 @@ const showToast = (message: string) => {
 export const validateStep = (step: number, formData: any) => {
   if (step === 1) {
     const info = formData.information || {};
+    if (!info.isbnNumber?.trim()) {
+      showToast('isbnNumber is mandatory');
+      return false;
+    }
     if (!info.productName?.trim()) {
       showToast('Product Name is required');
       return false;

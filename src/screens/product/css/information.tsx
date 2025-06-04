@@ -49,6 +49,13 @@ const informationStyles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
   },
+  ISBNinputDisabled: {
+    height: 40,
+    fontSize: 13,
+    backgroundColor: '#d6d6d6',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',

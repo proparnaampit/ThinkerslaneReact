@@ -35,7 +35,7 @@ const BookDetailsComp = ({data, onClose}: any) => {
         {
           text: 'OK',
           onPress: () => {
-            navigation.navigate('Update', {data});
+            navigation.navigate('Update', {bookData: data});
             onClose();
           },
         },
@@ -84,28 +84,36 @@ const BookDetailsComp = ({data, onClose}: any) => {
         )}
         {data.offered_price && (
           <CustomText style={singleBookStyles.isbn}>
-            offeredPrice: {data.offered_price}
+            <CustomText style={singleBookStyles.isbnBold}>
+              offeredPrice:
+            </CustomText>{' '}
+            {data.offered_price}
           </CustomText>
         )}
 
         <CustomText style={singleBookStyles.isbn}>
-          ISBN: {data?.isbn_number ? data?.isbn_number : null}
+          <CustomText style={singleBookStyles.isbnBold}>ISBN:</CustomText>{' '}
+          {data?.isbn_number ? data?.isbn_number : null}
         </CustomText>
+
         {data.binding && (
           <CustomText style={singleBookStyles.isbn}>
-            Binding: {data.binding}
+            <CustomText style={singleBookStyles.isbnBold}>Binding:</CustomText>{' '}
+            {data.binding}
           </CustomText>
         )}
 
         {data.width && (
           <CustomText style={singleBookStyles.isbn}>
-            Width: {data.width}
+            <CustomText style={singleBookStyles.isbnBold}>Width:</CustomText>{' '}
+            {data.width}
           </CustomText>
         )}
 
         {data.height && (
           <CustomText style={singleBookStyles.isbn}>
-            Height: {data.height}
+            <CustomText style={singleBookStyles.isbnBold}>Height:</CustomText>{' '}
+            {data.height}
           </CustomText>
         )}
 
@@ -117,54 +125,80 @@ const BookDetailsComp = ({data, onClose}: any) => {
         )}
         {data.created_at && (
           <CustomText style={singleBookStyles.isbn}>
-            Created at: {data.created_at}
+            <CustomText style={singleBookStyles.isbnBold}>
+              Created at:
+            </CustomText>{' '}
+            {data.created_at}
           </CustomText>
         )}
 
         {data.updated_at && (
           <CustomText style={singleBookStyles.isbn}>
-            Updated at: {data.updated_at}
+            <CustomText style={singleBookStyles.isbnBold}>
+              Updated at:
+            </CustomText>{' '}
+            {data.updated_at}
           </CustomText>
         )}
 
         {data.publish_date && (
           <CustomText style={singleBookStyles.isbn}>
-            Publish date: {data.publish_date}
+            <CustomText style={singleBookStyles.isbnBold}>
+              Publish date:
+            </CustomText>{' '}
+            {data.publish_date}
           </CustomText>
         )}
 
         {data.edited_by && (
           <CustomText style={singleBookStyles.isbn}>
-            Edited by: {data.edited_by}
+            <CustomText style={singleBookStyles.isbnBold}>
+              Edited by :
+            </CustomText>{' '}
+            {data.edited_by}
           </CustomText>
         )}
+
         {data.category.name && (
           <CustomText style={singleBookStyles.isbn}>
-            Category name: {data.category.name}
+            <CustomText style={singleBookStyles.isbnBold}>
+              Category name:
+            </CustomText>{' '}
+            {data.category.name}
           </CustomText>
         )}
 
         {data.langauge && (
           <CustomText style={singleBookStyles.isbn}>
-            Langauge: {data.langauge}
+            <CustomText style={singleBookStyles.isbnBold}>Langauge:</CustomText>{' '}
+            {data.langauge}
           </CustomText>
         )}
 
         {data.description && (
           <CustomText style={singleBookStyles.isbn}>
-            Description: {plainTextDescription}
+            <CustomText style={singleBookStyles.isbnBold}>
+              Description:
+            </CustomText>{' '}
+            {plainTextDescription}
           </CustomText>
         )}
 
         {data.short_description && (
           <CustomText style={singleBookStyles.isbn}>
-            Short description: {data.short_description}
+            <CustomText style={singleBookStyles.isbnBold}>
+              Short description:
+            </CustomText>{' '}
+            {data.short_description}
           </CustomText>
         )}
 
         {data.affiliateLink && (
           <CustomText style={singleBookStyles.isbn}>
-            AffiliateLink: {data.affiliateLink}
+            <CustomText style={singleBookStyles.isbnBold}>
+              AffiliateLink:
+            </CustomText>{' '}
+            {data.affiliateLink}
           </CustomText>
         )}
 

@@ -37,6 +37,7 @@ const ProductUploadForm: React.FC<any> = () => {
     SEOInputForm,
   ];
 
+  console.log('formData', formData);
   const onSubmit = async () => {
     const payload = {
       params: {
@@ -80,7 +81,6 @@ const ProductUploadForm: React.FC<any> = () => {
           })) || [],
       },
     };
-    console.log(payload);
 
     try {
       const result = await uploadBooks(payload).unwrap();
