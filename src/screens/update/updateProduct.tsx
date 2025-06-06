@@ -25,8 +25,46 @@ const ProductUpdate: React.FC = () => {
   } = useFormContext();
   const route = useRoute();
   const {bookData}: any = route.params || {};
+  const convertImageToBase64 = async (imageUrl: string): Promise<string> => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
 
-  const mapBookToFormData = (bookData: any) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result?.toString().split(',')[1] || '';
+          resolve(base64String);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error converting image to base64:', error);
+      return '';
+    }
+  };
+
+  const mapBookToFormData = async (bookData: any) => {
+    const images = await Promise.all(
+      (bookData.images || []).map(async (img: string, index: number) => {
+        const imageUrl = bookData.images?.[0]
+          ? `https://staging.thinkerslane.com/public/uploads/admin/books/${img}`
+          : null;
+
+        if (!imageUrl) return null;
+
+        const base64 = await convertImageToBase64(imageUrl);
+        return {
+          id: `book-image-${index}`,
+          name: img,
+          mimeType: 'image/jpeg',
+          base64,
+          includeBase64: true,
+        };
+      }),
+    );
+
     return {
       information: {
         isbnNumber: bookData.isbn_number,
@@ -61,12 +99,7 @@ const ProductUpdate: React.FC = () => {
         keywords: bookData.seo_details?.keyword,
         promotionUrl: bookData.seo_details?.promotion_url,
       },
-      images: (bookData.images || []).map((img: string, index: number) => ({
-        id: `book-image-${index}`,
-        name: img,
-        mimeType: 'image/jpeg',
-        base64: '',
-      })),
+      images,
     };
   };
 
@@ -187,13 +220,15 @@ const ProductUpdate: React.FC = () => {
 
   useEffect(() => {
     if (bookData) {
-      const mappedData = mapBookToFormData(bookData);
-
-      updateFormData('information', mappedData.information);
-      updateFormData('pricing', mappedData.pricing);
-      updateFormData('product', mappedData.product);
-      updateFormData('seo', mappedData.seo);
-      addImage(mappedData.images);
+      const loadFormData = async () => {
+        const mappedData = await mapBookToFormData(bookData);
+        updateFormData('information', mappedData.information);
+        updateFormData('pricing', mappedData.pricing);
+        updateFormData('product', mappedData.product);
+        updateFormData('seo', mappedData.seo);
+        addImage(mappedData.images);
+      };
+      loadFormData();
     }
   }, [bookData]);
 
