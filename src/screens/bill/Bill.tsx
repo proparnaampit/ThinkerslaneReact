@@ -179,7 +179,7 @@ const Bill = ({route}: any) => {
               <p><strong>Order Date: </strong>${booking_details.order_date_time}</p>
               <p><strong>Invoice No: </strong>IN-${booking_details.id}</p>
               <p><strong>Invoice Date: </strong>${booking_details.order_date_time}</p>
-              <p><strong>Discount Added: </strong>${booking_details.discount_amount}(${discountPercentage}%)</p>
+              <p><strong>Discount Added: </strong>${booking_details.discount_amount}(${booking_details.discount_percentage}%)</p>
             </div>
           </div>
         </div>
@@ -195,7 +195,7 @@ const Bill = ({route}: any) => {
           ${productRows}
         </table>
         <div style="text-align:center">
-          <p><strong>Discount Amount: </strong>${booking_details.discount_amount}(${discountPercentage}%)</p>
+          <p><strong>Discount Amount: </strong>${booking_details.discount_amount}(${booking_details.discount_percentage}%)</p>
           <p><strong>Grand Total: </strong>${booking_details.amount}</p>
         </div>
         <div class="footer">
