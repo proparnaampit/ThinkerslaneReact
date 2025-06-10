@@ -321,13 +321,9 @@ const AddOrderScreen = () => {
             );
           }}
           keyExtractor={item => item.id}
-          ListEmptyComponent={
-            <Animated.View style={{opacity: fadeAnim}}>
-              <CustomText style={commonstyles.errorText}>{message}</CustomText>
-            </Animated.View>
-          }
           windowSize={21}
           maxToRenderPerBatch={15}
+          ListFooterComponent={<View style={{marginBottom: 500}}></View>}
           extraData={isLoadingBooks}
           ListEmptyComponent={
             !isLoadingBooks ? (
