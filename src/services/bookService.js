@@ -15,7 +15,6 @@ export const bookService = createApi({
         if (search) params.append('search', search);
         if (pid) params.append('pid', pid);
         const url = `/getBooks?${params.toString()}`;
-        console.log(url);
 
         return url;
       },

@@ -285,48 +285,6 @@ const AddOrderScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* <ScrollView
-        style={addOrderStyles.booksContainer}
-        showsVerticalScrollIndicator={false}>
-        {apiBooksLoading && <ActivityIndicator size="large" color="#0000ff" />}
-        {filteredBooks?.length > 0 &&
-          filteredBooks.map((book: any) => {
-            const cartItem = cart[book.id];
-            const quantity = cartItem ? cartItem.quantity : 0;
-            return (
-              <TouchableOpacity
-                key={book.id}
-                style={addOrderStyles.bookContainer}
-                onPress={() => handleAddToCart(book)}
-                activeOpacity={0.8}>
-                <View style={{flex: 1}}>
-                  <Book data={book} />
-                </View>
-
-                {quantity > 0 && (
-                  <TouchableOpacity
-                    style={addOrderStyles.quantityBadgeContainer}
-                    onPress={e => {
-                      e.stopPropagation();
-                      handleDecreaseQuantity(book.id);
-                    }}>
-                    <View>
-                      <FontAwesome name="minus" size={16} color="red" />
-                    </View>
-                    <CustomText style={addOrderStyles.quantityText}>
-                      {quantity}
-                    </CustomText>
-                  </TouchableOpacity>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-
-        <Animated.View style={{opacity: fadeAnim}}>
-          <CustomText style={commonstyles.errorText}>{message}</CustomText>
-        </Animated.View>
-      </ScrollView> */}
-
       <View>
         <FlatList
           data={filteredBooks}
