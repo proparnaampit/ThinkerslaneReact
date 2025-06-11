@@ -22,7 +22,7 @@ const CategoryForm: React.FC = () => {
   const {data: publishersData} = useGetAllPublishersQuery({});
   const {data: categoriesData} = useGetAllCategoryQuery({});
 
-  console.log('formData', formData);
+  console.log('formData', JSON.stringify(formData, null, 2));
   const [isbnNumber, setIsbnNumber] = useState(
     formData.information?.isbnNumber || '',
   );
@@ -197,7 +197,7 @@ const CategoryForm: React.FC = () => {
         <TextInput
           style={[informationStyles.ISBNinputDisabled, {flex: 1}]}
           placeholder="Enter ISBN NUMBER"
-          value={'12'}
+          value={isbnNumber}
           keyboardType="numeric"
           editable={false}
         />

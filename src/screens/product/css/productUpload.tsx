@@ -66,7 +66,6 @@ const productStyles = StyleSheet.create({
     minWidth: Math.max(width * 0.35, 120),
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 23,
   },
   submitButtonText: {
     color: '#fff',

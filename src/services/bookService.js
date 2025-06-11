@@ -43,6 +43,13 @@ export const bookService = createApi({
         `https://staging.thinkerslane.com/thAdmin/getBookByIsbn?isbn_number=${isbn}`,
       keepUnusedDataFor: 86400,
     }),
+    updateBook: builder.mutation({
+      query: payload => ({
+        url: 'https://staging.thinkerslane.com/thAdmin/updateProduct',
+        method: 'POST',
+        body: payload,
+      }),
+    }),
   }),
 });
 
@@ -53,4 +60,5 @@ export const {
   useGetAllCategoryQuery,
   useUploadBooksMutation,
   useGetBookDataByCodeFromServerQuery,
+  useUpdateBookMutation,
 } = bookService;

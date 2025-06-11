@@ -10,6 +10,7 @@ import SEOInputForm from '../product/SEO';
 import productStyles from '../product/css/productUpload';
 import {validateStep} from '../../utils/formValidation';
 import {useRoute} from '@react-navigation/native';
+import {useUpdateBookMutation} from '../../services/bookService';
 
 const ProductUpdate: React.FC = () => {
   const {
@@ -25,45 +26,91 @@ const ProductUpdate: React.FC = () => {
   } = useFormContext();
   const route = useRoute();
   const {bookData}: any = route.params || {};
-  const convertImageToBase64 = async (imageUrl: string): Promise<string> => {
-    try {
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
+  const [updateBook, {isLoading, error}] = useUpdateBookMutation();
 
+  const convertImageToBase64 = async (
+    imageUrl: string,
+  ): Promise<{base64: string; mimeType: string}> => {
+    try {
+      console.log('Fetching image from:', imageUrl);
+      const response = await fetch(imageUrl, {mode: 'cors'});
+      console.log(
+        'Response:',
+        response.status,
+        response.statusText,
+        response.headers.get('Content-Type'),
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const mimeType = response.headers.get('Content-Type') || 'image/jpeg';
+      if (!mimeType.startsWith('image/')) {
+        throw new Error(`Invalid mime type: ${mimeType}`);
+      }
+
+      const blob = await response.blob();
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => {
           const base64String = reader.result?.toString().split(',')[1] || '';
-          resolve(base64String);
+          console.log('Base64 length:', base64String.length);
+          if (!base64String) {
+            reject(new Error('Invalid Base64 string: Empty result'));
+          } else {
+            resolve({base64: base64String, mimeType});
+          }
         };
-        reader.onerror = reject;
+        reader.onerror = error => {
+          console.error('FileReader error:', error);
+          reject(error);
+        };
         reader.readAsDataURL(blob);
       });
     } catch (error) {
-      console.error('Error converting image to base64:', error);
-      return '';
+      console.error('Error converting image to Base64:', error);
+      return {base64: '', mimeType: ''};
     }
   };
 
   const mapBookToFormData = async (bookData: any) => {
-    const images = await Promise.all(
-      (bookData.images || []).map(async (img: string, index: number) => {
-        const imageUrl = bookData.images?.[0]
-          ? `https://staging.thinkerslane.com/public/uploads/admin/books/${img}`
-          : null;
+    const images =
+      bookData.images &&
+      Array.isArray(bookData.images) &&
+      bookData.images.length > 0
+        ? await Promise.all(
+            bookData.images.map(async (img: string, index: number) => {
+              const imageUrl = img
+                ? `https://staging.thinkerslane.com/public/uploads/admin/books/${img}?t=${Date.now()}`
+                : null;
+              if (!imageUrl) {
+                console.warn(`No image URL for ${img}`);
+                return null;
+              }
 
-        if (!imageUrl) return null;
+              let result;
+              try {
+                result = await convertImageToBase64(imageUrl);
+                if (!result.base64) {
+                  console.warn(`Failed to convert ${img} to Base64`);
+                  return null;
+                }
+              } catch (error) {
+                console.error(`Error converting ${img} to Base64:`, error);
+                return null;
+              }
 
-        const base64 = await convertImageToBase64(imageUrl);
-        return {
-          id: `book-image-${index}`,
-          name: img,
-          mimeType: 'image/jpeg',
-          base64,
-          includeBase64: true,
-        };
-      }),
-    );
+              return {
+                id: `book-image-${index}`,
+                name: img,
+                mimeType: result.mimeType,
+                base64: `data:${result.mimeType};base64,${result.base64}`,
+                includeBase64: true,
+              };
+            }),
+          )
+        : [];
 
     return {
       information: {
@@ -99,10 +146,9 @@ const ProductUpdate: React.FC = () => {
         keywords: bookData.seo_details?.keyword,
         promotionUrl: bookData.seo_details?.promotion_url,
       },
-      images,
+      images: images.filter(img => img !== null),
     };
   };
-
   const steps = [
     CategoryForm,
     PriceInputScreen,
@@ -133,6 +179,8 @@ const ProductUpdate: React.FC = () => {
 
     const payload = {
       params: {
+        product_id: 1,
+        isbn: formData.information?.isbnNumber,
         basic_information: {
           name: formData.information?.productName || '',
           short_description: formData.information?.shortDescription || '',
@@ -141,25 +189,23 @@ const ProductUpdate: React.FC = () => {
           status: formData.information?.status === 'active' ? 1 : 0,
           resource_name: formData.information?.authorName || '',
           resource_type: formData.information?.resourceType || '',
-          category: parseInt(formData.information?.category || '0') || 0,
+          category: parseInt(formData.information?.category) || null,
           sub_category: formData.information?.subCategory
             ? parseInt(formData.information.subCategory)
             : null,
           language: formData.information?.language || '',
-          isbn_number: formData.information?.isbnNumber || '',
         },
         pricing: {
-          price: parseFloat(formData.pricing?.price || '0') || 0,
-          offered_price:
-            parseFloat(formData.pricing?.offered_price || '0') || 0,
+          price: parseFloat(formData.pricing?.price) || null,
+          offered_price: parseFloat(formData.pricing?.offered_price) || null,
         },
         attributes: {
-          quantity: parseInt(formData.product?.quantity || '0') || 0,
-          width: parseFloat(formData.product?.width || '0') || 0,
-          height: parseFloat(formData.product?.height || '0') || 0,
-          length: parseFloat(formData.product?.length || '0') || 0,
+          quantity: parseInt(formData.product?.quantity) || null,
+          width: parseFloat(formData.product?.width) || null,
+          height: parseFloat(formData.product?.height) || null,
+          length: parseFloat(formData.product?.length) || null,
           binding: formData.product?.binding || '',
-          weight: parseFloat(formData.product?.weight || '0') || 0,
+          weight: parseFloat(formData.product?.weight) || null,
         },
         seo: {
           seo_title: formData.seo?.seoTitle || '',
@@ -175,35 +221,34 @@ const ProductUpdate: React.FC = () => {
           })) || [],
       },
     };
+    try {
+      const result = await updateBook(payload).unwrap();
 
-    // try {
-    //   const result = await uploadBooks(payload).unwrap();
-
-    //   if (result?.status === 200) {
-    //     Toast.show({
-    //       type: 'success',
-    //       text1: 'Product Added Successfully',
-    //       text2: 'Your product has been added successfully.',
-    //     });
-    //     resetFormData();
-    //   } else {
-    //     Toast.show({
-    //       type: 'error',
-    //       text1: 'Failed to Add Product',
-    //       text2: result?.message || 'An unexpected error occurred.',
-    //     });
-    //   }
-    // } catch (error: any) {
-    //   console.error('API error:', error);
-    //   Toast.show({
-    //     type: 'error',
-    //     text1: 'Failed to Add Product',
-    //     text2:
-    //       error?.data?.message || 'Something went wrong. Please try again.',
-    //   });
-    // } finally {
-    //   setLoading(false);
-    // }
+      if (result?.status === 200) {
+        Toast.show({
+          type: 'success',
+          text1: 'Product Added Successfully',
+          text2: 'Your product has been added successfully.',
+        });
+        resetFormData();
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Failed to Add Product',
+          text2: result?.message || 'An unexpected error occurred.',
+        });
+      }
+    } catch (error: any) {
+      console.error('API error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to Add Product',
+        text2:
+          error?.data?.message || 'Something went wrong. Please try again.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleNextStep = () => {

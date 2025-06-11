@@ -27,10 +27,6 @@ const FilePickerComponent = () => {
       const currentImages: any = Array.isArray(formData?.images)
         ? formData.images
         : [];
-      console.log(
-        'Current image IDs before pick:',
-        currentImages.map((img: any) => img.id),
-      );
 
       const results: PickedImage[] = await ImagePicker.openPicker({
         mediaType: 'photo',
