@@ -164,30 +164,19 @@ const CategoryForm: React.FC = () => {
   }, [categoriesData, publishersData]);
 
   useEffect(() => {
-    updateFormData('information', {
-      isbnNumber,
-      productName,
-      shortDescription,
-      longDescription,
-      resourceType,
-      language,
-      publisher,
-      status,
-      category: selectedCategory,
-      subCategory,
-    });
-  }, [
-    isbnNumber,
-    productName,
-    shortDescription,
-    longDescription,
-    resourceType,
-    language,
-    publisher,
-    status,
-    selectedCategory,
-    subCategory,
-  ]);
+    if (formData.information) {
+      setIsbnNumber(formData.information.isbnNumber || '');
+      setProductName(formData.information.productName || '');
+      setShortDescription(formData.information.shortDescription || '');
+      setLongDescription(formData.information.longDescription || '');
+      setResourceType(formData.information.resourceType || '');
+      setLanguage(formData.information.language || '');
+      setPublisher(formData.information.publisher || '');
+      setStatus(formData.information.status || 'active');
+      setSubCategory(formData.information.subCategory || '');
+      setSelectedCategory(formData.information.category || '');
+    }
+  }, [formData.information]);
 
   return (
     <ScrollView style={informationStyles.container}>

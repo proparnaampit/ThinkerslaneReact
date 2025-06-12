@@ -41,6 +41,7 @@ const ProductUploadForm: React.FC<any> = () => {
   const onSubmit = async () => {
     const payload = {
       params: {
+        isbn: formData.information?.isbnNumber || 0,
         basic_information: {
           name: formData.information?.productName || '',
           short_description: formData.information?.shortDescription || '',

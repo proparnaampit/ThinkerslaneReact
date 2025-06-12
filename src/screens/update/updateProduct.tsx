@@ -34,38 +34,39 @@ const ProductUpdate: React.FC = () => {
     try {
       console.log('Fetching image from:', imageUrl);
       const response = await fetch(imageUrl, {mode: 'cors'});
-      console.log(
-        'Response:',
-        response.status,
-        response.statusText,
-        response.headers.get('Content-Type'),
-      );
+
+      const mimeType = response.headers.get('Content-Type') || 'image/jpeg';
+      console.log('Response:', response.status, response.statusText, mimeType);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const mimeType = response.headers.get('Content-Type') || 'image/jpeg';
       if (!mimeType.startsWith('image/')) {
         throw new Error(`Invalid mime type: ${mimeType}`);
       }
 
       const blob = await response.blob();
+
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
+
         reader.onloadend = () => {
-          const base64String = reader.result?.toString().split(',')[1] || '';
-          console.log('Base64 length:', base64String.length);
-          if (!base64String) {
-            reject(new Error('Invalid Base64 string: Empty result'));
+          const result = reader.result?.toString() || '';
+          const base64String = result.split(',')[1] || '';
+
+          if (!base64String || base64String.length < 1) {
+            reject(new Error('Base64 too short or invalid'));
           } else {
             resolve({base64: base64String, mimeType});
           }
         };
+
         reader.onerror = error => {
           console.error('FileReader error:', error);
           reject(error);
         };
+
         reader.readAsDataURL(blob);
       });
     } catch (error) {
@@ -76,38 +77,38 @@ const ProductUpdate: React.FC = () => {
 
   const mapBookToFormData = async (bookData: any) => {
     const images =
-      bookData.images &&
-      Array.isArray(bookData.images) &&
-      bookData.images.length > 0
+      bookData.images && bookData.images.length > 0
         ? await Promise.all(
             bookData.images.map(async (img: string, index: number) => {
               const imageUrl = img
-                ? `https://staging.thinkerslane.com/public/uploads/admin/books/${img}?t=${Date.now()}`
+                ? `https://staging.thinkerslane.com/public/uploads/admin/books/${
+                    img.startsWith('/') ? img.slice(1) : img
+                  }`
                 : null;
+
               if (!imageUrl) {
                 console.warn(`No image URL for ${img}`);
                 return null;
               }
 
-              let result;
               try {
-                result = await convertImageToBase64(imageUrl);
+                const result = await convertImageToBase64(imageUrl);
                 if (!result.base64) {
-                  console.warn(`Failed to convert ${img} to Base64`);
+                  console.warn(`Invalid Base64 for image: ${img}`);
                   return null;
                 }
+
+                return {
+                  id: `book-image-${index}`,
+                  name: img,
+                  mimeType: result.mimeType,
+                  base64: `data:${result.mimeType};base64,${result.base64}`,
+                  includeBase64: true,
+                };
               } catch (error) {
                 console.error(`Error converting ${img} to Base64:`, error);
                 return null;
               }
-
-              return {
-                id: `book-image-${index}`,
-                name: img,
-                mimeType: result.mimeType,
-                base64: `data:${result.mimeType};base64,${result.base64}`,
-                includeBase64: true,
-              };
             }),
           )
         : [];
@@ -149,6 +150,7 @@ const ProductUpdate: React.FC = () => {
       images: images.filter(img => img !== null),
     };
   };
+
   const steps = [
     CategoryForm,
     PriceInputScreen,
@@ -179,39 +181,42 @@ const ProductUpdate: React.FC = () => {
 
     const payload = {
       params: {
-        product_id: 1,
-        isbn: formData.information?.isbnNumber,
+        user_id: formData.information?.isbnNumber || 0,
+        product_id: bookData.id ? bookData.id : null,
+        isbn: formData.information?.isbnNumber || '',
         basic_information: {
           name: formData.information?.productName || '',
           short_description: formData.information?.shortDescription || '',
           long_description: formData.information?.longDescription || '',
-          publisher: formData.information?.publisher || '',
+          publisher: parseInt(formData.information?.publisher) || 0,
           status: formData.information?.status === 'active' ? 1 : 0,
           resource_name: formData.information?.authorName || '',
           resource_type: formData.information?.resourceType || '',
-          category: parseInt(formData.information?.category) || null,
+          category: parseInt(formData.information?.category) || 0,
           sub_category: formData.information?.subCategory
             ? parseInt(formData.information.subCategory)
-            : null,
+            : 0,
           language: formData.information?.language || '',
         },
         pricing: {
-          price: parseFloat(formData.pricing?.price) || null,
-          offered_price: parseFloat(formData.pricing?.offered_price) || null,
+          price: parseFloat(formData.pricing?.price) || 0,
+          offered_price: parseFloat(formData.pricing?.offered_price) || 0,
         },
         attributes: {
-          quantity: parseInt(formData.product?.quantity) || null,
-          width: parseFloat(formData.product?.width) || null,
-          height: parseFloat(formData.product?.height) || null,
-          length: parseFloat(formData.product?.length) || null,
+          quantity: parseInt(formData.product?.quantity) || 0,
+          width: parseFloat(formData.product?.width) || 0,
+          height: parseFloat(formData.product?.height) || 0,
+          length: parseFloat(formData.product?.length) || 0,
           binding: formData.product?.binding || '',
-          weight: parseFloat(formData.product?.weight) || null,
+          weight: parseFloat(formData.product?.weight) || 0,
         },
         seo: {
           seo_title: formData.seo?.seoTitle || '',
           seo_description: formData.seo?.seoDescription || '',
           keywords: formData.seo?.keywords || '',
           promotion_url: formData.seo?.promotionUrl || '',
+          og_title: formData.seo?.ogTitle || '',
+          og_description: formData.seo?.ogDescription || '',
         },
         images:
           formData.images?.map(img => ({
@@ -221,6 +226,7 @@ const ProductUpdate: React.FC = () => {
           })) || [],
       },
     };
+
     try {
       const result = await updateBook(payload).unwrap();
 

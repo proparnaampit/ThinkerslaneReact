@@ -33,7 +33,7 @@ export const bookService = createApi({
     }),
     uploadBooks: builder.mutation({
       query: payload => ({
-        url: 'https://thinkerslane.com/thAdmin/addProducts',
+        url: 'https://staging.thinkerslane.com/thAdmin/addProducts',
         method: 'POST',
         body: payload,
       }),

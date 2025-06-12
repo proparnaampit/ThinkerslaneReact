@@ -43,6 +43,7 @@ const BookDetailsComp = ({data, onClose}: any) => {
       {cancelable: true},
     );
   };
+  console.log('data', data);
 
   return (
     <View style={singleBookStyles.container}>
@@ -94,6 +95,10 @@ const BookDetailsComp = ({data, onClose}: any) => {
         <CustomText style={singleBookStyles.isbn}>
           <CustomText style={singleBookStyles.isbnBold}>ISBN:</CustomText>{' '}
           {data?.isbn_number ? data?.isbn_number : null}
+        </CustomText>
+        <CustomText style={singleBookStyles.isbn}>
+          <CustomText style={singleBookStyles.isbnBold}>Product id:</CustomText>{' '}
+          {data?.id ? data?.id : null}
         </CustomText>
 
         {data.binding && (
