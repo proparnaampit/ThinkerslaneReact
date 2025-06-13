@@ -40,6 +40,7 @@ const CategoryForm: React.FC = () => {
   const [resourceType, setResourceType] = useState(
     formData.information?.resourceType || '',
   );
+
   const [language, setLanguage] = useState(
     formData.information?.language || '',
   );
@@ -373,7 +374,7 @@ const CategoryForm: React.FC = () => {
         placeholder="Select Category"
       />
 
-      <Text style={informationStyles.label}>Author Name *:</Text>
+      <Text style={informationStyles.label}>resource name*:</Text>
       <TextInput
         style={informationStyles.input}
         placeholder="Author Name"

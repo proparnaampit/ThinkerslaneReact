@@ -96,7 +96,8 @@ const ProductUploadForm: React.FC<any> = () => {
       } else {
         Toast.show({
           type: 'error',
-          text1: 'Failed to Add Product',
+          text1: 'Duplicate ISBN',
+          text2: ' Duplicate entries are not allowed.',
         });
       }
     } catch (error: any) {

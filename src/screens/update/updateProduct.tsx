@@ -81,15 +81,14 @@ const ProductUpdate: React.FC = () => {
         ? await Promise.all(
             bookData.images.map(async (img: string, index: number) => {
               const imageUrl = img
-                ? `https://staging.thinkerslane.com/public/uploads/admin/books/${
-                    img.startsWith('/') ? img.slice(1) : img
-                  }`
+                ? `https://staging.thinkerslane.com/public/uploads/admin/books/${img}`
                 : null;
 
               if (!imageUrl) {
                 console.warn(`No image URL for ${img}`);
                 return null;
               }
+              console.log(imageUrl);
 
               try {
                 const result = await convertImageToBase64(imageUrl);
@@ -120,9 +119,15 @@ const ProductUpdate: React.FC = () => {
         shortDescription: bookData.short_description,
         longDescription: bookData.description,
         resourceType: bookData.type,
+        resourceName: bookData.authorName,
         language: bookData.language,
         publisher: bookData.publisher_id?.toString(),
-        status: bookData.status,
+        status:
+          bookData.status === 'active'
+            ? 1
+            : bookData.status === 'inactive'
+            ? 0
+            : null,
         category: bookData.category?.id?.toString(),
         subCategory: bookData.sub_category_id?.toString(),
         authorName: bookData.author || bookData['edited_by'],
@@ -190,6 +195,7 @@ const ProductUpdate: React.FC = () => {
           long_description: formData.information?.longDescription || '',
           publisher: parseInt(formData.information?.publisher) || 0,
           status: formData.information?.status === 'active' ? 1 : 0,
+
           resource_name: formData.information?.authorName || '',
           resource_type: formData.information?.resourceType || '',
           category: parseInt(formData.information?.category) || 0,
