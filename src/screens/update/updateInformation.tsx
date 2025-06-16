@@ -22,10 +22,10 @@ const CategoryForm: React.FC = () => {
   const {data: publishersData} = useGetAllPublishersQuery({});
   const {data: categoriesData} = useGetAllCategoryQuery({});
 
-  console.log('formData', JSON.stringify(formData, null, 2));
   const [isbnNumber, setIsbnNumber] = useState(
     formData.information?.isbnNumber || '',
   );
+  const [authorName, setAuthorName] = useState('');
   const [productName, setProductName] = useState(
     formData.information?.productName || '',
   );
@@ -44,9 +44,7 @@ const CategoryForm: React.FC = () => {
   const [publisher, setPublisher] = useState(
     formData.information?.publisher || '',
   );
-  const [status, setStatus] = useState(
-    formData.information?.status || 'active',
-  );
+  const [status, setStatus] = useState(formData.information?.status);
   const [subCategory, setSubCategory] = useState(
     formData.information?.subCategory || '',
   );
@@ -172,7 +170,8 @@ const CategoryForm: React.FC = () => {
       setResourceType(formData.information.resourceType || '');
       setLanguage(formData.information.language || '');
       setPublisher(formData.information.publisher || '');
-      setStatus(formData.information.status || 'active');
+      setAuthorName(formData.information.authorName || '');
+      setStatus(formData.information.status);
       setSubCategory(formData.information.subCategory || '');
       setSelectedCategory(formData.information.category || '');
     }
@@ -301,7 +300,12 @@ const CategoryForm: React.FC = () => {
       <View style={informationStyles.radioContainer}>
         <TouchableOpacity
           style={informationStyles.radioButton}
-          onPress={() => setStatus('active')}>
+          onPress={status =>
+            updateFormData('information', {
+              ...formData.information,
+              status: 'active',
+            })
+          }>
           <View
             style={[
               informationStyles.radioCircle,
@@ -312,7 +316,12 @@ const CategoryForm: React.FC = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={informationStyles.radioButton}
-          onPress={() => setStatus('inactive')}>
+          onPress={status =>
+            updateFormData('information', {
+              ...formData.information,
+              status: 'inactive',
+            })
+          }>
           <View
             style={[
               informationStyles.radioCircle,

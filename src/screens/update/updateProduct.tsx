@@ -122,12 +122,7 @@ const ProductUpdate: React.FC = () => {
         resourceName: bookData.authorName,
         language: bookData.language,
         publisher: bookData.publisher_id?.toString(),
-        status:
-          bookData.status === 'active'
-            ? 1
-            : bookData.status === 'inactive'
-            ? 0
-            : null,
+        status: bookData.is_deleted == 0 ? 'active' : 'inactive',
         category: bookData.category?.id?.toString(),
         subCategory: bookData.sub_category_id?.toString(),
         authorName: bookData.author || bookData['edited_by'],
@@ -194,7 +189,7 @@ const ProductUpdate: React.FC = () => {
           short_description: formData.information?.shortDescription || '',
           long_description: formData.information?.longDescription || '',
           publisher: parseInt(formData.information?.publisher) || 0,
-          status: formData.information?.status === 'active' ? 1 : 0,
+          status: formData.information?.status == 'active' ? 1 : 0,
 
           resource_name: formData.information?.authorName || '',
           resource_type: formData.information?.resourceType || '',
