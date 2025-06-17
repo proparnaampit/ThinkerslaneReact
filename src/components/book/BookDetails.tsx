@@ -19,7 +19,7 @@ const BookDetailsComp = ({data, onClose}: any) => {
     .slice(0, 20)
     .join(' ');
   const imageUrl = data.images?.[0]
-    ? `https://staging.thinkerslane.com/public/uploads/admin/books/${data.image}`
+    ? `https://thinkerslane.com/public/uploads/admin/books/${data.image}`
     : null;
   const publisher =
     data.publisher_name || data?.publisher_details?.name || 'Not Assigned';

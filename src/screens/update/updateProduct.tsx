@@ -81,7 +81,7 @@ const ProductUpdate: React.FC = () => {
         ? await Promise.all(
             bookData.images.map(async (img: string, index: number) => {
               const imageUrl = img
-                ? `https://staging.thinkerslane.com/public/uploads/admin/books/${img}`
+                ? `https://thinkerslane.com/public/uploads/admin/books/${img}`
                 : null;
 
               if (!imageUrl) {
@@ -118,14 +118,25 @@ const ProductUpdate: React.FC = () => {
         productName: bookData.name,
         shortDescription: bookData.short_description,
         longDescription: bookData.description,
-        resourceType: bookData.type,
+        resourceType:
+          bookData.resourceType ||
+          (bookData.edited_by
+            ? 'edited_by'
+            : bookData.collected_by
+            ? 'collected_by'
+            : 'author'),
         resourceName: bookData.authorName,
         language: bookData.language,
         publisher: bookData.publisher_id?.toString(),
         status: bookData.is_deleted == 0 ? 'active' : 'inactive',
         category: bookData.category?.id?.toString(),
         subCategory: bookData.sub_category_id?.toString(),
-        authorName: bookData.author || bookData['edited_by'],
+        authorName:
+          bookData.resource_name ||
+          bookData.author ||
+          bookData.edited_by ||
+          bookData.collected_by ||
+          '',
       },
       pricing: {
         price: bookData.price,

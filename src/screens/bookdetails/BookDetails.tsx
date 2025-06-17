@@ -16,20 +16,23 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import BookDetailsComp from '../../components/book/BookDetails';
 
 const BookDetails = () => {
-  const [isbnNumber, setIsbnNumber]: any = useState();
-  const [isMainISBNset, setIsMainISbnSet] = useState();
+  const [isbnNumber, setIsbnNumber] = useState('');
+  const [queryISBN, setQueryISBN] = useState('');
   const [showCamera, setShowCamera] = useState(false);
-  const [mainData, setMainData]: any = useState(null);
-  const {data, isLoading} = useGetBookDataByCodeFromServerQuery(
-    isMainISBNset ? isMainISBNset : skipToken,
+  const [mainData, setMainData] = useState(null);
+  const [triggerRefetch, setTriggerRefetch] = useState(0);
+
+  const {data, isLoading, refetch} = useGetBookDataByCodeFromServerQuery(
+    queryISBN ? queryISBN : skipToken,
   );
 
   const onClose = () => {
     setMainData(null);
-    setIsbnNumber(null);
+    setIsbnNumber('');
+    setQueryISBN('');
   };
 
-  const openCamera = async (prev: any) => {
+  const openCamera = async () => {
     const permission = await Camera.requestCameraPermission();
     if (permission === 'denied') {
       return;
@@ -41,14 +44,22 @@ const BookDetails = () => {
   const handleCodeScanned = (code: string) => {
     if (code) {
       setIsbnNumber(code);
+      setQueryISBN(code);
+      setTriggerRefetch(prev => prev + 1);
       setShowCamera(false);
     }
   };
 
   const fetchBookData = () => {
-    setIsbnNumber(isbnNumber);
-    setIsMainISbnSet(isbnNumber);
+    setQueryISBN(isbnNumber);
+    setTriggerRefetch(prev => prev + 1);
   };
+
+  useEffect(() => {
+    if (queryISBN) {
+      refetch();
+    }
+  }, [triggerRefetch]);
 
   useEffect(() => {
     if (data) {
@@ -59,7 +70,9 @@ const BookDetails = () => {
   return (
     <ScrollView style={informationStyles.containerForBookDetails}>
       <Text style={informationStyles.header}>Book Details</Text>
+
       {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
+
       <Text style={informationStyles.label}>Search by ISBN Number:</Text>
       <View style={informationStyles.inputContainer}>
         <TextInput
@@ -72,6 +85,7 @@ const BookDetails = () => {
             setIsbnNumber(numericText);
           }}
         />
+
         <TouchableOpacity
           style={[informationStyles.cameraButton, {marginLeft: 5}]}
           onPress={openCamera}>
@@ -100,8 +114,8 @@ const BookDetails = () => {
       </View>
 
       <View>
-        {mainData && mainData?.book?.id && (
-          <BookDetailsComp data={mainData?.book} onClose={onClose} />
+        {mainData?.book?.id && (
+          <BookDetailsComp data={mainData.book} onClose={onClose} />
         )}
       </View>
     </ScrollView>

@@ -167,7 +167,8 @@ const CategoryForm: React.FC = () => {
       setProductName(formData.information.productName || '');
       setShortDescription(formData.information.shortDescription || '');
       setLongDescription(formData.information.longDescription || '');
-      setResourceType(formData.information.resourceType || '');
+      setResourceType(formData.information.resourceType);
+
       setLanguage(formData.information.language || '');
       setPublisher(formData.information.publisher || '');
       setAuthorName(formData.information.authorName || '');
@@ -232,7 +233,13 @@ const CategoryForm: React.FC = () => {
       <CustomPicker
         label="Resource Type *:"
         selectedValue={resourceType}
-        onValueChange={setResourceType}
+        onValueChange={value => {
+          setResourceType(value);
+          updateFormData('information', {
+            ...formData.information,
+            resourceType: value,
+          });
+        }}
         data={[
           {id: 'author', description: 'Author'},
           {id: 'edited_by', description: 'Edited Type'},
@@ -241,17 +248,18 @@ const CategoryForm: React.FC = () => {
         placeholder="Select Category"
       />
 
-      <Text style={informationStyles.label}>Author Name *:</Text>
+      <Text style={informationStyles.label}>Resource Name *:</Text>
       <TextInput
         style={informationStyles.input}
         placeholder="Author Name"
-        value={formData.information?.authorName || ''}
-        onChangeText={text =>
+        value={authorName}
+        onChangeText={text => {
+          setAuthorName(text);
           updateFormData('information', {
             ...formData.information,
             authorName: text,
-          })
-        }
+          });
+        }}
       />
 
       <CustomPicker
@@ -287,11 +295,17 @@ const CategoryForm: React.FC = () => {
       <CustomPicker
         label="Language:"
         selectedValue={language}
-        onValueChange={setLanguage}
+        onValueChange={value => {
+          setLanguage(value);
+          updateFormData('information', {
+            ...formData.information,
+            language: value,
+          });
+        }}
         data={[
           {id: 'EN', description: 'English'},
-          {id: 'BEN', description: 'Bengali'},
-          {id: 'HIN', description: 'Hindi'},
+          {id: 'BN', description: 'Bengali'},
+          {id: 'HI', description: 'Hindi'},
         ]}
         placeholder="Select Category"
       />

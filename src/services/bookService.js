@@ -33,19 +33,19 @@ export const bookService = createApi({
     }),
     uploadBooks: builder.mutation({
       query: payload => ({
-        url: 'https://staging.thinkerslane.com/thAdmin/addProducts',
+        url: 'https://thinkerslane.com/thAdmin/addProducts',
         method: 'POST',
         body: payload,
       }),
     }),
     getBookDataByCodeFromServer: builder.query({
       query: isbn =>
-        `https://staging.thinkerslane.com/thAdmin/getBookByIsbn?isbn_number=${isbn}`,
+        `https://thinkerslane.com/thAdmin/getBookByIsbn?isbn_number=${isbn}`,
       keepUnusedDataFor: 86400,
     }),
     updateBook: builder.mutation({
       query: payload => ({
-        url: 'https://staging.thinkerslane.com/thAdmin/updateProduct',
+        url: 'https://thinkerslane.com/thAdmin/updateProduct',
         method: 'POST',
         body: payload,
       }),
