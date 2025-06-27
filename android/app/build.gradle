@@ -79,7 +79,7 @@ android {
 
     namespace "com.thinkerslanenative"
     defaultConfig {
-        applicationId "com.thinkerslanenative"
+        applicationId "com.thinkerslanenative.v2"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
