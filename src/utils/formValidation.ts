@@ -47,29 +47,54 @@ export const validateStep = (step: number, formData: any) => {
       showToast('Original Price is required');
       return false;
     }
-    if (!pricing.offered_price?.trim()) {
-      showToast('Offered Price is required');
-      return false;
-    }
-    const price = parseFloat(pricing.price);
-    const offeredPrice = parseFloat(pricing.offered_price);
-    if (isNaN(price) || price <= 0) {
-      showToast('Original Price must be a valid positive number');
-      return false;
-    }
-    if (isNaN(offeredPrice) || offeredPrice <= 0) {
-      showToast('Offered Price must be a valid positive number');
-      return false;
-    }
-    if (offeredPrice > price) {
-      showToast('Offered Price cannot be greater than Original Price');
-      return false;
-    }
+    // if (!pricing.offered_price?.trim()) {
+    //   showToast('Offered Price is required');
+    //   return false;
+    // }
+    // const price = parseFloat(pricing.price);
+    // const offeredPrice = parseFloat(pricing.offered_price);
+    // if (isNaN(price) || price <= 0) {
+    //   showToast('Original Price must be a valid positive number');
+    //   return false;
+    // }
+    // // if (isNaN(offeredPrice) || offeredPrice <= 0) {
+    // //   showToast('Offered Price must be a valid positive number');
+    // //   return false;
+    // // }
+    // if (offeredPrice > price) {
+    //   showToast('Offered Price cannot be greater than Original Price');
+    //   return false;
+    // }
   }
   if (step === 3) {
     const product = formData.product || {};
     if (!product.quantity?.trim()) {
       showToast('quantity is required');
+      return false;
+    }
+
+    if (!product.weight?.trim()) {
+      showToast('weight is required');
+      return false;
+    }
+
+    if (!product.width?.trim()) {
+      showToast('width is required');
+      return false;
+    }
+
+    if (!product.length?.trim()) {
+      showToast('length is required');
+      return false;
+    }
+
+    if (!product.height?.trim()) {
+      showToast('height is required');
+      return false;
+    }
+
+    if (!product.binding?.trim()) {
+      showToast('binding is required');
       return false;
     }
   }
