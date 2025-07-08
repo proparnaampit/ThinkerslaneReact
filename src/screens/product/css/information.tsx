@@ -121,6 +121,18 @@ const informationStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  //
+
+  pickerWrapper: {
+    marginBottom: 16,
+    zIndex: 1000,
+  },
+
+  dropdown: {
+    borderColor: '#ccc',
+    zIndex: 1000,
+  },
 });
 
 export default informationStyles;

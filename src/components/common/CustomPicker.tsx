@@ -1,6 +1,13 @@
 import React, {useState} from 'react';
-import {View, Text, TextInput, StyleSheet} from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+} from 'react-native';
 import informationStyles from '../../screens/product/css/information';
 
 const CustomPicker = ({
@@ -10,63 +17,134 @@ const CustomPicker = ({
   data,
   valueKey = 'id',
   labelKey = 'description',
-  placeholder = '',
+  placeholder = 'Select...',
 }: any) => {
-  const [searchText, setSearchText] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [search, setSearch] = useState('');
+  const [filteredData, setFilteredData] = useState(data);
 
-  // Filter data based on search text with safety checks
-  const filteredData = data
-    ? data.filter(item => {
-        const label = item[labelKey];
-        return (
-          typeof label === 'string' &&
-          label.toLowerCase().includes(searchText.toLowerCase())
-        );
-      })
-    : [];
+  const openDropdown = () => {
+    setFilteredData(data);
+    setModalVisible(true);
+  };
 
-  // Handle case when selectedValue is not in filteredData
-  const isValidSelection = filteredData.some(
-    item => item[valueKey] === selectedValue,
-  );
+  const handleSearch = (text: string) => {
+    setSearch(text);
+    const filtered = data.filter(item =>
+      item[labelKey].toLowerCase().includes(text.toLowerCase()),
+    );
+    setFilteredData(filtered);
+  };
+
+  const handleSelect = (value: any) => {
+    onValueChange(value);
+    setModalVisible(false);
+    setSearch('');
+  };
+
+  const selectedLabel =
+    data.find(item => item[valueKey] === selectedValue)?.[labelKey] ||
+    placeholder;
 
   return (
     <>
       {label ? <Text style={informationStyles.label}>{label}</Text> : null}
-      <View style={informationStyles.pickerContainer}>
-        <TextInput
-          style={[informationStyles.picker, {marginBottom: 10, padding: 8}]}
-          placeholder="Search..."
-          value={searchText}
-          onChangeText={text => {
-            setSearchText(text);
-            // Optionally reset selectedValue if it’s no longer in filteredData
-            if (!isValidSelection && text) {
-              onValueChange('');
-            }
-          }}
-        />
-        <Picker
-          selectedValue={isValidSelection ? selectedValue : ''}
-          onValueChange={onValueChange}
-          style={informationStyles.picker}>
-          {placeholder && <Picker.Item label={placeholder} value="" />}
-          {filteredData.length > 0 ? (
-            filteredData.map(item => (
-              <Picker.Item
-                key={item[valueKey]}
-                label={item[labelKey]}
-                value={item[valueKey]}
-                style={{fontSize: 13}}
-              />
-            ))
-          ) : (
-            <Picker.Item label="No results found" value="" />
-          )}
-        </Picker>
-      </View>
+      <TouchableOpacity
+        style={styles.dropdownButton}
+        onPress={openDropdown}
+        activeOpacity={0.8}>
+        <Text style={styles.dropdownButtonText}>{selectedLabel}</Text>
+      </TouchableOpacity>
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TextInput
+              placeholder="Search..."
+              value={search}
+              onChangeText={handleSearch}
+              style={styles.searchInput}
+            />
+            <FlatList
+              data={filteredData}
+              keyExtractor={item => item[valueKey].toString()}
+              renderItem={({item}) => (
+                <TouchableOpacity
+                  onPress={() => handleSelect(item[valueKey])}
+                  style={styles.item}>
+                  <Text>{item[labelKey]}</Text>
+                </TouchableOpacity>
+              )}
+              ListEmptyComponent={
+                <Text style={styles.noResults}>No results found</Text>
+              }
+            />
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  dropdownButton: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 12,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+  },
+  dropdownButtonText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  modalContent: {
+    margin: 20,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    maxHeight: '80%',
+  },
+  searchInput: {
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+    paddingVertical: 8,
+    marginBottom: 12,
+  },
+  item: {
+    paddingVertical: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#ddd',
+  },
+  noResults: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#888',
+  },
+  closeButton: {
+    marginTop: 12,
+    padding: 10,
+    backgroundColor: '#ddd',
+    borderRadius: 4,
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontWeight: 'bold',
+  },
+});
 
 export default CustomPicker;

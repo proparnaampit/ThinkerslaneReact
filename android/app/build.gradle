@@ -74,8 +74,8 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
     ndkVersion rootProject.ext.ndkVersion
+       compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-    compileSdk rootProject.ext.compileSdkVersion
 
     namespace "com.thinkerslanenative"
     defaultConfig {
@@ -84,6 +84,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        buildConfigField "boolean", "VISION_CAMERA_ENABLE_FRAME_PROCESSORS", "true"
     }
     signingConfigs {
         debug {

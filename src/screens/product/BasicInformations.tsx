@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Button,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
@@ -16,9 +17,15 @@ import informationStyles from './css/information';
 import {useFormContext} from '../context/FormContextType';
 import CustomPicker from '../../components/common/CustomPicker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Camera} from 'react-native-vision-camera';
+import Entypo from 'react-native-vector-icons/Entypo';
+import {
+  Camera,
+  useCameraDevices,
+  useFrameProcessor,
+} from 'react-native-vision-camera';
 import BarcodeScanner from '../../components/common/CameraScanner';
 import {useGetBookDataByCodeFromServerQuery} from '../../services/bookService';
+import TextScanner from '../../components/common/TextScanner';
 
 const CategoryForm: React.FC = () => {
   const {formData, updateFormData} = useFormContext();
@@ -61,6 +68,7 @@ const CategoryForm: React.FC = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [publishers, setPublishers] = useState<any[]>([]);
   const [showCamera, setShowCamera] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
 
   const fetchBookData = async () => {
     if (!isbnNumber) {
@@ -240,14 +248,22 @@ const CategoryForm: React.FC = () => {
     setShowCamera(false);
   };
 
-  const openCamera = async (prev: any) => {
+  const openCamera = async (type: 'camera' | 'scanner') => {
     const permission = await Camera.requestCameraPermission();
     if (permission === 'denied') {
       setError('Camera permission denied');
       return;
     }
+
     setIsbnNumber('');
-    setShowCamera(prev => !prev);
+
+    if (type === 'camera') {
+      setShowCamera(prev => !prev);
+      setShowScanner(false);
+    } else if (type === 'scanner') {
+      setShowScanner(prev => !prev);
+      setShowCamera(false);
+    }
   };
 
   useEffect(() => {
@@ -303,7 +319,7 @@ const CategoryForm: React.FC = () => {
 
         <TouchableOpacity
           style={[informationStyles.cameraButton, {marginLeft: 5}]}
-          onPress={openCamera}>
+          onPress={() => openCamera('camera')}>
           <MaterialCommunityIcons
             name="barcode-scan"
             size={32}
@@ -354,12 +370,28 @@ const CategoryForm: React.FC = () => {
       />
 
       <Text style={informationStyles.label}>Long Description:</Text>
+
       <TextInput
-        style={[informationStyles.input, {height: 80}]}
+        style={{height: 80, borderWidth: 1, margin: 10}}
         placeholder="Enter Long Description"
         value={longDescription}
         onChangeText={setLongDescription}
         multiline
+      />
+      <TouchableOpacity
+        style={[informationStyles.cameraButton, {marginLeft: 5}]}
+        onPress={() => openCamera('scanner')}>
+        <MaterialCommunityIcons
+          name="barcode"
+          size={32}
+          color={showScanner ? 'red' : '#223d79'}
+          style={{marginLeft: 5}}
+        />
+      </TouchableOpacity>
+
+      <TextScanner
+        isVisible={showScanner}
+        onClose={() => setShowScanner(false)}
       />
 
       <CustomPicker
