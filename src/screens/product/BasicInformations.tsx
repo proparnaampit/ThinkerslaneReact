@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  Button,
+  Modal,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
@@ -17,15 +17,13 @@ import informationStyles from './css/information';
 import {useFormContext} from '../context/FormContextType';
 import CustomPicker from '../../components/common/CustomPicker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Entypo from 'react-native-vector-icons/Entypo';
 import {
   Camera,
-  useCameraDevices,
-  useFrameProcessor,
+  useCameraDevice,
+  useCameraFormat,
 } from 'react-native-vision-camera';
+import MLKitOcr from 'react-native-mlkit-ocr';
 import BarcodeScanner from '../../components/common/CameraScanner';
-import {useGetBookDataByCodeFromServerQuery} from '../../services/bookService';
-import TextScanner from '../../components/common/TextScanner';
 
 const CategoryForm: React.FC = () => {
   const {formData, updateFormData} = useFormContext();
@@ -70,6 +68,10 @@ const CategoryForm: React.FC = () => {
   const [showCamera, setShowCamera] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
 
+  const [ocrText, setOcrText] = useState('');
+  const camera = useRef<Camera>(null);
+  // const devices = useCameraDevice();
+  const device = useCameraDevice('back');
   const fetchBookData = async () => {
     if (!isbnNumber) {
       setError('Please enter an ISBN number');
@@ -248,21 +250,26 @@ const CategoryForm: React.FC = () => {
     setShowCamera(false);
   };
 
-  const openCamera = async (type: 'camera' | 'scanner') => {
-    const permission = await Camera.requestCameraPermission();
-    if (permission === 'denied') {
-      setError('Camera permission denied');
-      return;
-    }
+  const openCamera = () => {
+    setOcrText('');
+    setShowCamera(true);
+  };
 
-    setIsbnNumber('');
-
-    if (type === 'camera') {
-      setShowCamera(prev => !prev);
-      setShowScanner(false);
-    } else if (type === 'scanner') {
-      setShowScanner(prev => !prev);
-      setShowCamera(false);
+  const captureAndScan = async () => {
+    if (camera.current) {
+      const photo = await camera.current.takePhoto({
+        flash: 'on',
+      });
+      const fileUri = `file://${photo.path}`;
+      const textBlocks = await MLKitOcr.detectFromUri(fileUri);
+      const combinedText = textBlocks
+        .map(b => b.text.trim())
+        .filter(Boolean)
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      setOcrText(combinedText);
+      setShowCamera(false); // Close modal after capture
     }
   };
 
@@ -299,6 +306,10 @@ const CategoryForm: React.FC = () => {
     status,
     selectedCategory,
     subCategory,
+  ]);
+
+  const format = useCameraFormat(device, [
+    {photoResolution: {width: 1280, height: 720}},
   ]);
 
   return (
@@ -340,11 +351,11 @@ const CategoryForm: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <BarcodeScanner
+      {/* <BarcodeScanner
         isVisible={showCamera}
         onCodeScanned={handleCodeScanned}
         onClose={() => setShowCamera(false)}
-      />
+      /> */}
 
       <Text style={informationStyles.noteText}>
         ISBN can fetch the book minimal details, enter usbn number to fetch or
@@ -370,6 +381,102 @@ const CategoryForm: React.FC = () => {
       />
 
       <Text style={informationStyles.label}>Long Description:</Text>
+      <View style={{flex: 1}}>
+        <Modal visible={showCamera} animationType="slide">
+          <View style={{flex: 1, height: '50%', justifyContent: 'center'}}>
+            <Camera
+              ref={camera}
+              style={{flex: 0.5}}
+              device={device}
+              isActive={showCamera}
+              format={format}
+              photo={true}
+              photoQualityBalance="quality"
+            />
+
+            {/* Top dim */}
+            <View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '30%',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+              }}
+            />
+
+            {/* Bottom dim */}
+            <View
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: '30%',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+              }}
+            />
+
+            {/* Left dim */}
+            <View
+              style={{
+                position: 'absolute',
+                top: '30%',
+                bottom: '30%',
+                left: 0,
+                width: '10%',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+              }}
+            />
+
+            {/* Right dim */}
+            <View
+              style={{
+                position: 'absolute',
+                top: '30%',
+                bottom: '30%',
+                right: 0,
+                width: '10%',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+              }}
+            />
+
+            {/* Frame box */}
+            <View
+              style={{
+                position: 'absolute',
+                top: '30%',
+                left: '10%',
+                width: '80%',
+                height: '40%',
+                borderWidth: 2,
+                borderColor: 'white',
+                borderRadius: 8,
+              }}
+            />
+
+            <TouchableOpacity
+              onPress={captureAndScan}
+              style={{
+                position: 'absolute',
+                bottom: 50,
+                alignSelf: 'center',
+                backgroundColor: 'white',
+                padding: 15,
+                borderRadius: 50,
+              }}>
+              <Text>Capture & OCR</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </View>
+      {ocrText ? (
+        <View style={{padding: 20}}>
+          <Text>OCR Text:</Text>
+          <Text>{ocrText}</Text>
+        </View>
+      ) : null}
 
       <TextInput
         style={{height: 80, borderWidth: 1, margin: 10}}
@@ -380,7 +487,7 @@ const CategoryForm: React.FC = () => {
       />
       <TouchableOpacity
         style={[informationStyles.cameraButton, {marginLeft: 5}]}
-        onPress={() => openCamera('scanner')}>
+        onPress={() => openCamera()}>
         <MaterialCommunityIcons
           name="barcode"
           size={32}
@@ -388,11 +495,6 @@ const CategoryForm: React.FC = () => {
           style={{marginLeft: 5}}
         />
       </TouchableOpacity>
-
-      <TextScanner
-        isVisible={showScanner}
-        onClose={() => setShowScanner(false)}
-      />
 
       <CustomPicker
         label="Resource Type *:"

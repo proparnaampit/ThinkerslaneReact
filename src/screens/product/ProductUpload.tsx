@@ -37,7 +37,6 @@ const ProductUploadForm: React.FC<any> = () => {
     SEOInputForm,
   ];
 
-  console.log('formData', formData);
   const onSubmit = async () => {
     const payload = {
       params: {
