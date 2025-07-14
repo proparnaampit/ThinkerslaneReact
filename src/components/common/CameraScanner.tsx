@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     borderRadius: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Darker overlay for contrast
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -173,9 +173,9 @@ const styles = StyleSheet.create({
   scanLine: {
     width: 180,
     height: 2,
-    backgroundColor: '#00FF00', // Green scan line
+    backgroundColor: '#00FF00', 
     position: 'absolute',
-    top: 30, // Center within scan area (200 - 140 / 2)
+    top: 30,
   },
   cornerTopLeft: {
     position: 'absolute',

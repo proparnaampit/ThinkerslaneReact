@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  StyleSheet,
   Modal,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -68,10 +69,8 @@ const CategoryForm: React.FC = () => {
   const [showCamera, setShowCamera] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
 
-  const [ocrText, setOcrText] = useState('');
   const camera = useRef<Camera>(null);
-  // const devices = useCameraDevice();
-  const device = useCameraDevice('back');
+  const device: any = useCameraDevice('back');
   const fetchBookData = async () => {
     if (!isbnNumber) {
       setError('Please enter an ISBN number');
@@ -250,9 +249,17 @@ const CategoryForm: React.FC = () => {
     setShowCamera(false);
   };
 
-  const openCamera = () => {
-    setOcrText('');
-    setShowCamera(true);
+  const openCamera = async () => {
+    const permission: any = await Camera.requestCameraPermission();
+    console.log(permission);
+    if (permission === 'granted') {
+      setShowCamera(true);
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Camera permission denied',
+      });
+    }
   };
 
   const captureAndScan = async () => {
@@ -268,8 +275,8 @@ const CategoryForm: React.FC = () => {
         .join(' ')
         .replace(/\s+/g, ' ')
         .trim();
-      setOcrText(combinedText);
-      setShowCamera(false); // Close modal after capture
+      setLongDescription(combinedText);
+      setShowCamera(false);
     }
   };
 
@@ -330,7 +337,7 @@ const CategoryForm: React.FC = () => {
 
         <TouchableOpacity
           style={[informationStyles.cameraButton, {marginLeft: 5}]}
-          onPress={() => openCamera('camera')}>
+          onPress={() => openCamera()}>
           <MaterialCommunityIcons
             name="barcode-scan"
             size={32}
@@ -350,12 +357,6 @@ const CategoryForm: React.FC = () => {
           )}
         </TouchableOpacity>
       </View>
-
-      {/* <BarcodeScanner
-        isVisible={showCamera}
-        onCodeScanned={handleCodeScanned}
-        onClose={() => setShowCamera(false)}
-      /> */}
 
       <Text style={informationStyles.noteText}>
         ISBN can fetch the book minimal details, enter usbn number to fetch or
@@ -381,12 +382,12 @@ const CategoryForm: React.FC = () => {
       />
 
       <Text style={informationStyles.label}>Long Description:</Text>
-      <View style={{flex: 1}}>
+      <View style={styles.container}>
         <Modal visible={showCamera} animationType="slide">
-          <View style={{flex: 1, height: '50%', justifyContent: 'center'}}>
+          <View style={styles.modalContent}>
             <Camera
               ref={camera}
-              style={{flex: 0.5}}
+              style={styles.camera}
               device={device}
               isActive={showCamera}
               format={format}
@@ -394,92 +395,23 @@ const CategoryForm: React.FC = () => {
               photoQualityBalance="quality"
             />
 
-            {/* Top dim */}
-            <View
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '30%',
-                backgroundColor: 'rgba(0,0,0,0.5)',
-              }}
-            />
-
-            {/* Bottom dim */}
-            <View
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '30%',
-                backgroundColor: 'rgba(0,0,0,0.5)',
-              }}
-            />
-
-            {/* Left dim */}
-            <View
-              style={{
-                position: 'absolute',
-                top: '30%',
-                bottom: '30%',
-                left: 0,
-                width: '10%',
-                backgroundColor: 'rgba(0,0,0,0.5)',
-              }}
-            />
-
-            {/* Right dim */}
-            <View
-              style={{
-                position: 'absolute',
-                top: '30%',
-                bottom: '30%',
-                right: 0,
-                width: '10%',
-                backgroundColor: 'rgba(0,0,0,0.5)',
-              }}
-            />
-
-            {/* Frame box */}
-            <View
-              style={{
-                position: 'absolute',
-                top: '30%',
-                left: '10%',
-                width: '80%',
-                height: '40%',
-                borderWidth: 2,
-                borderColor: 'white',
-                borderRadius: 8,
-              }}
-            />
+            <View style={styles.topOverlay} />
+            <View style={styles.bottomOverlay} />
+            <View style={styles.leftOverlay} />
+            <View style={styles.rightOverlay} />
+            <View style={styles.frame} />
 
             <TouchableOpacity
               onPress={captureAndScan}
-              style={{
-                position: 'absolute',
-                bottom: 50,
-                alignSelf: 'center',
-                backgroundColor: 'white',
-                padding: 15,
-                borderRadius: 50,
-              }}>
+              style={styles.captureButton}>
               <Text>Capture & OCR</Text>
             </TouchableOpacity>
           </View>
         </Modal>
       </View>
-      {ocrText ? (
-        <View style={{padding: 20}}>
-          <Text>OCR Text:</Text>
-          <Text>{ocrText}</Text>
-        </View>
-      ) : null}
 
       <TextInput
-        style={{height: 80, borderWidth: 1, margin: 10}}
+        style={[informationStyles.input, {height: 300}]}
         placeholder="Enter Long Description"
         value={longDescription}
         onChangeText={setLongDescription}
@@ -593,3 +525,67 @@ const CategoryForm: React.FC = () => {
 };
 
 export default CategoryForm;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  modalContent: {
+    flex: 1,
+    height: '50%',
+    justifyContent: 'center',
+  },
+  camera: {
+    flex: 0.5,
+  },
+  topOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '30%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  bottomOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '30%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  leftOverlay: {
+    position: 'absolute',
+    top: '30%',
+    bottom: '30%',
+    left: 0,
+    width: '10%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  rightOverlay: {
+    position: 'absolute',
+    top: '30%',
+    bottom: '30%',
+    right: 0,
+    width: '10%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  frame: {
+    position: 'absolute',
+    top: '30%',
+    left: '10%',
+    width: '80%',
+    height: '40%',
+    borderWidth: 2,
+    borderColor: 'white',
+    borderRadius: 8,
+  },
+  captureButton: {
+    position: 'absolute',
+    bottom: 50,
+    alignSelf: 'center',
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 50,
+  },
+});
