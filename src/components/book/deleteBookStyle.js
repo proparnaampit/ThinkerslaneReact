@@ -2,7 +2,7 @@ import {StyleSheet} from 'react-native';
 
 const singleBookStyles = StyleSheet.create({
   container: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     padding: 16,
     backgroundColor: '#fff',
     borderRadius: 10,
@@ -14,8 +14,8 @@ const singleBookStyles = StyleSheet.create({
     elevation: 2,
   },
   image: {
-    width: 140,
-    height: 200,
+    width: 70,
+    height: 90,
     borderRadius: 6,
     alignSelf: 'center',
     marginBottom: 16,
@@ -23,6 +23,7 @@ const singleBookStyles = StyleSheet.create({
   textContainer: {
     flex: 1,
     paddingLeft: 0,
+    marginLeft: 40,
   },
   title: {
     fontSize: 18,
@@ -85,6 +86,17 @@ const singleBookStyles = StyleSheet.create({
   checkboxLabel: {
     marginLeft: 8,
     fontSize: 14,
+  },
+  deleteButtonDetails: {
+    backgroundColor: 'red',
+    padding: 8,
+    marginTop: 20,
+    borderRadius: 5,
+    width: '70%',
+    justifyContent: 'space-between',
+    margin: 'auto',
+    alignItems: 'center',
+    marginRight: 80,
   },
 });
 

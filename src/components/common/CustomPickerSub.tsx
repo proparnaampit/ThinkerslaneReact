@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import informationStyles from '../../screens/product/css/information';
 
-const CustomPicker = ({
+const CustomPickerSub = ({
   label,
   selectedValue,
   onValueChange,
   data,
   valueKey = 'id',
-  labelKey = 'description',
+  labelKey = 'name',
   placeholder = 'Select...',
 }: any) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -85,7 +85,6 @@ const CustomPicker = ({
                 <Text style={styles.noResults}>No results found</Text>
               }
             />
-
             <TouchableOpacity
               onPress={() => setModalVisible(false)}
               style={styles.closeButton}>
@@ -150,4 +149,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CustomPicker;
+export default CustomPickerSub;

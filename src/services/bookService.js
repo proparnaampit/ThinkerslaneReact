@@ -15,7 +15,6 @@ export const bookService = createApi({
         if (search) params.append('search', search);
         if (pid) params.append('pid', pid);
         const url = `/getBooks?${params.toString()}`;
-        console.log(url);
 
         return url;
       },
@@ -39,26 +38,50 @@ export const bookService = createApi({
       }),
     }),
     getBookDataByCodeFromServer: builder.query({
-      query: isbn =>
-        `https://thinkerslane.com/thAdmin/getBookByIsbn?isbn_number=${isbn}`,
-      keepUnusedDataFor: 86400,
+      query: isbn => {
+        return `https://thinkerslane.com/thAdmin/getBookByIsbn?isbn_number=${isbn}`;
+      },
+    }),
+    getproductNameDataByCodeFromServer: builder.query({
+      query: ({productName = '', publisherId = '', isbn = ' '}) => {
+        if (isbn) {
+          return `https://thinkerslane.com/thAdmin/getBookByIsbn?isbn_number=${isbn}`;
+        } else if (publisherId) {
+          return `https://thinkerslane.com/th1/getBooksByName?search_keyword=${productName}&publisher_id=${publisherId}`;
+        } else {
+          return `https://thinkerslane.com/th1/getBooksByName?search_keyword=${productName}`;
+        }
+      },
     }),
     updateBook: builder.mutation({
+      query: payload => {
+        return {
+          url: 'https://thinkerslane.com/thAdmin/updateProduct',
+          method: 'POST',
+          body: payload,
+        };
+      },
+    }),
+    deleteBook: builder.mutation({
       query: payload => ({
-        url: 'https://thinkerslane.com/thAdmin/updateProduct',
+        url: 'https://thinkerslane.com/thAdmin/deleteProduct',
         method: 'POST',
-        body: payload,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       }),
     }),
   }),
 });
-
 export const {
   useFetchAllBooksQuery,
   useFetchBooksQuery,
   useGetAllPublishersQuery,
   useGetAllCategoryQuery,
   useUploadBooksMutation,
-  useGetBookDataByCodeFromServerQuery,
+  useLazyGetBookDataByCodeFromServerQuery,
+  useLazyGetproductNameDataByCodeFromServerQuery,
   useUpdateBookMutation,
+  useDeleteBookMutation,
 } = bookService;

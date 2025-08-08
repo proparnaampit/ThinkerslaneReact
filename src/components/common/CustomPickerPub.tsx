@@ -16,7 +16,7 @@ const CustomPicker = ({
   onValueChange,
   data,
   valueKey = 'id',
-  labelKey = 'description',
+  labelKey = 'name',
   placeholder = 'Select...',
 }: any) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -43,7 +43,7 @@ const CustomPicker = ({
   };
 
   const selectedLabel =
-    data.find(item => item[valueKey] === selectedValue)?.[labelKey] ||
+    data.find(item => item[valueKey] === String(selectedValue))?.[labelKey] ||
     placeholder;
 
   return (
@@ -85,7 +85,6 @@ const CustomPicker = ({
                 <Text style={styles.noResults}>No results found</Text>
               }
             />
-
             <TouchableOpacity
               onPress={() => setModalVisible(false)}
               style={styles.closeButton}>

@@ -106,7 +106,6 @@ const PaymentScreen = () => {
       clearCart();
     } catch (error) {
       setLoading(false);
-      console.log(error);
       Toast.show({
         text1: 'There is an error processing this payment',
         type: 'error',

@@ -25,6 +25,11 @@ import {
 } from 'react-native-vision-camera';
 import MLKitOcr from 'react-native-mlkit-ocr';
 import BarcodeScanner from '../../components/common/CameraScanner';
+import axios from 'axios';
+import {Platform} from 'react-native';
+import RNFS from 'react-native-fs';
+import CustomPickerPub from '../../components/common/CustomPickerPub';
+import CustomPickerSub from '../../components/common/CustomPickerSub';
 
 const CategoryForm: React.FC = () => {
   const {formData, updateFormData} = useFormContext();
@@ -36,6 +41,9 @@ const CategoryForm: React.FC = () => {
   );
   const [productName, setProductName] = useState(
     formData.information?.productName || '',
+  );
+  const [pageNumber, setPageNumber] = useState(
+    formData.information?.pageNumber || '',
   );
   const [shortDescription, setShortDescription] = useState(
     formData.information?.shortDescription || '',
@@ -246,14 +254,19 @@ const CategoryForm: React.FC = () => {
     if (code) {
       fetchBookDataByCode(code);
     }
-    setShowCamera(false);
+    setShowScanner(false);
   };
 
-  const openCamera = async () => {
+  const openCamera = async (type: 'camera' | 'scanner') => {
     const permission: any = await Camera.requestCameraPermission();
-    console.log(permission);
     if (permission === 'granted') {
-      setShowCamera(true);
+      if (type === 'camera') {
+        setShowScanner(false);
+        setShowCamera(true);
+      } else if (type === 'scanner') {
+        setShowCamera(false);
+        setShowScanner(true);
+      }
     } else {
       Toast.show({
         type: 'error',
@@ -263,11 +276,12 @@ const CategoryForm: React.FC = () => {
   };
 
   const captureAndScan = async () => {
-    if (camera.current) {
-      const photo = await camera.current.takePhoto({
-        flash: 'on',
-      });
-      const fileUri = `file://${photo.path}`;
+    if (!camera.current) return;
+
+    const photo = await camera.current.takePhoto({flash: 'on'});
+    const fileUri = `file://${photo.path}`;
+
+    try {
       const textBlocks = await MLKitOcr.detectFromUri(fileUri);
       const combinedText = textBlocks
         .map(b => b.text.trim())
@@ -275,8 +289,43 @@ const CategoryForm: React.FC = () => {
         .join(' ')
         .replace(/\s+/g, ' ')
         .trim();
-      setLongDescription(combinedText);
+
+      if (combinedText && combinedText.length > 0) {
+        setLongDescription(combinedText);
+      } else {
+        const path =
+          Platform.OS === 'android'
+            ? photo.path
+            : photo.path.replace('file://', '');
+        const base64Image = await RNFS.readFile(path, 'base64');
+
+        const formData = new FormData();
+        formData.append('apikey', 'K84224185188957');
+        formData.append('base64Image', `data:image/jpeg;base64,${base64Image}`);
+        formData.append('language', 'ben');
+
+        const response = await axios.post(
+          'https://api.ocr.space/parse/image',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        );
+
+        const parsedText = response.data?.ParsedResults?.[0]?.ParsedText || '';
+        setLongDescription(parsedText.trim().replace(/\s+/g, ' '));
+      }
+
       setShowCamera(false);
+    } catch (error) {
+      console.error('OCR Error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'OCR failed',
+        text2: 'Please try again.',
+      });
     }
   };
 
@@ -291,6 +340,7 @@ const CategoryForm: React.FC = () => {
 
   useEffect(() => {
     updateFormData('information', {
+      pageNumber,
       isbnNumber,
       productName,
       shortDescription,
@@ -303,6 +353,7 @@ const CategoryForm: React.FC = () => {
       subCategory,
     });
   }, [
+    pageNumber,
     isbnNumber,
     productName,
     shortDescription,
@@ -334,10 +385,10 @@ const CategoryForm: React.FC = () => {
             setIsbnNumber(numericText);
           }}
         />
-
+        {/* Buttons */}
         <TouchableOpacity
           style={[informationStyles.cameraButton, {marginLeft: 5}]}
-          onPress={() => openCamera()}>
+          onPress={() => openCamera('scanner')}>
           <MaterialCommunityIcons
             name="barcode-scan"
             size={32}
@@ -346,8 +397,16 @@ const CategoryForm: React.FC = () => {
           />
         </TouchableOpacity>
 
+        <Modal visible={showScanner} animationType="slide">
+          <BarcodeScanner
+            isVisible={showScanner}
+            onCodeScanned={handleCodeScanned}
+            onClose={() => setShowScanner(false)}
+          />
+        </Modal>
+
         <TouchableOpacity
-          style={informationStyles.fetchButton}
+          style={informationStyles.fetchButton2}
           onPress={fetchBookData}
           disabled={isLoading}>
           {isLoading ? (
@@ -365,6 +424,18 @@ const CategoryForm: React.FC = () => {
 
       {error ? <Text style={informationStyles.errorText}>{error}</Text> : null}
 
+      <Text style={informationStyles.label}>Page Numbers:</Text>
+      <TextInput
+        style={informationStyles.input}
+        placeholder="Enter Page Numbers"
+        value={pageNumber}
+        keyboardType="numeric"
+        onChangeText={text => {
+          const numericText = text.replace(/[^0-9]/g, '');
+          setPageNumber(numericText);
+        }}
+      />
+
       <Text style={informationStyles.label}>Product Name *:</Text>
       <TextInput
         style={informationStyles.input}
@@ -373,60 +444,13 @@ const CategoryForm: React.FC = () => {
         onChangeText={setProductName}
       />
 
-      <Text style={informationStyles.label}>Short Description *:</Text>
+      {/* <Text style={informationStyles.label}>Short Description *:</Text>
       <TextInput
         style={informationStyles.input}
         placeholder="Enter Short Description"
         value={shortDescription}
         onChangeText={setShortDescription}
-      />
-
-      <Text style={informationStyles.label}>Long Description:</Text>
-      <View style={styles.container}>
-        <Modal visible={showCamera} animationType="slide">
-          <View style={styles.modalContent}>
-            <Camera
-              ref={camera}
-              style={styles.camera}
-              device={device}
-              isActive={showCamera}
-              format={format}
-              photo={true}
-              photoQualityBalance="quality"
-            />
-
-            <View style={styles.topOverlay} />
-            <View style={styles.bottomOverlay} />
-            <View style={styles.leftOverlay} />
-            <View style={styles.rightOverlay} />
-            <View style={styles.frame} />
-
-            <TouchableOpacity
-              onPress={captureAndScan}
-              style={styles.captureButton}>
-              <Text>Capture & OCR</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-      </View>
-
-      <TextInput
-        style={[informationStyles.input, {height: 300}]}
-        placeholder="Enter Long Description"
-        value={longDescription}
-        onChangeText={setLongDescription}
-        multiline
-      />
-      <TouchableOpacity
-        style={[informationStyles.cameraButton, {marginLeft: 5}]}
-        onPress={() => openCamera()}>
-        <MaterialCommunityIcons
-          name="barcode"
-          size={32}
-          color={showScanner ? 'red' : '#223d79'}
-          style={{marginLeft: 5}}
-        />
-      </TouchableOpacity>
+      /> */}
 
       <CustomPicker
         label="Resource Type *:"
@@ -453,7 +477,7 @@ const CategoryForm: React.FC = () => {
         }
       />
 
-      <CustomPicker
+      <CustomPickerPub
         label="Choose Category *:"
         selectedValue={selectedCategory}
         onValueChange={setSelectedCategory}
@@ -463,7 +487,7 @@ const CategoryForm: React.FC = () => {
 
       {selectedCategory !== '' &&
         categories.some(item => item.parent_id === selectedCategory) && (
-          <CustomPicker
+          <CustomPickerSub
             label="Choose Sub-Category:"
             selectedValue={subCategory}
             onValueChange={setSubCategory}
@@ -587,5 +611,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 15,
     borderRadius: 50,
+  },
+  captureclose: {
+    position: 'absolute',
+    bottom: 50,
+    alignSelf: 'center',
+    backgroundColor: 'white',
+    padding: 14,
+    borderRadius: 50,
+  },
+  closescanner: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

@@ -5,17 +5,21 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
+  Modal,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
   useGetAllPublishersQuery,
   useGetAllCategoryQuery,
 } from '../../services/bookService';
+import {Camera} from 'react-native-vision-camera';
 import informationStyles from '../product/css/information';
 import {useFormContext} from '../context/FormContextType';
 import CustomPicker from '../../components/common/CustomPicker';
 import BarcodeScanner from '../../components/common/CameraScanner';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import CustomPickerPub from '../../components/common/CustomPickerPub';
+import CustomPickerSub from '../../components/common/CustomPickerSub';
 
 const CategoryForm: React.FC = () => {
   const {formData, updateFormData} = useFormContext();
@@ -29,8 +33,8 @@ const CategoryForm: React.FC = () => {
   const [productName, setProductName] = useState(
     formData.information?.productName || '',
   );
-  const [shortDescription, setShortDescription] = useState(
-    formData.information?.shortDescription || '',
+  const [pageNumber, setPageNumber] = useState(
+    formData.information?.pageNumber || '',
   );
   const [longDescription, setLongDescription] = useState(
     formData.information?.longDescription || '',
@@ -51,18 +55,19 @@ const CategoryForm: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState(
     formData.information?.category || '',
   );
-  const [isLoading, setIsLoading] = useState(false);
+
   const [error, setError] = useState('');
   const [categories, setCategories] = useState<any[]>([]);
   const [publishers, setPublishers] = useState<any[]>([]);
   const [showCamera, setShowCamera] = useState(false);
+
+  const [showScanner, setShowScanner] = useState(false);
 
   const fetchBookDataByCode = async code => {
     if (!code) {
       setError('Please enter an ISBN number');
       return;
     }
-    setIsLoading(true);
     setError('');
     const normalize = (str: any) =>
       str
@@ -121,7 +126,6 @@ const CategoryForm: React.FC = () => {
         setProductName(newInfo.productName);
         setPublisher(newInfo.publisher);
         setLanguage(newInfo.language);
-        setShortDescription(newInfo.shortDescription);
         setLongDescription(newInfo.longDescription);
 
         updateFormData('information', {
@@ -135,20 +139,30 @@ const CategoryForm: React.FC = () => {
     } catch (err) {
       console.error('Fetch Error:', err);
       setError('Error fetching book data');
-    } finally {
-      setIsLoading(false);
     }
   };
 
+  const openCamera = async () => {
+    const permission = await Camera.requestCameraPermission();
+    if (permission === 'denied') {
+      return;
+    }
+    setIsbnNumber('');
+    setShowCamera(prev => !prev);
+  };
   const handleCodeScanned = (code: string) => {
-    setIsbnNumber(code);
+    const numericCode = code.replace(/[^0-9]/g, '');
+    setIsbnNumber(numericCode);
+    updateFormData('information', {
+      ...formData.information,
+      isbnNumber: numericCode,
+    });
+
     Toast.show({
       type: 'success',
-      text1: `Barcode found ${code}`,
+      text1: `Barcode found ${numericCode}`,
     });
-    if (code) {
-      fetchBookDataByCode(code);
-    }
+
     setShowCamera(false);
   };
 
@@ -163,18 +177,17 @@ const CategoryForm: React.FC = () => {
 
   useEffect(() => {
     if (formData.information) {
+      setPageNumber(formData.information.pageNumber || '');
       setIsbnNumber(formData.information.isbnNumber || '');
       setProductName(formData.information.productName || '');
-      setShortDescription(formData.information.shortDescription || '');
       setLongDescription(formData.information.longDescription || '');
       setResourceType(formData.information.resourceType);
-
       setLanguage(formData.information.language || '');
       setPublisher(formData.information.publisher || '');
       setAuthorName(formData.information.authorName || '');
       setStatus(formData.information.status);
-      setSubCategory(formData.information.subCategory || '');
       setSelectedCategory(formData.information.category || '');
+      setSubCategory(formData.information.subCategory || '');
     }
   }, [formData.information]);
 
@@ -188,46 +201,65 @@ const CategoryForm: React.FC = () => {
           placeholder="Enter ISBN NUMBER"
           value={isbnNumber}
           keyboardType="numeric"
-          editable={false}
+          onChangeText={text => {
+            const numericText = text.replace(/[^0-9]/g, '');
+            setIsbnNumber(numericText);
+            updateFormData('information', {
+              ...formData.information,
+              isbnNumber: numericText,
+            });
+          }}
+        />
+      </View>
+      <TouchableOpacity
+        style={[informationStyles.cameraButton, {marginLeft: 5}]}
+        onPress={openCamera}>
+        <MaterialCommunityIcons
+          name="barcode-scan"
+          size={32}
+          color={showCamera ? 'red' : '#223d79'}
+          style={{marginLeft: 5}}
+        />
+      </TouchableOpacity>
+
+      <View style={{flex: 1}}>
+        <BarcodeScanner
+          isVisible={showCamera}
+          onCodeScanned={handleCodeScanned}
+          onClose={() => setShowCamera(false)}
         />
       </View>
 
-      <BarcodeScanner
-        isVisible={showCamera}
-        onCodeScanned={handleCodeScanned}
-        onClose={() => setShowCamera(false)}
-      />
-
-      <Text style={informationStyles.noteText}>
-        Because you are editing book, you cannot chage the ISBN here. It is
-        restricted
-      </Text>
-
       {error ? <Text style={informationStyles.errorText}>{error}</Text> : null}
+
+      <Text style={informationStyles.label}>Page Numbers *:</Text>
+      <TextInput
+        style={informationStyles.input}
+        placeholder="Enter Page Numbers"
+        value={pageNumber}
+        keyboardType="numeric"
+        onChangeText={value => {
+          const numericText = value.replace(/[^0-9]/g, '');
+          setPageNumber(numericText);
+          updateFormData('information', {
+            ...formData.information,
+            pageNumber: numericText,
+          });
+        }}
+      />
 
       <Text style={informationStyles.label}>Product Name *:</Text>
       <TextInput
         style={informationStyles.input}
         placeholder="Enter Product Name"
         value={productName}
-        onChangeText={setProductName}
-      />
-
-      <Text style={informationStyles.label}>Short Description *:</Text>
-      <TextInput
-        style={informationStyles.input}
-        placeholder="Enter Short Description"
-        value={shortDescription}
-        onChangeText={setShortDescription}
-      />
-
-      <Text style={informationStyles.label}>Long Description:</Text>
-      <TextInput
-        style={[informationStyles.input, {height: 80}]}
-        placeholder="Enter Long Description"
-        value={longDescription}
-        onChangeText={setLongDescription}
-        multiline
+        onChangeText={value => {
+          setProductName(value);
+          updateFormData('information', {
+            ...formData.information,
+            productName: value,
+          });
+        }}
       />
 
       <CustomPicker
@@ -262,20 +294,31 @@ const CategoryForm: React.FC = () => {
         }}
       />
 
-      <CustomPicker
+      <CustomPickerPub
         label="Choose Category *:"
         selectedValue={selectedCategory}
-        onValueChange={setSelectedCategory}
+        onValueChange={value => {
+          setSelectedCategory(value);
+          updateFormData('information', {
+            ...formData.information,
+            category: value,
+          });
+        }}
         data={categories}
         placeholder="Select Category"
       />
-
       {selectedCategory !== '' &&
         categories.some(item => item.parent_id === selectedCategory) && (
-          <CustomPicker
+          <CustomPickerSub
             label="Choose Sub-Category:"
             selectedValue={subCategory}
-            onValueChange={setSubCategory}
+            onValueChange={value => {
+              setSubCategory(value);
+              updateFormData('information', {
+                ...formData.information,
+                subCategory: value,
+              });
+            }}
             data={categories.filter(
               item => item.parent_id === selectedCategory,
             )}
@@ -307,7 +350,7 @@ const CategoryForm: React.FC = () => {
           {id: 'BN', description: 'Bengali'},
           {id: 'HI', description: 'Hindi'},
         ]}
-        placeholder="Select Category"
+        placeholder="Select language"
       />
 
       <Text style={informationStyles.label}>Status:</Text>

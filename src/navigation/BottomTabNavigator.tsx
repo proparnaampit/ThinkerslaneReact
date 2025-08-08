@@ -4,6 +4,7 @@ import DashboardScreen from '../screens/dashboard/Dashboard';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Foundation from 'react-native-vector-icons/Foundation';
 import Feather from 'react-native-vector-icons/Feather';
 import ExpenseScreen from '../screens/expenses/ExpenseScreen';
 import CustomHeader from '../components/Header';
@@ -27,6 +28,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProductUpload from '../screens/product/ProductUpload';
 import BookDetails from '../screens/bookdetails/BookDetails';
 import ProductUpdate from '../screens/update/updateProduct';
+import BookDetailsdel from '../screens/delete/deleteBookDetails';
 import DashboardScreenThinkerslane from '../screens/dashboard/DashboardThinkerslane';
 
 const Tab = createBottomTabNavigator();
@@ -187,6 +189,17 @@ export default function BottomTabNavigator() {
         initialParams={{add: false}}
         options={{
           tabBarButton: () => null,
+          headerShown: true,
+        }}
+      />
+      <Tab.Screen
+        name="BookDelete"
+        component={BookDetailsdel}
+        initialParams={{add: false}}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <Foundation name="page-delete" color={color} size={size} />
+          ),
           headerShown: true,
         }}
       />

@@ -5,6 +5,7 @@ const informationStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    position: 'relative',
   },
   containerForBookDetails: {
     flex: 1,
@@ -151,6 +152,25 @@ const informationStyles = StyleSheet.create({
   dropdown: {
     borderColor: '#ccc',
     zIndex: 1000,
+  },
+  fetchButtonSelect: {
+    backgroundColor: '#223d79',
+    padding: 5,
+    borderRadius: 5,
+    marginLeft: 2,
+    minWidth: 80,
+    alignItems: 'center',
+    marginTop: 10,
+    marginRight: 260,
+  },
+  fetchButtonDelete: {
+    backgroundColor: '#223d79',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 2,
+    minWidth: 80,
+    alignItems: 'center',
+    marginTop: 10,
   },
 });
 

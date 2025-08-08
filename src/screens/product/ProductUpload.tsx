@@ -13,6 +13,7 @@ import CategoryForm from './BasicInformations';
 import PriceInputScreen from '../product/Pricing';
 import SEOInputForm from '../product/SEO';
 import productStyles from './css/productUpload';
+import LongDescription from './longDescription';
 import Toast from 'react-native-toast-message';
 import {validateStep} from '../../utils/formValidation';
 import {useUploadBooksMutation} from '../../services/bookService';
@@ -31,6 +32,7 @@ const ProductUploadForm: React.FC<any> = () => {
 
   const steps = [
     CategoryForm,
+    LongDescription,
     PriceInputScreen,
     ProductInputForm,
     FilePickerComponent,
@@ -42,6 +44,7 @@ const ProductUploadForm: React.FC<any> = () => {
       params: {
         isbn: formData.information?.isbnNumber || 0,
         basic_information: {
+          pagenumber: formData.information?.pageNumber || '',
           name: formData.information?.productName || '',
           short_description: formData.information?.shortDescription || '',
           long_description: formData.information?.longDescription || '',

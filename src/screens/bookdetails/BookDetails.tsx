@@ -6,31 +6,31 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
+  Modal,
 } from 'react-native';
 import {skipToken} from '@reduxjs/toolkit/query';
 import informationStyles from '../product/css/information';
 import {Camera} from 'react-native-vision-camera';
 import BarcodeScanner from '../../components/common/CameraScanner';
-import {useGetBookDataByCodeFromServerQuery} from '../../services/bookService';
+import {
+  useLazyGetBookDataByCodeFromServerQuery,
+  useLazyGetproductNameDataByCodeFromServerQuery,
+} from '../../services/bookService';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import BookDetailsComp from '../../components/book/BookDetails';
+import CustomPicker from '../../components/common/CustomPicker';
+import {useGetAllPublishersQuery} from '../../services/bookService';
+import Toast from 'react-native-toast-message';
 
 const BookDetails = () => {
   const [isbnNumber, setIsbnNumber] = useState('');
-  const [queryISBN, setQueryISBN] = useState('');
+  const [productName, setProductName] = useState('');
+  const [publisherId, setPublisherId] = useState('');
   const [showCamera, setShowCamera] = useState(false);
-  const [mainData, setMainData] = useState(null);
-  const [triggerRefetch, setTriggerRefetch] = useState(0);
-
-  const {data, isLoading, refetch} = useGetBookDataByCodeFromServerQuery(
-    queryISBN ? queryISBN : skipToken,
-  );
-
-  const onClose = () => {
-    setMainData(null);
-    setIsbnNumber('');
-    setQueryISBN('');
-  };
+  const [mainData, setMainData]: any = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const {data: publishersData} = useGetAllPublishersQuery({});
+  const [publishers, setPublishers] = useState<any[]>([]);
 
   const openCamera = async () => {
     const permission = await Camera.requestCameraPermission();
@@ -44,28 +44,63 @@ const BookDetails = () => {
   const handleCodeScanned = (code: string) => {
     if (code) {
       setIsbnNumber(code);
-      setQueryISBN(code);
-      setTriggerRefetch(prev => prev + 1);
       setShowCamera(false);
     }
   };
 
-  const fetchBookData = () => {
-    setQueryISBN(isbnNumber);
-    setTriggerRefetch(prev => prev + 1);
+  const onClose = () => {
+    setMainData(null);
+    setIsbnNumber('');
+    setProductName('');
+    setPublisherId('');
   };
 
-  useEffect(() => {
-    if (queryISBN) {
-      refetch();
+  const fetchBookData = async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams();
+
+      if (isbnNumber.trim()) {
+        params.append('isbn_number', isbnNumber.trim());
+      }
+
+      if (productName.trim()) {
+        params.append('product_name', productName.trim());
+      }
+
+      if (publisherId.trim()) {
+        params.append('publisher_id', publisherId.trim());
+      }
+
+      const url = `https://thinkerslane.com/thAdmin/getBookByIsbn?${params.toString()}`;
+      const response = await fetch(url);
+      const result = await response.json();
+
+      if (result?.books && result.books.length > 0) {
+        setMainData(result.books);
+      } else {
+        setMainData(null);
+        Toast.show({
+          text1: 'No book found',
+        });
+      }
+    } catch (error) {
+      setMainData(null);
+      Toast.show({
+        text1: 'Error fetching data',
+      });
+    } finally {
+      setIsLoading(false);
     }
-  }, [triggerRefetch]);
+  };
+  console.log('maindata', mainData);
 
   useEffect(() => {
-    if (data) {
-      setMainData(data);
+    if (publishersData?.data?.length > 0) {
+      setPublishers(publishersData.data);
     }
-  }, [data]);
+  }, [publishersData]);
+  console.log(mainData);
 
   return (
     <ScrollView style={informationStyles.containerForBookDetails}>
@@ -96,26 +131,46 @@ const BookDetails = () => {
             style={{marginLeft: 5}}
           />
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={informationStyles.fetchButton}
-          onPress={fetchBookData}
-          disabled={isLoading}>
-          <Text style={informationStyles.fetchButtonText}>Search</Text>
-        </TouchableOpacity>
       </View>
+      <Text style={informationStyles.label}>Product Name:</Text>
+      <TextInput
+        style={informationStyles.input}
+        placeholder="Enter Product Name"
+        value={productName}
+        onChangeText={setProductName}
+      />
+      <Text style={informationStyles.label}>Publisher:</Text>
 
-      <View style={{flex: 1}}>
+      <CustomPicker
+        selectedValue={publisherId}
+        onValueChange={setPublisherId}
+        data={publishers}
+        labelKey="name"
+        placeholder="Select Publisher"
+      />
+
+      <Modal visible={showCamera} animationType="slide">
         <BarcodeScanner
           isVisible={showCamera}
           onCodeScanned={handleCodeScanned}
           onClose={() => setShowCamera(false)}
         />
-      </View>
+      </Modal>
+
+      <TouchableOpacity
+        style={informationStyles.fetchButton}
+        onPress={fetchBookData}
+        disabled={isLoading}>
+        <Text style={informationStyles.fetchButtonText}>Search</Text>
+      </TouchableOpacity>
 
       <View>
-        {mainData?.book?.id && (
-          <BookDetailsComp data={mainData.book} onClose={onClose} />
+        {Array.isArray(mainData) && mainData.length > 0 ? (
+          mainData.map(book => (
+            <BookDetailsComp key={book.id} data={book} onClose={onClose} />
+          ))
+        ) : (
+          <BookDetailsComp data={mainData} onClose={onClose} />
         )}
       </View>
     </ScrollView>

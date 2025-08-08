@@ -36,6 +36,18 @@ const ProductInputForm = () => {
         Enter the attributes of the books you are selling. This will help in
         better categorization and searchability of your products.
       </Text>
+
+      <Text style={informationStyles.label}>Quantity * :</Text>
+      <TextInput
+        style={informationStyles.input}
+        value={productData.quantity}
+        onChangeText={text => {
+          const numericText = text.replace(/[^0-9]/g, '');
+          handleInputChange('quantity', numericText);
+        }}
+        placeholder="Enter quantity"
+        keyboardType="numeric"
+      />
       {bindingOptions && (
         <CustomPicker
           label="Binding *:"
@@ -45,6 +57,48 @@ const ProductInputForm = () => {
           placeholder="Select binding type"
         />
       )}
+
+      <Text style={informationStyles.label}>Height * (in cm)</Text>
+      <TextInput
+        style={informationStyles.input}
+        value={productData.height}
+        onChangeText={text => {
+          const numericText = text
+            .replace(/[^0-9.]/g, '')
+            .replace(/(\..*?)\..*/g, '$1');
+          handleInputChange('height', numericText);
+        }}
+        placeholder="Enter height in cm"
+        keyboardType="decimal-pad"
+      />
+
+      <Text style={informationStyles.label}>Width * (in cm)</Text>
+      <TextInput
+        style={informationStyles.input}
+        value={productData.width}
+        onChangeText={text => {
+          const numericText = text
+            .replace(/[^0-9.]/g, '')
+            .replace(/(\..*?)\..*/g, '$1');
+          handleInputChange('width', numericText);
+        }}
+        placeholder="Enter width in cm"
+        keyboardType="decimal-pad"
+      />
+
+      <Text style={informationStyles.label}>Length * (in cm)</Text>
+      <TextInput
+        style={informationStyles.input}
+        value={productData.length}
+        onChangeText={text => {
+          const numericText = text
+            .replace(/[^0-9.]/g, '')
+            .replace(/(\..*?)\..*/g, '$1');
+          handleInputChange('length', numericText);
+        }}
+        placeholder="Enter length in cm"
+        keyboardType="decimal-pad"
+      />
 
       <Text style={informationStyles.label}>Weight * (in gm)</Text>
       <TextInput
@@ -58,61 +112,13 @@ const ProductInputForm = () => {
         keyboardType="numeric"
       />
 
-      <Text style={informationStyles.label}>Quantity * :</Text>
-      <TextInput
-        style={informationStyles.input}
-        value={productData.quantity}
-        onChangeText={text => {
-          const numericText = text.replace(/[^0-9]/g, '');
-          handleInputChange('quantity', numericText);
-        }}
-        placeholder="Enter quantity"
-        keyboardType="numeric"
-      />
-
-      <Text style={informationStyles.label}>Width * (in cm)</Text>
-      <TextInput
-        style={informationStyles.input}
-        value={productData.width}
-        onChangeText={text => {
-          const numericText = text.replace(/[^0-9]/g, '');
-          handleInputChange('width', numericText);
-        }}
-        placeholder="Enter width in cm"
-        keyboardType="numeric"
-      />
-
-      <Text style={informationStyles.label}>Affiliate Link</Text>
+      {/* <Text style={informationStyles.label}>Affiliate Link</Text>
       <TextInput
         style={informationStyles.input}
         value={productData.affiliateLink}
         onChangeText={text => handleInputChange('affiliateLink', text)}
         placeholder="Enter affiliate link"
-      />
-
-      <Text style={informationStyles.label}>Length * (in cm)</Text>
-      <TextInput
-        style={informationStyles.input}
-        value={productData.length}
-        onChangeText={text => {
-          const numericText = text.replace(/[^0-9]/g, '');
-          handleInputChange('length', numericText);
-        }}
-        placeholder="Enter length in cm"
-        keyboardType="numeric"
-      />
-
-      <Text style={informationStyles.label}>Height * (in cm)</Text>
-      <TextInput
-        style={informationStyles.input}
-        value={productData.height}
-        onChangeText={text => {
-          const numericText = text.replace(/[^0-9]/g, '');
-          handleInputChange('height', numericText);
-        }}
-        placeholder="Enter height in cm"
-        keyboardType="numeric"
-      />
+      /> */}
     </ScrollView>
   );
 };

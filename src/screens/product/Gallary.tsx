@@ -64,7 +64,6 @@ const FilePickerComponent = () => {
       addImage(newImages);
     } catch (err: any) {
       if (err.message === 'User cancelled image selection') {
-        console.log('User cancelled image picker');
       } else {
         console.error('Error picking images:', err);
         Alert.alert('Error', 'Failed to pick images. Please try again.');
@@ -96,7 +95,6 @@ const FilePickerComponent = () => {
       replaceImage(id, newImage);
     } catch (err: any) {
       if (err.message === 'User cancelled image selection') {
-        console.log('User cancelled image picker');
       } else {
         console.error('Error replacing image:', err);
         Alert.alert('Error', 'Failed to replace image.');
@@ -202,7 +200,6 @@ const FilePickerComponent = () => {
       addImage([newImage]);
     } catch (err: any) {
       if (err.message === 'User cancelled image selection') {
-        console.log('User cancelled camera');
       } else {
         console.error('Error capturing image:', err);
         Alert.alert('Error', 'Failed to capture image. Please try again.');
