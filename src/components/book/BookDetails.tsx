@@ -13,6 +13,8 @@ import singleBookStyles from './singleBookStyles';
 import informationStyles from '../../screens/product/css/information';
 import {useDeleteBookMutation} from '../../services/bookService';
 import Toast from 'react-native-toast-message';
+import {useFormContext} from '../../screens/context/FormContextType';
+
 interface BookData {
   id?: string;
   name?: string;
@@ -55,6 +57,8 @@ const BookDetailsComp = ({data, onClose}: BookDetailsProps) => {
   const [deleteBook] = useDeleteBookMutation();
   const [isLoading, setIsLoading] = useState(false);
 
+  const {resetFormData} = useFormContext();
+
   const navigation: any = useNavigation();
   const description = data.description || '';
   const plainTextDescription = description
@@ -93,6 +97,7 @@ const BookDetailsComp = ({data, onClose}: BookDetailsProps) => {
         {
           text: 'OK',
           onPress: () => {
+            resetFormData();
             navigation.navigate('Update', {bookData: data});
             onClose();
           },

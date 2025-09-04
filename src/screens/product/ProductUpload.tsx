@@ -44,7 +44,7 @@ const ProductUploadForm: React.FC<any> = () => {
       params: {
         isbn: formData.information?.isbnNumber || 0,
         basic_information: {
-          pagenumber: formData.information?.pageNumber || '',
+          pageNumber: formData.information?.pageNumber || '',
           name: formData.information?.productName || '',
           short_description: formData.information?.shortDescription || '',
           long_description: formData.information?.longDescription || '',
@@ -84,7 +84,7 @@ const ProductUploadForm: React.FC<any> = () => {
           })) || [],
       },
     };
-
+    console.log(payload);
     try {
       const result = await uploadBooks(payload).unwrap();
 

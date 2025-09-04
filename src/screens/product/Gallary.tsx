@@ -7,6 +7,7 @@ import {
   Alert,
   Modal,
   FlatList,
+  ScrollView,
 } from 'react-native';
 import ImagePicker, {
   Image as PickedImage,
@@ -39,17 +40,11 @@ const FilePickerComponent = () => {
 
       const results: PickedImage[] = await ImagePicker.openPicker({
         mediaType: 'photo',
-        multiple: true,
+        multiple: true, // Allows multiple image selection
         includeBase64: true,
-        maxFiles: 5 - currentImages.length,
         cropping: false,
         compressImageQuality: 0.8,
       });
-
-      if (currentImages.length + results.length > 5) {
-        Alert.alert('Limit Reached', 'You can only select up to 5 images.');
-        return;
-      }
 
       const newImages = results.map((result, index) => {
         const id = generateUniqueId();
@@ -149,13 +144,6 @@ const FilePickerComponent = () => {
             <Text style={galleryStyles.coverText}>Cover</Text>
           </View>
         )}
-
-        <Text
-          style={galleryStyles.fileName}
-          numberOfLines={1}
-          ellipsizeMode="tail">
-          {item.name}
-        </Text>
       </View>
     ),
     [removeFile, replaceFile],
@@ -170,15 +158,6 @@ const FilePickerComponent = () => {
 
   const takePhoto = async () => {
     try {
-      const currentImages: any = Array.isArray(formData?.images)
-        ? formData.images
-        : [];
-
-      if (currentImages.length >= 5) {
-        Alert.alert('Limit Reached', 'You can only select up to 5 images.');
-        return;
-      }
-
       const result: PickedImage = await ImagePicker.openCamera({
         mediaType: 'photo',
         includeBase64: true,
@@ -208,58 +187,58 @@ const FilePickerComponent = () => {
   };
 
   return (
-    <View style={galleryStyles.container}>
-      <Text style={galleryStyles.noteTextCenter}>
-        The first image will serve as the cover image
-      </Text>
-      <Text style={galleryStyles.noteTextCenter}>
-        ({5 - images.length} image{5 - images.length !== 1 ? 's' : ''}{' '}
-        remaining)
-      </Text>
+    <ScrollView>
+      <View style={galleryStyles.container}>
+        <Text style={galleryStyles.noteTextCenter}>
+          The first image will serve as the cover image
+        </Text>
 
-      {pairedFiles.length === 0 && (
-        <TouchableOpacity style={galleryStyles.button} onPress={pickFile}>
-          <Icon name="cloud-upload" size={33} color="black" />
-        </TouchableOpacity>
-      )}
-
-      <TouchableOpacity
-        style={[galleryStyles.button, galleryStyles.cameraButton]}
-        onPress={takePhoto}>
-        <MaterialCommunityIcons name="camera" size={30} color="black" />
-      </TouchableOpacity>
-
-      {images.length <= 0 && (
-        <Text style={galleryStyles.noteTextCenter}>Browse file to upload</Text>
-      )}
-
-      {pairedFiles.map((pair, index) => renderRow({item: pair, index}))}
-
-      {images.length >= 1 && (
-        <TouchableOpacity
-          style={[galleryStyles.button, galleryStyles.addMoreButton]}
-          onPress={pickFile}>
-          <Text style={galleryStyles.addMoreButtonText}>Add More Files</Text>
-        </TouchableOpacity>
-      )}
-
-      <Modal visible={!!previewImage} transparent={true} animationType="fade">
-        <View style={galleryStyles.modalContainer}>
-          <TouchableOpacity
-            style={galleryStyles.modalCloseButton}
-            onPress={() => setPreviewImage(null)}>
-            <Text style={galleryStyles.crossButtonText}>×</Text>
+        {pairedFiles.length === 0 && (
+          <TouchableOpacity style={galleryStyles.button} onPress={pickFile}>
+            <Icon name="cloud-upload" size={33} color="black" />
           </TouchableOpacity>
-          {previewImage && (
-            <Image
-              source={{uri: previewImage.uri}}
-              style={galleryStyles.modalImage}
-              resizeMode="contain"
-            />
-          )}
-        </View>
-      </Modal>
-    </View>
+        )}
+
+        <TouchableOpacity
+          style={[galleryStyles.button, galleryStyles.cameraButton]}
+          onPress={takePhoto}>
+          <MaterialCommunityIcons name="camera" size={30} color="black" />
+        </TouchableOpacity>
+
+        {images.length <= 0 && (
+          <Text style={galleryStyles.noteTextCenter}>
+            Browse file to upload
+          </Text>
+        )}
+
+        {pairedFiles.map((pair, index) => renderRow({item: pair, index}))}
+
+        {images.length >= 1 && (
+          <TouchableOpacity
+            style={[galleryStyles.button, galleryStyles.addMoreButton]}
+            onPress={pickFile}>
+            <Text style={galleryStyles.addMoreButtonText}>Add More Files</Text>
+          </TouchableOpacity>
+        )}
+
+        <Modal visible={!!previewImage} transparent={true} animationType="fade">
+          <View style={galleryStyles.modalContainer}>
+            <TouchableOpacity
+              style={galleryStyles.modalCloseButton}
+              onPress={() => setPreviewImage(null)}>
+              <Text style={galleryStyles.crossButtonText}>×</Text>
+            </TouchableOpacity>
+            {previewImage && (
+              <Image
+                source={{uri: previewImage.uri}}
+                style={galleryStyles.modalImage}
+                resizeMode="contain"
+              />
+            )}
+          </View>
+        </Modal>
+      </View>
+    </ScrollView>
   );
 };
 
