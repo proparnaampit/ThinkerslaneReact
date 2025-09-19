@@ -26,6 +26,11 @@ export const bookService = createApi({
       query: () => 'https://thinkerslane.com/th1/getPublishers',
       keepUnusedDataFor: 86400,
     }),
+    getBookDataByCodeFromServer: builder.query({
+      query: isbn =>
+        `https://thinkerslane.com/thAdmin/getBookByIsbn/suprokash?isbn_number=${isbn}`,
+      keepUnusedDataFor: 86400,
+    }),
   }),
 });
 
@@ -33,4 +38,5 @@ export const {
   useFetchAllBooksQuery,
   useFetchBooksQuery,
   useGetAllPublishersQuery,
+  useGetBookDataByCodeFromServerQuery,
 } = bookService;

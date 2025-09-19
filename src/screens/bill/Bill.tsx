@@ -58,25 +58,36 @@ const Bill = ({route}: any) => {
   const {booking_product_details} = data;
   const {total_order_price, discount_amount} = booking_details;
   const discountPercentage = (discount_amount / total_order_price) * 100;
+  console.log('main data', data);
 
   const productRows = booking_product_details
-    .map(
-      (product: any, index: any) => `
-        <tr>
-          <td>${index + 1}</td>
-          <td>${product.product_name}</td>
-          <td>${product.publisher_name ? product.publisher_name : 'None'}</td>
-          <td>${product.quantity}</td>
-          <td>
-            <p>Basic Amount</p>
-            
-          </td>
-          <td>
-            <p>${product.price}</p>
-          </td>
-        </tr>
-      `,
-    )
+    .map((product: any, index: any) => {
+      console.log('Product:', product);
+      console.log(booking_details);
+
+      return `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${product.product_name}</td>
+        <td>${product.publisher_name ? product.publisher_name : 'None'}</td>
+       
+        <td>
+          <p>${product.product_mrp}</p>
+        </td>
+        <td>
+          <p>${product.discounted_percentage}%</p>
+        </td>
+         <td>${product.quantity}</td>
+        <td>
+          <p>${product.price}</p>
+        </td>
+        <td>
+        <p>${product.price * product.quantity}</p>
+        </td>
+      
+      </tr>
+    `;
+    })
     .join('');
 
   const htmlContent = `
@@ -158,6 +169,7 @@ const Bill = ({route}: any) => {
               width: 100%;
               border: 1px solid #ddd;
             }
+           
           }
         </style>
       </head>
@@ -169,8 +181,8 @@ const Bill = ({route}: any) => {
         <div class="details-container">
           <div class="details-section">
             <div class="details">
-              <p><strong>Sold By:</strong><br> 16, Radhanath Mullick Lane, College Street, Kolkata : 700012</p>
-              <p><strong>Billing Address:</strong><br> ${booking_details.name}<br> ${booking_details.billing_address}, P.O- ${booking_details.billing_city}-${booking_details.billing_pin}<br> Dist- Nadia<br> Mobile :${booking_details.mobile}</p>
+              <p><strong>Sold By:</strong> Suprokash<br> 16, Radhanath Mullick Lane, College Street, Kolkata : 700012</p>
+               <p><strong>Billing Address:</strong><br> ${booking_details.name}<br> Mobile :${booking_details.mobile}</p>
             </div>
           </div>
           <div class="details-section">
@@ -179,24 +191,35 @@ const Bill = ({route}: any) => {
               <p><strong>Order Date: </strong>${booking_details.order_date_time}</p>
               <p><strong>Invoice No: </strong>IN-${booking_details.id}</p>
               <p><strong>Invoice Date: </strong>${booking_details.order_date_time}</p>
-              <p><strong>Discount Added: </strong>${booking_details.discount_amount}(${booking_details.discount_percentage}%)</p>
+             
             </div>
           </div>
         </div>
         <table border="1" cellpadding="5" class="table">
           <tr>
-            <th>Sr No</th>
+            <th>SL No.</th>
             <th>Name</th>
             <th>Publisher</th>
+            <th>MRP</th>
+            <th>Discount(%)</th>
             <th>Quantity</th>
-            <th>Price</th>
-            <th>Unit Cost</th>
+            <th>Discount price(₹)</th>
+            <th>Total Price(₹)</th>           
           </tr>
           ${productRows}
+          <tr style="background-color: #f4f4f4">
+          <td colspan="7" style="text-align:center">
+         Grand Total
+          </td>
+            <td>
+             
+              ₹ ${booking_details.total_order_price}
+          </td>
+          </tr>
         </table>
         <div style="text-align:center">
-          <p><strong>Discount Amount: </strong>${booking_details.discount_amount}(${booking_details.discount_percentage}%)</p>
-          <p><strong>Grand Total: </strong>${booking_details.amount}</p>
+        
+          <p><strong>Grand Total: </strong>₹ ${booking_details.total_order_price}</p>
         </div>
         <div class="footer">
           <p>For Thinkerslane<br> Authorized Signatory</p>

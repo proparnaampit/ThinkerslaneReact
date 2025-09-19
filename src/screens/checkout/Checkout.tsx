@@ -52,7 +52,7 @@ const CheckoutScreen = () => {
     const requiredFields: any = {
       fullName: 'Full Name',
       phone: 'Phone number',
-      zip: 'Pin Code',
+      address: 'address Code',
     };
 
     for (let field in requiredFields) {
@@ -212,13 +212,13 @@ const CheckoutScreen = () => {
           value={form.fullName}
           onChangeText={text => handleChange('fullName', text)}
         />
-        <TextInput
+        {/* <TextInput
           style={checkoutStyles.input}
           placeholder="Email Id"
           value={form.email}
           keyboardType="email-address"
           onChangeText={text => handleChange('email', text)}
-        />
+        /> */}
         <TextInput
           style={checkoutStyles.input}
           placeholder="Phone No"
@@ -233,32 +233,32 @@ const CheckoutScreen = () => {
           value={form.address}
           onChangeText={text => handleChange('address', text)}
         />
-        <TextInput
+        {/* <TextInput
           style={checkoutStyles.input}
           placeholder="Landmark"
           value={form.landmark}
           onChangeText={text => handleChange('landmark', text)}
-        />
+        /> */}
 
-        <TextInput
+        {/* <TextInput
           style={checkoutStyles.input}
           placeholder="City"
           value={form.city}
           onChangeText={text => handleChange('city', text)}
-        />
-        <TextInput
+        /> */}
+        {/* <TextInput
           style={checkoutStyles.input}
           placeholder="State"
           value={form.state}
           onChangeText={text => handleChange('state', text)}
-        />
-        <TextInput
+        /> */}
+        {/* <TextInput
           style={checkoutStyles.input}
           placeholder="PIN Code"
           value={form.zip}
           keyboardType="numeric"
           onChangeText={text => handleChange('zip', text)}
-        />
+        /> */}
       </ScrollView>
 
       <PaymentMethodModal

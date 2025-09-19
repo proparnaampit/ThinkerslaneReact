@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Image, TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import CustomText from '../CustomText';
 import cartBookStyles from './cartBookStyles';
 import {useCart} from '../../context/CartContext';
@@ -11,7 +11,20 @@ const CartBook = ({data}: any) => {
     data.image.split(',')[0]
   }`;
   const {increaseQuantity, decreaseQuantity} = useCart();
-  const totalPrice = data.price * data.quantity;
+
+  // ✅ If discounted price is 0, use original price
+  const effectivePrice =
+    data.app_discounted_price && data.app_discounted_price > 0
+      ? data.app_discounted_price
+      : data.price;
+
+  const totalPrice = effectivePrice * data.quantity;
+
+  // ✅ Round discount to whole number if decimal exists
+  const discountRate =
+    data.app_discounted_offer && data.app_discounted_price > 0
+      ? Math.round(data.app_discounted_offer)
+      : null;
 
   return (
     <View style={cartBookStyles.container}>
@@ -22,13 +35,34 @@ const CartBook = ({data}: any) => {
       />
       <View style={cartBookStyles.textContainer}>
         <CustomText style={cartBookStyles.title}>{data.name}</CustomText>
+
         {data.quantity > 0 && (
           <View style={cartBookStyles.price}>
-            <CustomText style={cartBookStyles.priceText}>
-              Rs.{data.price}
-            </CustomText>
+            {/* If there is an offer */}
+            {data.app_discounted_offer ? (
+              <>
+                <CustomText style={cartBookStyles.strikePriceText}>
+                  Rs.{data.price}
+                </CustomText>
+                <CustomText style={cartBookStyles.offeredPriceText}>
+                  Rs.{effectivePrice}
+                </CustomText>
+              </>
+            ) : (
+              <CustomText style={cartBookStyles.priceText}>
+                Rs.{data.price}
+              </CustomText>
+            )}
           </View>
         )}
+
+        {/* ✅ Discount Field */}
+        {discountRate !== null && (
+          <CustomText style={cartBookStyles.discountText}>
+            Discount: {discountRate}%
+          </CustomText>
+        )}
+
         <View style={cartBookStyles.quantityContainer}>
           <TouchableOpacity
             onPress={() => decreaseQuantity(data.id)}
@@ -44,6 +78,7 @@ const CartBook = ({data}: any) => {
             <FontAwesome name="plus" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
+
         <View style={cartBookStyles.totalPriceContainer}>
           <CustomText style={cartBookStyles.totalPriceText}>
             Total: Rs.{totalPrice}

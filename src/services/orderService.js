@@ -7,30 +7,16 @@ export const orderService = createApi({
   tagTypes: ['Order'],
   endpoints: builder => ({
     addOrderCash: builder.mutation({
-      query: ({
-        user_id,
-        payment_method,
-        booking_user_details,
-        pricing,
-        booking_products,
-      }) => ({
-        url: 'addOrder',
+      query: payload => ({
+        url: 'addOrderTest',
         method: 'POST',
-        body: {
-          params: {
-            user_id,
-            payment_method,
-            booking_user_details,
-            pricing,
-            booking_products,
-          },
-        },
+        body: payload,
       }),
       invalidatesTags: ['Order'],
     }),
     getOrderDetails: builder.query({
       query: ({order_id}) => ({
-        url: `getOrderDetails?order_id=${order_id}`,
+        url: `getBookingDetails?order_id=${order_id}`,
         method: 'GET',
       }),
       providesTags: ['Order'],

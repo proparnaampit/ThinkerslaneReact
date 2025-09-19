@@ -85,6 +85,23 @@ const cartBookStyles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'green',
   },
+  strikePriceText: {
+    fontSize: 14,
+    color: 'gray',
+    textDecorationLine: 'line-through',
+    marginRight: 8,
+  },
+  offeredPriceText: {
+    fontSize: 16,
+    color: 'green',
+    fontWeight: 'bold',
+  },
+  discountText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#388E3C', // green to indicate discount
+    marginTop: 4,
+  },
 });
 
 export default cartBookStyles;

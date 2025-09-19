@@ -104,6 +104,22 @@ const addOrderStyles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
   },
+  cameraButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fetchButton: {
+    backgroundColor: '#223d79',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 5,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  fetchButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
 });
 
 export default addOrderStyles;

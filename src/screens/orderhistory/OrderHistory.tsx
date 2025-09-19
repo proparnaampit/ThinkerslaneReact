@@ -193,6 +193,7 @@ const OrderHistory = () => {
             </TouchableOpacity>
 
             <Text style={styles.productHeader}>Products:</Text>
+
             {order.booking_product_details.map((product: any, idx: any) => (
               <View key={idx} style={styles.productCard}>
                 <View style={styles.productRow}>

@@ -13,10 +13,11 @@ import AddOrderButton from '../../components/buttons/AddOrderButton';
 
 const Cart = () => {
   const navigation = useNavigation<any>();
+
   const {cart, clearCart} = useCart();
   const calculateTotal = () => {
     return Object.values(cart).reduce((total, item) => {
-      return total + item.price * item.quantity;
+      return total + item.app_product_price * item.quantity;
     }, 0);
   };
   const [modalVisible, setModalVisible] = useState(false);
