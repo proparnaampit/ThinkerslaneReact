@@ -59,6 +59,24 @@ const Bill = ({route}: any) => {
   const {total_order_price, discount_amount} = booking_details;
   const discountPercentage = (discount_amount / total_order_price) * 100;
   console.log('main data', data);
+  const {coupon_details} = data;
+
+  const couponSection = coupon_details
+    ? `
+  <div class="coupon">
+    <h3>🎁 Congratulations!</h3>
+    <p>You've received a discount coupon for your next order.</p>
+    <img src="https://thinkerslane.com/public/${
+      coupon_details.qr_code_image
+    }" alt="QR Code" />
+    <p><strong>Coupon Code:</strong> ${coupon_details.coupon_code}</p>
+    <p><strong>Discount:</strong> ${coupon_details.discount_percent}% off</p>
+    <p><strong>Valid Till:</strong> ${new Date(
+      coupon_details.valid_to,
+    ).toLocaleDateString()}</p>
+  </div>
+  `
+    : '';
 
   const productRows = booking_product_details
     .map((product: any, index: any) => {
@@ -91,141 +109,161 @@ const Bill = ({route}: any) => {
     .join('');
 
   const htmlContent = `
-    <html>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            color: grey;
-            font-size: 18px;
-            width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-          }
-          .header {
-            width: 100%;
-            text-align: left;
-            margin-bottom: 20px;
-          }
-          .header img {
-            width: 150px;
-            margin-bottom: 10px;
-          }
-          .header h1 {
-            font-size: 18px;
-            margin: 10px 0;
-          }
-          .details {
-            display: block;
-            width: 100%;
-            margin-bottom: 20px;
-          }
-        
-          .details strong {
-            font-weight: bold;
-          }
-          .details-container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 20px;
-          }
-          .details-section {
-            flex: 1;
-            min-width: 45%;
-            box-sizing: border-box;
-          }
-          .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0 auto;
-          }
-          .table th, .table td {
-            border: 1px solid #ddd;
-            text-align: left;
-            padding: 8px;
-          }
-          .table th {
-            background-color: #f4f4f4;
-          }
-          .footer {
-            text-align: center;
-            font-size: 12px;
-            color: gray;
-          }
-          @media print {
-            body {
-              margin: 0;
-              padding: 0;
-              width: 100%;
-              font-size: 16px;
-              padding: 20px;
-            }
-            .table {
-              width: 100%;
-              border: 1px solid #ddd;
-            }
-           
-          }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <img src="https://staging.thinkerslane.com/public/assets/images/calligraphy_Suprokash.png" alt="Logo" />
-          <h1>Tax Invoice/Bill of Supply/Cash Memo</h1>
-        </div>
-        <div class="details-container">
-          <div class="details-section">
-            <div class="details">
-              <p><strong>Sold By:</strong> Suprokash<br> 16, Radhanath Mullick Lane, College Street, Kolkata : 700012</p>
-               <p><strong>Billing Address:</strong><br> ${booking_details.name}<br> Mobile :${booking_details.mobile}</p>
-            </div>
-          </div>
-          <div class="details-section">
-            <div class="details">
-              <p><strong>Order No: </strong>${booking_details.unique_code}</p>
-              <p><strong>Order Date: </strong>${booking_details.order_date_time}</p>
-              <p><strong>Invoice No: </strong>IN-${booking_details.id}</p>
-              <p><strong>Invoice Date: </strong>${booking_details.order_date_time}</p>
-             
-            </div>
-          </div>
-        </div>
-        <table border="1" cellpadding="5" class="table">
-          <tr>
-            <th>SL No.</th>
-            <th>Name</th>
-            <th>Publisher</th>
-            <th>MRP</th>
-            <th>Discount(%)</th>
-            <th>Quantity</th>
-            <th>Discount price(₹)</th>
-            <th>Total Price(₹)</th>           
-          </tr>
-          ${productRows}
-          <tr style="background-color: #f4f4f4">
-          <td colspan="7" style="text-align:center">
-         Grand Total
-          </td>
-            <td>
-             
-              ₹ ${booking_details.total_order_price}
-          </td>
-          </tr>
-        </table>
-        <div style="text-align:center">
-        
-          <p><strong>Grand Total: </strong>₹ ${booking_details.total_order_price}</p>
-        </div>
-        <div class="footer">
-          <p>For Thinkerslane<br> Authorized Signatory</p>
-        </div>
-      </body>
-    </html>`;
+  <html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: grey;
+        font-size: 18px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .header {
+        width: 100%;
+        text-align: left;
+        margin-bottom: 20px;
+      }
+      .header img {
+        width: 150px;
+        margin-bottom: 10px;
+      }
+      .header h1 {
+        font-size: 18px;
+        margin: 10px 0;
+      }
+      .details-container {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .details-section {
+        flex: 1;
+        min-width: 45%;
+        box-sizing: border-box;
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 auto;
+      }
+      .table th,
+      .table td {
+        border: 1px solid #ddd;
+        text-align: left;
+        padding: 8px;
+      }
+      .table th {
+        background-color: #f4f4f4;
+      }
+      .footer {
+        text-align: center;
+        font-size: 12px;
+        color: gray;
+        margin-top: 30px;
+      }
+
+      /* --- Compact QR Coupon Section --- */
+      .coupon {
+        border: 1px dashed #888;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin: 20px auto;
+        text-align: center;
+        max-width: 300px;
+        background: #fafafa;
+        font-size: 14px;
+      }
+      .coupon h3 {
+        margin: 5px 0;
+        color: #333;
+        font-size: 16px;
+      }
+      .coupon p {
+        margin: 4px 0;
+      }
+      .coupon img {
+        width: 100px;
+        height: 100px;
+        margin: 6px 0;
+      }
+
+      @media print {
+        body {
+          font-size: 16px;
+          padding: 20px;
+        }
+        .coupon {
+          page-break-inside: avoid;
+          border: 1px dashed #333;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <img src="https://staging.thinkerslane.com/public/assets/images/calligraphy_Suprokash.png" alt="Logo" />
+      <h1>Tax Invoice/Bill of Supply/Cash Memo</h1>
+    </div>
+
+    <div class="details-container">
+      <div class="details-section">
+        <p><strong>Sold By:</strong> Suprokash<br>16, Radhanath Mullick Lane, College Street, Kolkata : 700012</p>
+        <p><strong>Billing Address:</strong><br>${
+          booking_details.name
+        }<br>Mobile : ${booking_details.mobile}</p>
+      </div>
+      <div class="details-section">
+        <p><strong>Order No: </strong>${booking_details.unique_code}</p>
+        <p><strong>Order Date: </strong>${booking_details.order_date_time}</p>
+        <p><strong>Invoice No: </strong>IN-${booking_details.id}</p>
+        <p><strong>Invoice Date: </strong>${booking_details.order_date_time}</p>
+      </div>
+    </div>
+
+    <table border="1" cellpadding="5" class="table">
+      <tr>
+        <th>SL No.</th>
+        <th>Name</th>
+        <th>Publisher</th>
+        <th>MRP</th>
+        <th>Discount(%)</th>
+        <th>Quantity</th>
+        <th>Discount price(₹)</th>
+        <th>Total Price(₹)</th>
+      </tr>
+      ${productRows}
+      <tr style="background-color: #f4f4f4">
+        <td colspan="7" style="text-align:center">Grand Total</td>
+        <td>₹ ${Math.round(booking_details.total_order_price)}</td>
+      </tr>
+    </table>
+
+    <div style="text-align:center; margin-top:15px;">
+      <p><strong>Grand Total: </strong>₹ ${Math.round(
+        booking_details.total_order_price,
+      )}</p>
+    </div>
+
+    <!-- ✅ Compact QR Coupon Section -->
+
+   ${couponSection}
+   
+    
+   
+
+    <div class="footer">
+      <p>For Thinkerslane<br>Authorized Signatory</p>
+    </div>
+  </body>
+</html>
+
+  `;
 
   const navigation = useNavigation<any>();
 

@@ -78,6 +78,14 @@ const checkoutStyles = {
     fontSize: 16,
     fontWeight: 'bold',
   },
+  dropdown: {
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginVertical: 10,
+  },
 };
 
 export default checkoutStyles;

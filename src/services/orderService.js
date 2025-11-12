@@ -8,7 +8,7 @@ export const orderService = createApi({
   endpoints: builder => ({
     addOrderCash: builder.mutation({
       query: payload => ({
-        url: 'addOrderTest',
+        url: 'addOrder',
         method: 'POST',
         body: payload,
       }),
@@ -16,7 +16,7 @@ export const orderService = createApi({
     }),
     getOrderDetails: builder.query({
       query: ({order_id}) => ({
-        url: `getBookingDetails?order_id=${order_id}`,
+        url: `getOrderDetails?order_id=${order_id}`,
         method: 'GET',
       }),
       providesTags: ['Order'],
@@ -28,6 +28,20 @@ export const orderService = createApi({
       }),
       providesTags: ['Order'],
     }),
+
+    // 🆕 New endpoint: checkCoupon
+    checkCoupon: builder.mutation({
+      query: ({coupon_code}) => {
+        const formData = new FormData();
+        formData.append('coupon_code', coupon_code);
+
+        return {
+          url: 'https://thinkerslane.com/th1/checkCoupon',
+          method: 'POST',
+          body: formData,
+        };
+      },
+    }),
   }),
 });
 
@@ -35,4 +49,5 @@ export const {
   useAddOrderCashMutation,
   useGetOrderDetailsQuery,
   useGetOrderHistoryQuery,
+  useCheckCouponMutation, // ← new hook
 } = orderService;

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   TouchableOpacity,
@@ -6,8 +6,11 @@ import {
   StyleSheet,
   Image,
   Modal,
-  ScrollView,
   FlatList,
+  Text,
+  KeyboardAvoidingView,
+  SafeAreaView,
+  Platform,
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import paymentstyles from './paymentstyles';
@@ -21,7 +24,13 @@ import {useSelector} from 'react-redux';
 import {BlurView} from '@react-native-community/blur';
 import LottieView from 'lottie-react-native';
 import Toast from 'react-native-toast-message';
-import {useAddOrderCashMutation} from '../../services/orderService';
+import {
+  useAddOrderCashMutation,
+  useCheckCouponMutation,
+} from '../../services/orderService';
+import {Camera} from 'react-native-vision-camera';
+import QRScanner from '../../components/common/qrScanner';
+import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
 
 const PaymentScreen = () => {
   const navigation = useNavigation<any>();
@@ -36,56 +45,214 @@ const PaymentScreen = () => {
   const [bookDiscounts, setBookDiscounts] = useState<{[key: string]: number}>(
     {},
   );
-  console.log('cart', cart);
+  const [pricing, setPricing] = useState<any>({});
+  const [result, setResult] = useState<string | null>(null);
+  const [hasPermission, setHasPermission] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string | null;
+    percent: number;
+  } | null>(null);
 
-  const calculatePricing = () => {
+  const [checkCoupon] = useCheckCouponMutation();
+  const toastShownRef = useRef(false);
+  const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Request camera permission
+  useEffect(() => {
+    const getPermission = async () => {
+      const status = await Camera.requestCameraPermission();
+      setHasPermission(status === 'granted');
+    };
+    getPermission();
+  }, []);
+
+  const handleCodeScanned = (code: string) => {
+    setResult(code);
+    setIsVisible(false);
+    toastShownRef.current = false; // Reset to allow new coupon check
+  };
+
+  // Pure pricing calculation (no side effects)
+  const calculateItemPricing = () => {
     const cartValues = Object.values(cart);
+    let total = 0;
+    let appliedDiscount = 0;
 
     const itemsWithPricing = cartValues.map((item: any) => {
       const basePrice = parseFloat(item.price);
       const qty = item.quantity;
-
       const userDiscount = bookDiscounts[item.id] || 0;
       const itemDiscount = (basePrice * userDiscount) / 100;
       const discountedPrice = basePrice - itemDiscount;
+
+      const itemTotal = basePrice * qty;
+      const itemDiscountTotal = itemDiscount * qty;
+      const finalPrice = discountedPrice * qty;
+
+      total += itemTotal;
+      appliedDiscount += itemDiscountTotal;
 
       return {
         ...item,
         base_price: basePrice,
         quantity: qty,
         user_discount: userDiscount,
-        item_discount: itemDiscount * qty,
-        final_price: discountedPrice * qty,
+        item_discount: itemDiscountTotal,
+        final_price: finalPrice,
       };
     });
 
-    const total = itemsWithPricing.reduce(
-      (acc, item) => acc + item.base_price * item.quantity,
-      0,
-    );
-
-    const appliedDiscount = itemsWithPricing.reduce(
-      (acc, item) => acc + item.item_discount,
-      0,
-    );
-
-    const grandTotal = total - appliedDiscount;
-
     return {
+      itemsWithPricing,
       total,
-      grand_total: grandTotal,
-      discount: appliedDiscount,
-      items: itemsWithPricing,
-      discount_add: appliedDiscount > 0 ? 1 : 0,
+      appliedDiscount,
+      grandTotal: total - appliedDiscount,
     };
   };
 
-  const pricing = calculatePricing();
+  // Apply QR coupon (with Toast & API)
+  const applyQRCoupon = async (grandTotal: number) => {
+    if (!result || toastShownRef.current) return {grandTotal, coupon: null};
 
-  const {fullName, email, address, phone, city, state, zip} = formData;
+    try {
+      Toast.hide();
+      const qrData = JSON.parse(result);
+      const coupon_code = qrData.coupon_code || null;
+      const validUntil = new Date(qrData.valid_to);
+      const now = new Date();
+
+      if (now > validUntil) {
+        Toast.show({
+          type: 'error',
+          text1: 'Coupon Expired',
+          text2: 'Your coupon is no longer valid.',
+        });
+        toastShownRef.current = true;
+        return {grandTotal, coupon: null};
+      }
+
+      const res = await checkCoupon({coupon_code}).unwrap();
+
+      if (res.status === 200 && res.is_used === 1) {
+        Toast.show({
+          type: 'error',
+          text1: 'Coupon Already Used',
+          text2: res.message || 'This coupon has already been used.',
+        });
+        toastShownRef.current = true;
+        return {grandTotal, coupon: null};
+      }
+
+      if (res.is_used === 0) {
+        const percent = parseFloat(qrData.discount_percent) || 0;
+        const couponDiscount = (grandTotal * percent) / 100;
+        const newGrandTotal = grandTotal - couponDiscount;
+
+        setAppliedCoupon({code: coupon_code, percent});
+        Toast.show({
+          type: 'success',
+          text1: 'Coupon Applied!',
+          text2: `${percent}% discount applied.`,
+        });
+        toastShownRef.current = true;
+
+        return {
+          grandTotal: newGrandTotal,
+          coupon: {code: coupon_code, percent, discount: couponDiscount},
+        };
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Coupon',
+          text2: res.message || 'Please try again.',
+        });
+        toastShownRef.current = true;
+        return {grandTotal, coupon: null};
+      }
+    } catch (err) {
+      console.error('Coupon validation error:', err);
+      Toast.hide();
+      Toast.show({
+        type: 'error',
+        text1: 'Coupon Check Failed',
+        text2: 'Unable to verify coupon.',
+      });
+      toastShownRef.current = true;
+      return {grandTotal, coupon: null};
+    }
+  };
+
+  // Full pricing recalc (with optional coupon)
+  const calculatePricing = async (includeCoupon: boolean = true) => {
+    const {itemsWithPricing, total, appliedDiscount, grandTotal} =
+      calculateItemPricing();
+
+    let finalGrandTotal = grandTotal;
+    let couponData = null;
+
+    // ✅ Apply new coupon if result (QR scan) exists
+    if (includeCoupon && result) {
+      const couponResult = await applyQRCoupon(grandTotal);
+      finalGrandTotal = couponResult.grandTotal;
+      couponData = couponResult.coupon;
+    }
+    // ✅ OR reapply existing coupon if already applied
+    else if (appliedCoupon) {
+      const percent = appliedCoupon.percent || 0;
+      const couponDiscount = (grandTotal * percent) / 100;
+      finalGrandTotal = grandTotal - couponDiscount;
+      couponData = {
+        ...appliedCoupon,
+        discount: couponDiscount,
+      };
+    }
+
+    return {
+      total,
+      grand_total: finalGrandTotal,
+      discount: appliedDiscount,
+      items: itemsWithPricing,
+      discount_add: appliedDiscount > 0 ? 1 : 0,
+      coupon_code: couponData?.code ?? null,
+    };
+  };
+
+  // Debounced recalc on cart / individual discount change
+  useEffect(() => {
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+    debounceTimeout.current = setTimeout(async () => {
+      const result = await calculatePricing(false); // Skip coupon during typing
+      setPricing(result);
+    }, 300);
+
+    return () => {
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    };
+  }, [cart, bookDiscounts]);
+
+  // Recalculate with coupon when QR result changes
+  useEffect(() => {
+    if (result) {
+      calculatePricing(true).then(setPricing);
+    }
+  }, [result]);
+
+  const resetPricing = () => {
+    setPricing(null);
+    setAppliedCoupon(null);
+    setResult(null); // clear scanned QR data if you keep it in state
+    toastShownRef.current = false;
+  };
+
+  // Build payload
+  const {fullName, email, address, phone, city, state, zip, userType} =
+    formData;
+
   const payload = {
     params: {
-      user_id: user_id,
+      user_id,
       payment_method: paymentMethod,
       booking_user_details: {
         user_id: 1,
@@ -98,24 +265,20 @@ const PaymentScreen = () => {
         country: 'India',
         pin: parseInt(zip, 10),
         is_paid: 1,
+        user_type: userType,
       },
       pricing,
       booking_products: Object.values(cart).map((item: any) => {
-        // find the same product inside pricing.items
-        const matched = pricing.items.find((p: any) => p.id === item.id);
-
-        // final price for all quantities
+        const matched = pricing?.items?.find((p: any) => p.id === item.id);
         const totalFinalPrice = matched ? matched.final_price : 0;
-
-        // per-unit discounted price
         const perUnitPrice =
           matched && item.quantity > 0 ? totalFinalPrice / item.quantity : 0;
 
         return {
           product_id: item.id,
           quantity: item.quantity || 1,
-          sell_price: String(totalFinalPrice), // total discounted price for qty
-          per_unit_price: String(perUnitPrice), // new key → discounted price per unit
+          sell_price: String(totalFinalPrice),
+          per_unit_price: String(perUnitPrice),
         };
       }),
     },
@@ -126,7 +289,6 @@ const PaymentScreen = () => {
       setShowUPIModal(true);
       return;
     }
-
     await processPayment(payload);
   };
 
@@ -160,18 +322,28 @@ const PaymentScreen = () => {
         visibilityTime: 2000,
       });
     }
-    console.log(JSON.stringify(payload));
   };
+  // 🧩 useEffect: trigger reset AFTER successful payment
+  useEffect(() => {
+    if (paymentSuccess) {
+      // Wait a bit for navigation to complete
+      const timeout = setTimeout(() => {
+        clearCart();
+        resetPricing();
+      }, 250); // same timing as navigation
+
+      return () => clearTimeout(timeout);
+    }
+  }, [paymentSuccess]);
 
   return (
     <View style={paymentstyles.container}>
-      {/* Loading animation */}
+      {/* Loading */}
       {loading && (
         <BlurView
           style={[StyleSheet.absoluteFill, {zIndex: 9999}]}
           blurType="dark"
-          blurAmount={100}
-          reducedTransparencyFallbackColor="white">
+          blurAmount={100}>
           <View style={paymentstyles.loadingContainer}>
             <LottieView
               source={require('../../assets/animation-processing.json')}
@@ -186,14 +358,13 @@ const PaymentScreen = () => {
         </BlurView>
       )}
 
-      {/* Success animation */}
+      {/* Success */}
       {paymentSuccess && (
         <BlurView
           style={[StyleSheet.absoluteFill, {zIndex: 9999}]}
           blurType="dark"
-          blurAmount={100}
-          reducedTransparencyFallbackColor="white">
-          <View style={[paymentstyles.successContainer, {zIndex: 9999}]}>
+          blurAmount={100}>
+          <View style={paymentstyles.successContainer}>
             <LottieView
               source={require('../../assets/animation-paysuccess.json')}
               autoPlay
@@ -235,106 +406,139 @@ const PaymentScreen = () => {
       {/* Summary */}
       <View style={paymentstyles.pricingContainer}>
         <CustomText style={paymentstyles.pricingText}>
-          Total: ₹{pricing.total}
+          Total: ₹{pricing?.total?.toFixed(2)}
         </CustomText>
         <CustomText style={paymentstyles.pricingText}>
-          Discount: ₹{pricing.discount}
+          Discount: ₹{pricing?.discount?.toFixed(2)}
         </CustomText>
         <CustomText style={paymentstyles.grandTotalText}>
-          Grand Total: ₹{pricing.grand_total}
+          Grand Total: ₹{pricing?.grand_total?.toFixed(2)}
         </CustomText>
       </View>
 
-      {/* Per book details */}
+      {/* QR Scanner Button */}
+      <TouchableOpacity
+        onPress={() => setIsVisible(true)}
+        style={{
+          backgroundColor: 'blue',
+          padding: 15,
+          borderRadius: 10,
+          alignItems: 'center',
+          marginVertical: 10,
+        }}>
+        <Text style={{color: 'white'}}>Open QR Scanner</Text>
+      </TouchableOpacity>
 
-      <FlatList
-        data={pricing.items}
-        keyExtractor={item => item.id.toString()}
-        contentContainerStyle={{paddingBottom: 20}}
-        renderItem={({item}) => {
-          // build image url
-          const imageUrl =
-            item.images && item.images.length > 0
-              ? `https://thinkerslane.com/public/uploads/admin/books/${item.images[0]}`
-              : item.image
-              ? `https://thinkerslane.com/public/uploads/admin/books/${
-                  item.image?.split(',')[0]
-                }`
-              : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpsmmND4V8TKm5UTAtJLvhqaFNgJeHKv-3rQ&s';
+      {result && (
+        <Text style={{marginTop: 10, textAlign: 'center'}}>
+          Coupon: {appliedCoupon?.code || 'Invalid'}
+        </Text>
+      )}
 
-          return (
-            <View
-              key={item.id}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: 20,
-                padding: 10,
-                borderWidth: 1,
-                borderRadius: 8,
-              }}>
-              {/* Book image */}
-              <Image
-                source={{uri: imageUrl}}
-                style={{
-                  width: 100,
-                  height: 130,
-                  marginRight: 10,
-                  borderRadius: 10,
-                }}
-                resizeMode="contain"
-              />
+      {/* QR Scanner Modal */}
+      {isVisible && (
+        <QRScanner
+          isVisible={isVisible}
+          onCodeScanned={handleCodeScanned}
+          onClose={() => setIsVisible(false)}
+        />
+      )}
 
-              {/* Book details */}
-              <View style={{flex: 1}}>
-                <CustomText
-                  style={{fontWeight: 'bold', marginBottom: 5, fontSize: 20}}>
-                  {item.name}
-                </CustomText>
-                <CustomText>
-                  Price: ₹{item.base_price} × {item.quantity}
-                </CustomText>
+      {/* Book List with Discount Input */}
+      <SafeAreaView style={{flex: 1}}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+          style={{flex: 1}}>
+          <FlatList
+            data={pricing?.items}
+            keyExtractor={item => item.id.toString()}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{
+              paddingBottom: 200, // increased bottom padding
+            }}
+            renderItem={({item}) => {
+              const imageUrl = item.images?.[0]
+                ? `https://thinkerslane.com/public/uploads/admin/books/${item.images[0]}`
+                : item.image
+                ? `https://thinkerslane.com/public/uploads/admin/books/${
+                    item.image.split(',')[0]
+                  }`
+                : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpsmmND4V8TKm5UTAtJLvhqaFNgJeHKv-3rQ&s';
 
-                <TextInput
-                  style={paymentstyles.discountInput}
-                  placeholder="Enter discount %"
-                  keyboardType="numeric"
-                  value={(bookDiscounts[item.id] || 0).toString()}
-                  onChangeText={value => {
-                    const discountValue = parseInt(value, 10);
-                    setBookDiscounts(prev => ({
-                      ...prev,
-                      [item.id]:
-                        !isNaN(discountValue) && discountValue >= 0
-                          ? discountValue
-                          : 0,
-                    }));
-                  }}
-                />
-
-                <CustomText>
-                  Applied Discount: {item.user_discount}% (₹
-                  {item.item_discount.toFixed(2)})
-                </CustomText>
-                <CustomText style={{fontWeight: 'bold', marginTop: 5}}>
-                  Final Price: ₹{item.final_price.toFixed(2)}
-                </CustomText>
-              </View>
-            </View>
-          );
-        }}
-      />
+              return (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginTop: 20,
+                    padding: 10,
+                    borderWidth: 1,
+                    borderColor: '#ddd',
+                    borderRadius: 8,
+                  }}>
+                  <Image
+                    source={{uri: imageUrl}}
+                    style={{
+                      width: 100,
+                      height: 130,
+                      marginRight: 10,
+                      borderRadius: 10,
+                    }}
+                    resizeMode="contain"
+                  />
+                  <View style={{flex: 1}}>
+                    <Text style={{fontWeight: 'bold', fontSize: 18}}>
+                      {item.name}
+                    </Text>
+                    <Text>
+                      Price: ₹{item.base_price} × {item.quantity}
+                    </Text>
+                    <TextInput
+                      style={{
+                        borderWidth: 1,
+                        borderColor: '#ccc',
+                        borderRadius: 5,
+                        padding: 8,
+                        marginTop: 5,
+                        backgroundColor: '#fff',
+                      }}
+                      placeholder="Discount %"
+                      keyboardType="numeric"
+                      value={(bookDiscounts[item.id] || 0).toString()}
+                      onChangeText={value => {
+                        const num = parseInt(value, 10);
+                        setBookDiscounts(prev => ({
+                          ...prev,
+                          [item.id]: !isNaN(num) && num >= 0 ? num : 0,
+                        }));
+                      }}
+                    />
+                    <Text style={{marginTop: 4}}>
+                      Applied: {item.user_discount}% (₹
+                      {item.item_discount.toFixed(2)})
+                    </Text>
+                    <Text style={{fontWeight: 'bold', marginTop: 4}}>
+                      Final: ₹{item.final_price.toFixed(2)}
+                    </Text>
+                  </View>
+                </View>
+              );
+            }}
+          />
+        </KeyboardAvoidingView>
+      </SafeAreaView>
 
       {/* UPI Modal */}
       <Modal
         visible={showUPIModal}
-        transparent={true}
+        transparent
         animationType="slide"
         onRequestClose={() => setShowUPIModal(false)}>
         <View style={cartStyles.modalContainer}>
           <View style={cartStyles.modalContent}>
             <Image
-              source={require('../../assets/qr.jpg')}
+              source={require('../../assets/qr2.jpg')}
               style={cartStyles.qrImage}
               resizeMode="contain"
             />

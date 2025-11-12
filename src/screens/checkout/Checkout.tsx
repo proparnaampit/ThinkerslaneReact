@@ -36,6 +36,7 @@ const CheckoutScreen = () => {
     city: '',
     state: 'West Bengal',
     zip: '',
+    customer_type: null,
   });
 
   const handleChange = (name: any, value: any) => {
@@ -106,6 +107,10 @@ const CheckoutScreen = () => {
       zip: item?.pin || '',
     });
   };
+  const userTypes = [
+    {label: 'Reader', value: 1},
+    {label: 'Saler', value: 2},
+  ];
 
   return (
     <View style={checkoutStyles.container}>
@@ -232,6 +237,17 @@ const CheckoutScreen = () => {
           multiline={true}
           value={form.address}
           onChangeText={text => handleChange('address', text)}
+        />
+        <Dropdown
+          style={checkoutStyles.dropdown}
+          placeholderStyle={{color: '#999'}}
+          selectedTextStyle={{color: '#000'}}
+          data={userTypes}
+          labelField="label"
+          valueField="value"
+          placeholder="Select User Type"
+          value={form.userType}
+          onChange={item => handleChange('userType', item.value)}
         />
         {/* <TextInput
           style={checkoutStyles.input}
