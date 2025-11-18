@@ -60,6 +60,12 @@ const Bill = ({route}: any) => {
   const discountPercentage = (discount_amount / total_order_price) * 100;
   console.log('main data', data);
   const {coupon_details} = data;
+  const {applied_coupon_details} = data;
+
+  const hasCoupon =
+    applied_coupon_details &&
+    !Array.isArray(applied_coupon_details) &&
+    Object.keys(applied_coupon_details).length > 0;
 
   const couponSection = coupon_details
     ? `
@@ -76,6 +82,39 @@ const Bill = ({route}: any) => {
     ).toLocaleDateString()}</p>
   </div>
   `
+    : '';
+
+  const appliedCouponPrice = hasCoupon
+    ? `
+     <tr style="background-color:#eef">
+      <td colspan="7" style="text-align:center"><b>Coupon Applied : ${
+        applied_coupon_details.coupon_code
+      } (${applied_coupon_details.discount_percent}%)</b></td>
+       <td><b>${
+         Math.round(
+           booking_details.total_order_price *
+             applied_coupon_details.discount_percent,
+         ) / 100
+       }</b></td>
+       </tr>
+
+  
+
+  <!-- Grand Total -->
+      <tr style="background-color: #f4f4f4">
+     <td colspan="7" style="text-align:center"><b>Grand Total</b></td>
+      <td>
+    <b>
+      ₹ ${Math.round(
+        booking_details.total_order_price -
+          (booking_details.total_order_price *
+            applied_coupon_details.discount_percent) /
+            100,
+      )}
+    </b>
+      </td>
+       </tr>
+    `
     : '';
 
   const productRows = booking_product_details
@@ -239,16 +278,15 @@ const Bill = ({route}: any) => {
       </tr>
       ${productRows}
       <tr style="background-color: #f4f4f4">
-        <td colspan="7" style="text-align:center">Grand Total</td>
+        <td colspan="7" style="text-align:center">Total Amount</td>
         <td>₹ ${Math.round(booking_details.total_order_price)}</td>
       </tr>
+
+       ${appliedCouponPrice}
+
     </table>
 
-    <div style="text-align:center; margin-top:15px;">
-      <p><strong>Grand Total: </strong>₹ ${Math.round(
-        booking_details.total_order_price,
-      )}</p>
-    </div>
+    
 
     <!-- ✅ Compact QR Coupon Section -->
 
