@@ -44,6 +44,7 @@ const FilePickerComponent = () => {
         includeBase64: true,
         cropping: false,
         compressImageQuality: 0.8,
+        maxFiles: 50,
       });
 
       const newImages = results.map((result, index) => {

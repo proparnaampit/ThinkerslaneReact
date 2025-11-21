@@ -74,17 +74,16 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
     ndkVersion rootProject.ext.ndkVersion
-       compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk rootProject.ext.compileSdkVersion
 
     namespace "com.thinkerslanenative"
     defaultConfig {
-        applicationId "com.thinkerslanenative.v2"
+        applicationId "com.thinkerslanenative"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        buildConfigField "boolean", "VISION_CAMERA_ENABLE_FRAME_PROCESSORS", "true"
     }
     signingConfigs {
         debug {
@@ -94,12 +93,10 @@ android {
             keyPassword 'android'
         }
         release {
-            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
-                storeFile file(MYAPP_RELEASE_STORE_FILE)
-                storePassword MYAPP_RELEASE_STORE_PASSWORD
-                keyAlias MYAPP_RELEASE_KEY_ALIAS
-                keyPassword MYAPP_RELEASE_KEY_PASSWORD
-            }
+            storeFile file('../proparna.keystore')
+            storePassword 'proparna'
+            keyAlias 'proparna'
+            keyPassword 'proparna'
         }
     }
     buildTypes {
@@ -127,3 +124,12 @@ dependencies {
 
 
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
+afterEvaluate {
+    def lintTask = tasks.findByName("generateDebugLintReportModel")
+    def copyFontsTask = tasks.findByName("copyReactNativeVectorIconFonts")
+    
+    if (lintTask && copyFontsTask) {
+        lintTask.dependsOn copyFontsTask
+    }
+}

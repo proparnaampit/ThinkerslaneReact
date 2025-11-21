@@ -84,10 +84,10 @@ const ProductUploadForm: React.FC<any> = () => {
           })) || [],
       },
     };
-    console.log(payload);
+    console.log('payload', payload);
     try {
       const result = await uploadBooks(payload).unwrap();
-
+      console.log('result', result);
       if (result?.status == 200) {
         Toast.show({
           type: 'success',
