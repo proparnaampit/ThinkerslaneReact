@@ -7,6 +7,7 @@ import {commonService} from '../services/commonService';
 import {bookService} from '../services/bookService';
 import {expenseService} from '../services/expenseService';
 import {orderService} from '../services/orderService';
+import {merchandiseService} from '../services/merchandiseService';
 
 const persistConfig = {
   key: 'root',
@@ -24,6 +25,7 @@ const store = configureStore({
     [bookService.reducerPath]: bookService.reducer,
     [expenseService.reducerPath]: expenseService.reducer,
     [orderService.reducerPath]: orderService.reducer,
+    [merchandiseService.reducerPath]: merchandiseService.reducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
@@ -34,6 +36,7 @@ const store = configureStore({
       bookService.middleware,
       expenseService.middleware,
       orderService.middleware,
+      merchandiseService.middleware,
     ),
 });
 

@@ -26,6 +26,10 @@ import {saveAuthState} from '../redux/authSlice';
 import {useFetchUserInfoQuery} from '../services/commonService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProductUpload from '../screens/product/ProductUpload';
+import MerchandiseUpload from '../screens/merchandise/upload/MerchandiseUpload';
+import MerchandiseEdit from '../screens/merchandise/update/MerchandiseEdit';
+import MerchandiseList from '../screens/merchandise/list/MerchandiseList';
+import MerchandiseDetails from '../screens/merchandise/list/MerchandiseDetails';
 import BookDetails from '../screens/bookdetails/BookDetails';
 import ProductUpdate from '../screens/update/updateProduct';
 import BookDetailsdel from '../screens/delete/deleteBookDetails';
@@ -165,6 +169,46 @@ export default function BottomTabNavigator() {
               size={size}
             />
           ),
+          headerShown: true,
+        }}
+      />
+      <Tab.Screen
+        name="Merchandise"
+        component={MerchandiseList}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <MaterialCommunityIcons
+              name="tshirt-crew"
+              color={color}
+              size={size}
+            />
+          ),
+          headerShown: true,
+        }}
+      />
+      <Tab.Screen
+        name="MerchandiseDetails"
+        component={MerchandiseDetails}
+        options={{
+          tabBarButton: () => null,
+          headerShown: true,
+          title: 'Product Details',
+        }}
+      />
+      <Tab.Screen
+        name="MerchandiseEdit"
+        component={MerchandiseEdit}
+        options={{
+          tabBarButton: () => null,
+          headerShown: true,
+          title: 'Update Product',
+        }}
+      />
+      <Tab.Screen
+        name="MerchandiseAdd"
+        component={MerchandiseUpload}
+        options={{
+          tabBarButton: () => null,
           headerShown: true,
         }}
       />

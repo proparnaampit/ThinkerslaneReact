@@ -78,13 +78,18 @@ android {
     compileSdk rootProject.ext.compileSdkVersion
 
     namespace "com.thinkerslanenative"
-    defaultConfig {
-        applicationId "com.thinkerslanenative"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+   defaultConfig {
+    applicationId "com.thinkarselane.com"
+    minSdkVersion rootProject.ext.minSdkVersion
+    targetSdkVersion rootProject.ext.targetSdkVersion
+    versionCode 2
+    versionName "1.1"
+
+    ndk {
+        abiFilters "armeabi-v7a", "arm64-v8a"
     }
+}
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -94,9 +99,9 @@ android {
         }
         release {
             storeFile file('../proparna.keystore')
-            storePassword 'proparna'
-            keyAlias 'proparna'
-            keyPassword 'proparna'
+            storePassword 'antarroy'
+            keyAlias 'mykey'
+            keyPassword 'antarroy'
         }
     }
     buildTypes {
