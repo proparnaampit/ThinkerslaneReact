@@ -1,7 +1,9 @@
 module.exports = {
-  project: {
-    ios: {},
-    android: {},
+  dependencies: {
+    'react-native-reanimated': {
+      platforms: {
+        android: null,
+      },
+    },
   },
-  assets: ['./assets/fonts'],
 };

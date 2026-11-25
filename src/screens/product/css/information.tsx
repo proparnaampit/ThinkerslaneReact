@@ -66,12 +66,31 @@ const informationStyles = StyleSheet.create({
     backgroundColor: '#223d79',
     padding: 10,
     borderRadius: 5,
+    marginLeft: 2,
+    minWidth: 80,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  fetchButton2: {
+    backgroundColor: '#223d79',
+    padding: 10,
+    borderRadius: 5,
     marginLeft: 5,
     minWidth: 80,
     alignItems: 'center',
   },
   fetchButtonDetails: {
     backgroundColor: '#223d79',
+    padding: 8,
+    marginTop: 20,
+    borderRadius: 5,
+    width: '70%',
+    justifyContent: 'space-between',
+    margin: 'auto',
+    alignItems: 'center',
+  },
+  deleteButtonDetails: {
+    backgroundColor: 'red',
     padding: 8,
     marginTop: 20,
     borderRadius: 5,
@@ -120,6 +139,18 @@ const informationStyles = StyleSheet.create({
   cameraButton: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  //
+
+  pickerWrapper: {
+    marginBottom: 16,
+    zIndex: 1000,
+  },
+
+  dropdown: {
+    borderColor: '#ccc',
+    zIndex: 1000,
   },
 });
 

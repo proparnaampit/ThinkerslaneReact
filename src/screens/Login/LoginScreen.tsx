@@ -60,14 +60,31 @@ const LoginScreen = () => {
     }
   };
 
-  const getCurrentLocation = () =>
+  const getPosition = (options: any) =>
     new Promise((resolve, reject) => {
       Geolocation.getCurrentPosition(
         position => resolve(position),
         error => reject(error),
-        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+        options,
       );
     });
+
+  const getCurrentLocation = async () => {
+    try {
+      return await getPosition({
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+      });
+    } catch (e) {
+      // fall back to network/coarse location
+      return await getPosition({
+        enableHighAccuracy: false,
+        timeout: 15000,
+        maximumAge: 60000,
+      });
+    }
+  };
 
   const getAddressFromCoordinates = async (latitude: any, longitude: any) => {
     const API_KEY = '14050353342d479cad920486863ea4c9';
@@ -148,18 +165,29 @@ const LoginScreen = () => {
       return;
     }
     setIsLoading(true);
-    const location: any = await getCurrentLocation();
     let address;
-    if (location && location?.coords) {
-      if (location.coords.latitude && location.coords.longitude) {
-        address = await getAddressFromCoordinates(
-          location.coords.latitude,
-          location.coords.longitude,
-        );
+    try {
+      const location: any = await getCurrentLocation();
+      if (location && location?.coords) {
+        if (location.coords.latitude && location.coords.longitude) {
+          address = await getAddressFromCoordinates(
+            location.coords.latitude,
+            location.coords.longitude,
+          );
+        }
       }
+    } catch (error: any) {
+      Toast.show({
+        text1: 'Location Error',
+        text2: `Could not get your location (${error?.code}: ${error?.message}). Turn on GPS and try again.`,
+        type: 'error',
+        position: 'top',
+        visibilityTime: 3000,
+      });
+      return;
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
 
     loginUser(
       loginMutation,

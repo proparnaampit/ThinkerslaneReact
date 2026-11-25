@@ -13,6 +13,7 @@ import CategoryForm from './BasicInformations';
 import PriceInputScreen from '../product/Pricing';
 import SEOInputForm from '../product/SEO';
 import productStyles from './css/productUpload';
+import LongDescription from './longDescription';
 import Toast from 'react-native-toast-message';
 import {validateStep} from '../../utils/formValidation';
 import {useUploadBooksMutation} from '../../services/bookService';
@@ -31,17 +32,19 @@ const ProductUploadForm: React.FC<any> = () => {
 
   const steps = [
     CategoryForm,
+    LongDescription,
     PriceInputScreen,
     ProductInputForm,
     FilePickerComponent,
     SEOInputForm,
   ];
 
-  console.log('formData', formData);
   const onSubmit = async () => {
     const payload = {
       params: {
+        isbn: formData.information?.isbnNumber || 0,
         basic_information: {
+          pageNumber: formData.information?.pageNumber || '',
           name: formData.information?.productName || '',
           short_description: formData.information?.shortDescription || '',
           long_description: formData.information?.longDescription || '',
@@ -81,10 +84,10 @@ const ProductUploadForm: React.FC<any> = () => {
           })) || [],
       },
     };
-
+    console.log('payload', payload);
     try {
       const result = await uploadBooks(payload).unwrap();
-
+      console.log('result', result);
       if (result?.status == 200) {
         Toast.show({
           type: 'success',
@@ -95,7 +98,8 @@ const ProductUploadForm: React.FC<any> = () => {
       } else {
         Toast.show({
           type: 'error',
-          text1: 'Failed to Add Product',
+          text1: 'Duplicate ISBN',
+          text2: ' Duplicate entries are not allowed.',
         });
       }
     } catch (error: any) {

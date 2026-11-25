@@ -51,5 +51,7 @@
 	<array>
 		<string>Avenir Regular.ttf</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+    <string>We need access to your camera to take photos.</string>
 </dict>
 </plist>

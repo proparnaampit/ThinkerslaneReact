@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  StyleSheet,
+  Modal,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
@@ -16,9 +18,18 @@ import informationStyles from './css/information';
 import {useFormContext} from '../context/FormContextType';
 import CustomPicker from '../../components/common/CustomPicker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Camera} from 'react-native-vision-camera';
+import {
+  Camera,
+  useCameraDevice,
+  useCameraFormat,
+} from 'react-native-vision-camera';
+import MLKitOcr from 'react-native-mlkit-ocr';
 import BarcodeScanner from '../../components/common/CameraScanner';
-import {useGetBookDataByCodeFromServerQuery} from '../../services/bookService';
+import axios from 'axios';
+import {Platform} from 'react-native';
+import RNFS from 'react-native-fs';
+import CustomPickerPub from '../../components/common/CustomPickerPub';
+import CustomPickerSub from '../../components/common/CustomPickerSub';
 
 const CategoryForm: React.FC = () => {
   const {formData, updateFormData} = useFormContext();
@@ -31,6 +42,9 @@ const CategoryForm: React.FC = () => {
   const [productName, setProductName] = useState(
     formData.information?.productName || '',
   );
+  const [pageNumber, setPageNumber] = useState(
+    formData.information?.pageNumber || '',
+  );
   const [shortDescription, setShortDescription] = useState(
     formData.information?.shortDescription || '',
   );
@@ -40,6 +54,7 @@ const CategoryForm: React.FC = () => {
   const [resourceType, setResourceType] = useState(
     formData.information?.resourceType || '',
   );
+
   const [language, setLanguage] = useState(
     formData.information?.language || '',
   );
@@ -60,7 +75,10 @@ const CategoryForm: React.FC = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [publishers, setPublishers] = useState<any[]>([]);
   const [showCamera, setShowCamera] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
 
+  const camera = useRef<Camera>(null);
+  const device: any = useCameraDevice('back');
   const fetchBookData = async () => {
     if (!isbnNumber) {
       setError('Please enter an ISBN number');
@@ -236,17 +254,79 @@ const CategoryForm: React.FC = () => {
     if (code) {
       fetchBookDataByCode(code);
     }
-    setShowCamera(false);
+    setShowScanner(false);
   };
 
-  const openCamera = async (prev: any) => {
-    const permission = await Camera.requestCameraPermission();
-    if (permission === 'denied') {
-      setError('Camera permission denied');
-      return;
+  const openCamera = async (type: 'camera' | 'scanner') => {
+    const permission: any = await Camera.requestCameraPermission();
+    if (permission === 'granted') {
+      if (type === 'camera') {
+        setShowScanner(false);
+        setShowCamera(true);
+      } else if (type === 'scanner') {
+        setShowCamera(false);
+        setShowScanner(true);
+      }
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Camera permission denied',
+      });
     }
-    setIsbnNumber('');
-    setShowCamera(prev => !prev);
+  };
+
+  const captureAndScan = async () => {
+    if (!camera.current) return;
+
+    const photo = await camera.current.takePhoto({flash: 'on'});
+    const fileUri = `file://${photo.path}`;
+
+    try {
+      const textBlocks = await MLKitOcr.detectFromUri(fileUri);
+      const combinedText = textBlocks
+        .map(b => b.text.trim())
+        .filter(Boolean)
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      if (combinedText && combinedText.length > 0) {
+        setLongDescription(combinedText);
+      } else {
+        const path =
+          Platform.OS === 'android'
+            ? photo.path
+            : photo.path.replace('file://', '');
+        const base64Image = await RNFS.readFile(path, 'base64');
+
+        const formData = new FormData();
+        formData.append('apikey', 'K84224185188957');
+        formData.append('base64Image', `data:image/jpeg;base64,${base64Image}`);
+        formData.append('language', 'ben');
+
+        const response = await axios.post(
+          'https://api.ocr.space/parse/image',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        );
+
+        const parsedText = response.data?.ParsedResults?.[0]?.ParsedText || '';
+        setLongDescription(parsedText.trim().replace(/\s+/g, ' '));
+      }
+
+      setShowCamera(false);
+    } catch (error) {
+      console.error('OCR Error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'OCR failed',
+        text2: 'Please try again.',
+      });
+    }
   };
 
   useEffect(() => {
@@ -260,6 +340,7 @@ const CategoryForm: React.FC = () => {
 
   useEffect(() => {
     updateFormData('information', {
+      pageNumber,
       isbnNumber,
       productName,
       shortDescription,
@@ -272,6 +353,7 @@ const CategoryForm: React.FC = () => {
       subCategory,
     });
   }, [
+    pageNumber,
     isbnNumber,
     productName,
     shortDescription,
@@ -282,6 +364,10 @@ const CategoryForm: React.FC = () => {
     status,
     selectedCategory,
     subCategory,
+  ]);
+
+  const format = useCameraFormat(device, [
+    {photoResolution: {width: 1280, height: 720}},
   ]);
 
   return (
@@ -299,10 +385,10 @@ const CategoryForm: React.FC = () => {
             setIsbnNumber(numericText);
           }}
         />
-
+        {/* Buttons */}
         <TouchableOpacity
           style={[informationStyles.cameraButton, {marginLeft: 5}]}
-          onPress={openCamera}>
+          onPress={() => openCamera('scanner')}>
           <MaterialCommunityIcons
             name="barcode-scan"
             size={32}
@@ -311,8 +397,16 @@ const CategoryForm: React.FC = () => {
           />
         </TouchableOpacity>
 
+        <Modal visible={showScanner} animationType="slide">
+          <BarcodeScanner
+            isVisible={showScanner}
+            onCodeScanned={handleCodeScanned}
+            onClose={() => setShowScanner(false)}
+          />
+        </Modal>
+
         <TouchableOpacity
-          style={informationStyles.fetchButton}
+          style={informationStyles.fetchButton2}
           onPress={fetchBookData}
           disabled={isLoading}>
           {isLoading ? (
@@ -323,18 +417,24 @@ const CategoryForm: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <BarcodeScanner
-        isVisible={showCamera}
-        onCodeScanned={handleCodeScanned}
-        onClose={() => setShowCamera(false)}
-      />
-
       <Text style={informationStyles.noteText}>
         ISBN can fetch the book minimal details, enter usbn number to fetch or
         fill up manually
       </Text>
 
       {error ? <Text style={informationStyles.errorText}>{error}</Text> : null}
+
+      <Text style={informationStyles.label}>Page Numbers:</Text>
+      <TextInput
+        style={informationStyles.input}
+        placeholder="Enter Page Numbers"
+        value={pageNumber}
+        keyboardType="numeric"
+        onChangeText={text => {
+          const numericText = text.replace(/[^0-9]/g, '');
+          setPageNumber(numericText);
+        }}
+      />
 
       <Text style={informationStyles.label}>Product Name *:</Text>
       <TextInput
@@ -344,22 +444,13 @@ const CategoryForm: React.FC = () => {
         onChangeText={setProductName}
       />
 
-      <Text style={informationStyles.label}>Short Description *:</Text>
+      {/* <Text style={informationStyles.label}>Short Description *:</Text>
       <TextInput
         style={informationStyles.input}
         placeholder="Enter Short Description"
         value={shortDescription}
         onChangeText={setShortDescription}
-      />
-
-      <Text style={informationStyles.label}>Long Description:</Text>
-      <TextInput
-        style={[informationStyles.input, {height: 80}]}
-        placeholder="Enter Long Description"
-        value={longDescription}
-        onChangeText={setLongDescription}
-        multiline
-      />
+      /> */}
 
       <CustomPicker
         label="Resource Type *:"
@@ -373,7 +464,7 @@ const CategoryForm: React.FC = () => {
         placeholder="Select Category"
       />
 
-      <Text style={informationStyles.label}>Author Name *:</Text>
+      <Text style={informationStyles.label}>resource name*:</Text>
       <TextInput
         style={informationStyles.input}
         placeholder="Author Name"
@@ -386,7 +477,7 @@ const CategoryForm: React.FC = () => {
         }
       />
 
-      <CustomPicker
+      <CustomPickerPub
         label="Choose Category *:"
         selectedValue={selectedCategory}
         onValueChange={setSelectedCategory}
@@ -396,7 +487,7 @@ const CategoryForm: React.FC = () => {
 
       {selectedCategory !== '' &&
         categories.some(item => item.parent_id === selectedCategory) && (
-          <CustomPicker
+          <CustomPickerSub
             label="Choose Sub-Category:"
             selectedValue={subCategory}
             onValueChange={setSubCategory}
@@ -458,3 +549,79 @@ const CategoryForm: React.FC = () => {
 };
 
 export default CategoryForm;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  modalContent: {
+    flex: 1,
+    height: '50%',
+    justifyContent: 'center',
+  },
+  camera: {
+    flex: 0.5,
+  },
+  topOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '30%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  bottomOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '30%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  leftOverlay: {
+    position: 'absolute',
+    top: '30%',
+    bottom: '30%',
+    left: 0,
+    width: '10%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  rightOverlay: {
+    position: 'absolute',
+    top: '30%',
+    bottom: '30%',
+    right: 0,
+    width: '10%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  frame: {
+    position: 'absolute',
+    top: '30%',
+    left: '10%',
+    width: '80%',
+    height: '40%',
+    borderWidth: 2,
+    borderColor: 'white',
+    borderRadius: 8,
+  },
+  captureButton: {
+    position: 'absolute',
+    bottom: 50,
+    alignSelf: 'center',
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 50,
+  },
+  captureclose: {
+    position: 'absolute',
+    bottom: 50,
+    alignSelf: 'center',
+    backgroundColor: 'white',
+    padding: 14,
+    borderRadius: 50,
+  },
+  closescanner: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+});

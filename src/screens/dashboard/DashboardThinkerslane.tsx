@@ -16,7 +16,7 @@ const DashboardScreenThinkerslane = () => {
   };
 
   const handleAddOrder = () => {
-    navigation.navigate('Update');
+    navigation.navigate('BookDetails');
   };
 
   const [location, setLocation] = useState('');

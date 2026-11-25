@@ -4,6 +4,7 @@ import DashboardScreen from '../screens/dashboard/Dashboard';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Foundation from 'react-native-vector-icons/Foundation';
 import Feather from 'react-native-vector-icons/Feather';
 import ExpenseScreen from '../screens/expenses/ExpenseScreen';
 import CustomHeader from '../components/Header';
@@ -25,8 +26,13 @@ import {saveAuthState} from '../redux/authSlice';
 import {useFetchUserInfoQuery} from '../services/commonService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProductUpload from '../screens/product/ProductUpload';
+import MerchandiseUpload from '../screens/merchandise/upload/MerchandiseUpload';
+import MerchandiseEdit from '../screens/merchandise/update/MerchandiseEdit';
+import MerchandiseList from '../screens/merchandise/list/MerchandiseList';
+import MerchandiseDetails from '../screens/merchandise/list/MerchandiseDetails';
 import BookDetails from '../screens/bookdetails/BookDetails';
 import ProductUpdate from '../screens/update/updateProduct';
+import BookDetailsdel from '../screens/delete/deleteBookDetails';
 import DashboardScreenThinkerslane from '../screens/dashboard/DashboardThinkerslane';
 
 const Tab = createBottomTabNavigator();
@@ -167,6 +173,46 @@ export default function BottomTabNavigator() {
         }}
       />
       <Tab.Screen
+        name="Merchandise"
+        component={MerchandiseList}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <MaterialCommunityIcons
+              name="tshirt-crew"
+              color={color}
+              size={size}
+            />
+          ),
+          headerShown: true,
+        }}
+      />
+      <Tab.Screen
+        name="MerchandiseDetails"
+        component={MerchandiseDetails}
+        options={{
+          tabBarButton: () => null,
+          headerShown: true,
+          title: 'Product Details',
+        }}
+      />
+      <Tab.Screen
+        name="MerchandiseEdit"
+        component={MerchandiseEdit}
+        options={{
+          tabBarButton: () => null,
+          headerShown: true,
+          title: 'Update Product',
+        }}
+      />
+      <Tab.Screen
+        name="MerchandiseAdd"
+        component={MerchandiseUpload}
+        options={{
+          tabBarButton: () => null,
+          headerShown: true,
+        }}
+      />
+      <Tab.Screen
         name="BookDetails"
         component={BookDetails}
         initialParams={{add: false}}
@@ -187,6 +233,17 @@ export default function BottomTabNavigator() {
         initialParams={{add: false}}
         options={{
           tabBarButton: () => null,
+          headerShown: true,
+        }}
+      />
+      <Tab.Screen
+        name="BookDelete"
+        component={BookDetailsdel}
+        initialParams={{add: false}}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <Foundation name="page-delete" color={color} size={size} />
+          ),
           headerShown: true,
         }}
       />

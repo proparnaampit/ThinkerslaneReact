@@ -76,6 +76,16 @@ const singleBookStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+
+  checkboxLabel: {
+    marginLeft: 8,
+    fontSize: 14,
+  },
 });
 
 export default singleBookStyles;
